@@ -1,0 +1,39 @@
+name: Content issue
+description: A problem in a published project package (panorama quality, hotspots, text, hierarchy).
+title: 'content: '
+labels: ['content']
+body:
+  - type: input
+    id: project
+    attributes:
+      label: Project slug
+      placeholder: e.g. villa-horizon
+    validations:
+      required: true
+  - type: input
+    id: panorama
+    attributes:
+      label: Panorama id (if scene-specific)
+      placeholder: e.g. living-room-1 — or paste the deep link
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of issue
+      options:
+        - Image quality (banding, seams, poles, color)
+        - Hotspot (wrong position, wrong target, missing)
+        - Text (name, description, alt text)
+        - Hierarchy (wrong building/floor/room)
+        - Views (initial or arrival direction)
+    validations:
+      required: true
+  - type: textarea
+    id: detail
+    attributes:
+      label: Details
+      description: >-
+        What's wrong and where you're looking (view direction helps). Remember:
+        packages are never hand-edited — fixes go through content-src/ and the
+        pipeline (doc 07 §7).
+    validations:
+      required: true

@@ -1,0 +1,11 @@
+# Normalize all text to LF in the repository (matches .editorconfig / Prettier).
+* text=auto eol=lf
+
+# Binary content — never normalized (panorama tiles, posters, fonts arrive later)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.avif binary
+*.woff2 binary
+*.ico binary

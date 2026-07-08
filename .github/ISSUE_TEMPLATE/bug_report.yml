@@ -1,0 +1,59 @@
+name: Bug report
+description: Something behaves incorrectly in the engine, the portfolio, the pipeline, or CI.
+title: 'fix: '
+labels: ['bug']
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Engine (packages/engine)
+        - Portfolio app (apps/portfolio)
+        - Asset pipeline / scripts
+        - Content (project package)
+        - Tooling / CI
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens
+      description: Observed behavior, including exact error output if any.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should happen
+      description: >-
+        If the expected behavior is defined by the frozen docs, cite the document
+        and section (e.g. "doc 10 §4 — transition must start ≤ 100 ms").
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open /p/fixture/pano/…
+        2. …
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device / browser
+      placeholder: e.g. iPhone 12, iOS 18 Safari — or "any"
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - Blocks a milestone gate (doc 08/09 budget or checklist violation)
+        - Visible to visitors
+        - Developer-facing only
+    validations:
+      required: true

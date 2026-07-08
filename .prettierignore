@@ -1,0 +1,10 @@
+# Frozen documentation — never reformatted by tooling
+docs/
+
+pnpm-lock.yaml
+dist/
+dist-packages/
+coverage/
+.asset-cache/
+.husky/_/
+apps/portfolio/public/projects/

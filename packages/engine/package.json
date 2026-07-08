@@ -1,0 +1,27 @@
+{
+  "name": "@virtual-gallery/engine",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Reusable panorama walkthrough engine (Photo Sphere Viewer foundation). Portfolio-agnostic; see docs/02-architecture.md.",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@photo-sphere-viewer/core": "^5.11.0",
+    "@photo-sphere-viewer/cubemap-tiles-adapter": "^5.11.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.0",
+    "vitest": "^3.1.0"
+  }
+}

@@ -1,0 +1,43 @@
+name: Feature request
+description: Propose work within the frozen architecture (new features need a roadmap slot).
+title: 'feat: '
+labels: ['enhancement']
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        **Before filing:** the architecture is frozen (docs v3). Features that require
+        realtime 3D/geometry are out of the v1 line entirely (doc 01 hard exclusions).
+        Features not in the roadmap need an owner-approved mini-PRD (doc 05).
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / visitor or artist need
+      description: What can't be done today, and for whom (visitor, artist, engine adopter)?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: dropdown
+    id: fit
+    attributes:
+      label: Roadmap fit
+      options:
+        - Already in the roadmap (doc 05 / doc 12 — link the milestone below)
+        - Post-v1 candidate (needs owner mini-PRD)
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: docs
+    attributes:
+      label: Frozen-docs check
+      description: >-
+        Which documents does this touch? Does it conflict with any frozen decision?
+        (Conflicts require an owner-approved superseding ADR before any work.)
+    validations:
+      required: true

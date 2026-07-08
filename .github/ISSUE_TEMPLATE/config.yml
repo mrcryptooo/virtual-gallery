@@ -1,0 +1,7 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Architecture change proposal
+    url: https://github.com/OWNER/virtual-gallery/blob/main/docs/README.md
+    about: >-
+      The architecture is FROZEN (docs v3). Changes require an owner-approved
+      superseding ADR — read docs/README.md governance rules before proposing.

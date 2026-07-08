@@ -1,0 +1,22 @@
+Copyright (c) 2026 Virtual Gallery — All Rights Reserved.
+
+This repository contains proprietary software and content:
+
+1. The panorama engine (packages/engine), the portfolio application
+   (apps/portfolio), and all documentation (docs/) are the exclusive
+   property of the repository owner.
+
+2. All panoramic imagery, renders, and derived assets (content-src/,
+   apps/portfolio/public/projects/) are the artistic work of the owner
+   and are protected by copyright.
+
+3. No part of this repository may be copied, modified, distributed,
+   sublicensed, or used to provide services to third parties without
+   the owner's prior written permission.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+
+Note: if the engine is later published as a reusable package (post-v1
+roadmap), it may be relicensed separately at the owner's discretion.

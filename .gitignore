@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dist-packages/
+*.tsbuildinfo
+
+# Pipeline cache (doc 07 §6)
+.asset-cache/
+
+# Test artifacts
+coverage/
+playwright-report/
+test-results/
+
+# Environment — only .env.example is tracked
+.env
+.env.*
+!.env.example
+
+# Local assistant tooling (not project source)
+.claude/
+__pycache__/
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Vite
+.vite/
