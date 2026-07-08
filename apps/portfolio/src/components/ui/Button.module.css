@@ -1,0 +1,101 @@
+/* Button (doc 11 §2): 44px height, label type, radius-s; six states (doc 11 §3). */
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--hit-target);
+  padding: 0 var(--space-5);
+  border: none;
+  border-radius: var(--radius-s);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--type-label-size);
+  line-height: var(--type-label-line);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color var(--motion-instant) var(--ease-standard),
+    color var(--motion-instant) var(--ease-standard),
+    border-color var(--motion-instant) var(--ease-standard),
+    opacity var(--motion-instant) var(--ease-standard),
+    transform var(--motion-instant) var(--ease-standard);
+}
+
+.button:hover:not(:disabled) {
+  transform: scale(var(--hover-scale));
+}
+
+.button:active:not(:disabled) {
+  transform: scale(1);
+}
+
+.button:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+}
+
+/* Loading keeps full opacity — it's busy, not unavailable (doc 11 §3) */
+.button[data-loading] {
+  opacity: 1;
+  cursor: progress;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* Variants (doc 11 §2) */
+.primary {
+  background: var(--color-ink);
+  color: var(--color-bg);
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--color-ink-soft);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--color-ink);
+  border: var(--hairline) solid var(--color-line);
+}
+
+.ghost:hover:not(:disabled) {
+  border-color: var(--color-ink-soft);
+}
+
+.quiet {
+  background: transparent;
+  color: var(--color-ink);
+}
+
+.quiet:hover:not(:disabled) {
+  color: var(--color-accent);
+}
+
+/* Loading: label hidden visually (still read by AT), width preserved */
+.button[data-loading] .label {
+  opacity: 0;
+}
+
+.spinner {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: var(--space-4);
+  height: var(--space-4);
+  border: var(--focus-ring-width) solid transparent;
+  border-top-color: currentcolor;
+  border-radius: var(--radius-full);
+  animation: spin var(--motion-slow) linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

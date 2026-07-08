@@ -18,6 +18,7 @@
     "typecheck": "pnpm -r typecheck && tsc -p e2e",
     "test": "pnpm -r test",
     "e2e": "playwright test",
+    "tokens:check": "node scripts/token-lint.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

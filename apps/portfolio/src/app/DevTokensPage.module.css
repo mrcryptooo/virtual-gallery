@@ -1,0 +1,73 @@
+/* Dev-only showcase layout — token-compliant like everything else. */
+.page {
+  max-width: var(--layout-max);
+  margin: 0 auto;
+  padding: var(--space-7) var(--space-5);
+  display: grid;
+  gap: var(--space-7);
+}
+
+.swatches {
+  list-style: none;
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--space-9), 1fr));
+  gap: var(--space-4);
+}
+
+.swatch {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.swatchChip {
+  display: block;
+  height: var(--space-7);
+  border-radius: var(--radius-s);
+  border: var(--hairline) solid var(--color-line);
+}
+
+.scrimDemo {
+  background: var(--scrim-edge), var(--scrim);
+}
+
+.spacingList {
+  list-style: none;
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.spacingRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.spacingBar {
+  height: var(--space-2);
+  background: var(--color-accent);
+  border-radius: var(--radius-s);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.motionTable {
+  margin-top: var(--space-4);
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.motionTable th,
+.motionTable td {
+  padding: var(--space-2) var(--space-5) var(--space-2) 0;
+  border-bottom: var(--hairline) solid var(--color-line);
+}
