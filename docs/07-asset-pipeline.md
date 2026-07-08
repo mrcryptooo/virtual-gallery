@@ -45,7 +45,7 @@ content-src/<slug>/project.authoring.json   (hierarchy → panoramas → hotspot
       build-time discovery scan → projects-index.json → deploy → CDN
 ```
 
-`scripts/validate-packages.mjs` runs over everything in `public/projects/` in CI: schema (`formatVersion`, hierarchy, ids unique), every referenced tile/preview/poster exists, hotspot targets resolve, **names/descriptions/alt text present (missing text fails)**, link graph has no orphan panoramas.
+`scripts/validate-packages.mjs` runs over everything in `public/projects/` in CI: schema (semver `schemaVersion`, hierarchy, ids unique), every referenced tile/preview/poster exists, hotspot targets resolve, **names/descriptions/alt text present (missing text fails)**, link graph has no orphan panoramas.
 
 ## 3. Package inventory per panorama
 

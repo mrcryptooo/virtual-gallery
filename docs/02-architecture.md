@@ -67,7 +67,7 @@ What ViewerCore adds and owns:
 
 Pure domain logic (no PSV imports):
 
-- **Manifest model.** zod-validated: `Project → Building[] → Floor[] → Room[] → Panorama[]`, with panorama-level hotspots (`link | info`), initial views, per-link arrival views, tile metadata, optional floorplans. Panorama ids are project-unique; an indexed lookup provides O(1) resolution and reverse lookup (panorama → its room/floor/building) for wayfinding.
+- **Manifest model.** zod-validated: `Project → Building[] → Floor[] → Room[] → Panorama[]`, with panorama-level hotspots (extensible `type` union: `navigation | information` implemented in v1; `media | external` reserved — owner amendment 2026-07-09), initial views, per-link arrival views, tile metadata, optional floorplans. Panorama ids are project-unique; an indexed lookup provides O(1) resolution and reverse lookup (panorama → its room/floor/building) for wayfinding.
 - **Tour state machine.** `idle → loading → viewing → transitioning → viewing …`; overlays (`indexOpen`, `infoOpen`) orthogonal. The only way panoramas change.
 - **Preload policy.** On `viewing`, previews of all link-adjacent panoramas prefetch (cross-floor/building links included — a stairwell link preloads like any other). Budget-aware; respects `Save-Data`.
 
@@ -111,7 +111,7 @@ public/projects/<slug>/
 └── posters/…             # posters/thumbs/OG images
 ```
 
-Copy the folder in → build-time scan regenerates `projects-index.json` → deployed. Remove the folder → project disappears. No code, imports, or routes touched (F9). The package format is versioned (`formatVersion` in the manifest) so future engine versions can evolve it compatibly.
+Copy the folder in → build-time scan regenerates `projects-index.json` → deployed. Remove the folder → project disappears. No code, imports, or routes touched (F9). The package format is versioned (semver `schemaVersion` in the manifest — owner amendment 2026-07-09) so future engine versions can evolve it compatibly.
 
 ## 5. Data flow
 

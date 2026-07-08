@@ -15,7 +15,7 @@ export default tseslint.config(
       '**/dist/**',
       'dist-packages/**',
       '.asset-cache/**',
-      'coverage/**',
+      '**/coverage/**',
       'docs/**',
       '.husky/**',
       'apps/portfolio/public/**',
@@ -140,6 +140,16 @@ export default tseslint.config(
           ],
         },
       ],
+    },
+  },
+
+  // ── Tests: non-null assertions on known fixture shapes are idiomatic ───────
+  // (deliberate, reviewable carve-out — production code keeps the full ban)
+  {
+    files: ['**/*.test.{ts,tsx}', '**/*.fixture.ts'],
+    rules: {
+      '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'off',
     },
   },
 

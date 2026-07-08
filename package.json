@@ -15,10 +15,11 @@
   "scripts": {
     "dev": "pnpm --filter @virtual-gallery/portfolio dev",
     "build": "pnpm -r build",
-    "typecheck": "pnpm -r typecheck && tsc -p e2e",
+    "typecheck": "pnpm -r typecheck && tsc -p e2e && tsc -p scripts",
     "test": "pnpm -r test",
     "e2e": "playwright test",
     "tokens:check": "node scripts/token-lint.mjs",
+    "validate:content": "node scripts/validate-packages.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -34,6 +35,7 @@
     ]
   },
   "devDependencies": {
+    "@virtual-gallery/engine": "workspace:*",
     "@commitlint/cli": "^19.7.0",
     "@commitlint/config-conventional": "^19.7.0",
     "@playwright/test": "^1.61.1",
