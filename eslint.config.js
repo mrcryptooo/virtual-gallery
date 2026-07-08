@@ -28,7 +28,11 @@ export default tseslint.config(
     extends: [...tseslint.configs.strictTypeChecked],
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        // Root-level config files sit outside every package tsconfig;
+        // typecheck coverage for them comes from e2e/tsconfig.json.
+        projectService: {
+          allowDefaultProject: ['playwright.config.ts'],
+        },
         tsconfigRootDir: import.meta.dirname,
       },
     },
