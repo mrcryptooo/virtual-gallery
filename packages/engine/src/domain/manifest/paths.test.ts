@@ -58,7 +58,7 @@ describe('package path scheme (contract §17)', () => {
     const project = makeProject();
     project.buildings[0]!.floors[0]!.floorplan = 'plans/ground.png';
     project.buildings[0]!.floors[0]!.rooms[0]!.panoramas[0]!.hotspots.push({
-      type: 'info',
+      type: 'information',
       yaw: 0,
       pitch: 0,
       label: 'About the facade',
@@ -70,5 +70,24 @@ describe('package path scheme (contract §17)', () => {
     expect(files).toContain('plans/ground.png');
     expect(files).toContain('info/facade.png');
     expect(files).toHaveLength(4 * 38 + 2);
+  });
+
+  it('includes poster/thumbnail overrides and reserved media assets', () => {
+    const project = makeProject();
+    const pano = project.buildings[0]!.floors[0]!.rooms[0]!.panoramas[0]!;
+    pano.poster.src = 'posters/custom-poster.png';
+    pano.thumbnail = { src: 'posters/custom-thumb.png' };
+    pano.hotspots.push({
+      type: 'media',
+      yaw: 0,
+      pitch: 0,
+      label: 'Ambience',
+      media: { kind: 'audio', src: 'media/ambience.opus' },
+    });
+    const files = expectedPackageFiles(project);
+    expect(files).toContain('posters/custom-poster.png');
+    expect(files).toContain('posters/custom-thumb.png');
+    expect(files).toContain('media/ambience.opus');
+    expect(files).toHaveLength(4 * 38 + 3);
   });
 });

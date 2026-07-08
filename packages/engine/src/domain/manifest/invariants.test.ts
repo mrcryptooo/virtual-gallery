@@ -36,7 +36,7 @@ describe('validateProjectInvariants (seeded defects)', () => {
   it('ignores info hotspots when checking link targets and connectivity', () => {
     const project = makeProject();
     project.buildings[0]!.floors[0]!.rooms[0]!.panoramas[0]!.hotspots.push({
-      type: 'info',
+      type: 'information',
       yaw: 5,
       pitch: 5,
       label: 'About',
@@ -55,7 +55,7 @@ describe('validateProjectInvariants (seeded defects)', () => {
     const project = makeProject();
     const pano = project.buildings[0]!.floors[0]!.rooms[0]!.panoramas[0]!;
     pano.hotspots.push({
-      type: 'link',
+      type: 'navigation',
       yaw: 0,
       pitch: 0,
       label: 'Go nowhere',
@@ -63,7 +63,7 @@ describe('validateProjectInvariants (seeded defects)', () => {
       arrivalView: { yaw: 0, pitch: 0, fov: 90 },
     });
     expect(validateProjectInvariants(project).join('\n')).toMatch(
-      /link target "does-not-exist" does not exist/,
+      /navigation target "does-not-exist" does not exist/,
     );
   });
 
@@ -71,7 +71,7 @@ describe('validateProjectInvariants (seeded defects)', () => {
     const project = makeProject();
     const pano = project.buildings[0]!.floors[0]!.rooms[0]!.panoramas[0]!;
     pano.hotspots.push({
-      type: 'link',
+      type: 'navigation',
       yaw: 0,
       pitch: 0,
       label: 'Stay here',

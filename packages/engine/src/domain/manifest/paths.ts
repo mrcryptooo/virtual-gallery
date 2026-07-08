@@ -89,9 +89,16 @@ export function expectedPackageFiles(project: ProjectManifest): string[] {
       for (const room of floor.rooms) {
         for (const panorama of room.panoramas) {
           files.push(...expectedPanoramaFiles(panorama));
+          // Explicit poster/thumbnail overrides must exist like any other asset
+          if (panorama.poster.src !== undefined) files.push(panorama.poster.src);
+          if (panorama.thumbnail !== undefined) files.push(panorama.thumbnail.src);
           for (const hotspot of panorama.hotspots) {
-            if (hotspot.type === 'info' && hotspot.image !== undefined) {
+            if (hotspot.type === 'information' && hotspot.image !== undefined) {
               files.push(hotspot.image);
+            }
+            // Reserved type: contract-accepted, so its asset is contract-checked
+            if (hotspot.type === 'media') {
+              files.push(hotspot.media.src);
             }
           }
         }

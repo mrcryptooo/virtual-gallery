@@ -1,6 +1,7 @@
 /**
  * Project-manifest schema — THE content contract of the engine (ADR-010,
- * doc 02 §4). Shape follows the frozen hierarchy of doc 01 §3.1:
+ * doc 02 §4), FINAL as of the owner-approved M0.4 revision. Shape follows
+ * the frozen hierarchy of doc 01 §3.1:
  *
  *   Project → Building[] → Floor[] → Room[] → Panorama[]
  *
@@ -9,14 +10,24 @@
  * (artist-friendly; the engine converts internally): yaw 0 = authored north,
  * positive clockwise, range ±180; pitch ±90 (up positive); fov 30–120.
  *
+ * Hotspots are an extensible discriminated union on `type`:
+ * `navigation` and `information` are implemented in v1; `media` and
+ * `external` are RESERVED — the contract accepts them so future engine
+ * versions can implement them without a schema break (owner decision,
+ * 2026-07-09).
+ *
  * Schema owns per-field shape rules; cross-cutting invariants (uniqueness,
  * reference resolution, connectivity) live in invariants.ts; file existence
  * is checked by scripts/validate-packages.ts against paths.ts.
  */
 import { z } from 'zod';
 
-/** Package format version this engine release reads (doc 02 §4). */
-export const PACKAGE_FORMAT_VERSION = 1;
+/**
+ * Semantic version of the manifest contract this engine release reads.
+ * Same-major manifests are accepted (minor/patch additions are compatible).
+ */
+export const SCHEMA_VERSION = '1.0.0';
+const SUPPORTED_SCHEMA_MAJOR = 1;
 
 /** Cube-face names used in tile paths, in fixed order (contract §17). */
 export const CUBE_FACES = ['front', 'right', 'back', 'left', 'up', 'down'] as const;
@@ -28,6 +39,22 @@ const slugSchema = z
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'must be a kebab-case slug (stable once published — F7)');
 
 const requiredText = (what: string) => z.string().trim().min(1, `${what} is required (ADR-010)`);
+
+/** Package-relative asset path (no leading slash, no traversal). */
+const relativePathSchema = z
+  .string()
+  .min(1)
+  .refine((p) => !p.startsWith('/') && !p.includes('..'), {
+    message: 'must be a package-relative path without traversal',
+  });
+
+/** ISO 8601 date (2026-07-09) or datetime (2026-07-09T12:00:00Z). */
+const isoDateSchema = z
+  .string()
+  .regex(
+    /^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2}))?$/,
+    'must be an ISO 8601 date or datetime',
+  );
 
 const degrees = (min: number, max: number) => z.number().min(min).max(max);
 
@@ -41,6 +68,8 @@ export const viewSchema = z.object({
 });
 export type View = z.infer<typeof viewSchema>;
 
+// ── Hotspots (extensible discriminated union) ────────────────────────────────
+
 const hotspotBase = {
   yaw: degrees(-180, 180),
   pitch: degrees(-90, 90),
@@ -48,28 +77,61 @@ const hotspotBase = {
   label: requiredText('hotspot label'),
 };
 
-export const linkHotspotSchema = z.object({
+/** Street View-style movement to another panorama (v1 — implemented). */
+export const navigationHotspotSchema = z.object({
   ...hotspotBase,
-  type: z.literal('link'),
+  type: z.literal('navigation'),
   /** Target panorama id — may cross rooms, floors, and buildings (doc 01 §3.1). */
   target: slugSchema,
   /** Authored arrival direction — the visitor lands facing something composed (doc 10 §4). */
   arrivalView: viewSchema,
 });
-export type LinkHotspot = z.infer<typeof linkHotspotSchema>;
+export type NavigationHotspot = z.infer<typeof navigationHotspotSchema>;
 
-export const infoHotspotSchema = z.object({
+/** In-scene commentary panel (v1 — implemented). */
+export const informationHotspotSchema = z.object({
   ...hotspotBase,
-  type: z.literal('info'),
-  title: requiredText('info title'),
-  body: requiredText('info body'),
+  type: z.literal('information'),
+  title: requiredText('information title'),
+  body: requiredText('information body'),
   /** Optional illustration, path relative to the package root. */
-  image: z.string().min(1).optional(),
+  image: relativePathSchema.optional(),
 });
-export type InfoHotspot = z.infer<typeof infoHotspotSchema>;
+export type InformationHotspot = z.infer<typeof informationHotspotSchema>;
 
-export const hotspotSchema = z.discriminatedUnion('type', [linkHotspotSchema, infoHotspotSchema]);
+/** RESERVED — embedded media point; no v1 runtime implementation. */
+export const mediaHotspotSchema = z.object({
+  ...hotspotBase,
+  type: z.literal('media'),
+  media: z.object({
+    kind: z.enum(['image', 'video', 'audio']),
+    /** Package-relative media file. */
+    src: relativePathSchema,
+    caption: z.string().min(1).optional(),
+  }),
+});
+export type MediaHotspot = z.infer<typeof mediaHotspotSchema>;
+
+/** RESERVED — outbound link; no v1 runtime implementation. */
+export const externalHotspotSchema = z.object({
+  ...hotspotBase,
+  type: z.literal('external'),
+  url: z.string().url(),
+});
+export type ExternalHotspot = z.infer<typeof externalHotspotSchema>;
+
+export const hotspotSchema = z.discriminatedUnion('type', [
+  navigationHotspotSchema,
+  informationHotspotSchema,
+  mediaHotspotSchema,
+  externalHotspotSchema,
+]);
 export type Hotspot = z.infer<typeof hotspotSchema>;
+
+/** Hotspot types the v1 engine actually renders and operates. */
+export const IMPLEMENTED_HOTSPOT_TYPES = ['navigation', 'information'] as const;
+
+// ── Tiles ────────────────────────────────────────────────────────────────────
 
 export const tileFormatSchema = z.enum(['avif', 'webp', 'jpg', 'png']);
 export type TileFormat = z.infer<typeof tileFormatSchema>;
@@ -101,13 +163,31 @@ export const tilesMetaSchema = z
   });
 export type TilesMeta = z.infer<typeof tilesMetaSchema>;
 
+// ── Hierarchy ────────────────────────────────────────────────────────────────
+
 export const panoramaSchema = z.object({
   id: slugSchema,
-  name: requiredText('panorama name'),
+  title: requiredText('panorama title'),
   /** Required — this is the accessibility text for the Space Index (doc 09 §1). */
   description: requiredText('panorama description'),
-  /** Required alt text for the poster still (ADR-010). */
-  posterAlt: requiredText('poster alt text'),
+  /** Optional free-form tags (filtering/search, future UI). */
+  tags: z.array(z.string().min(1)).optional(),
+  poster: z.object({
+    /** Required alt text for the poster still (ADR-010). */
+    alt: requiredText('poster alt text'),
+    /** Optional explicit path; when absent the canonical scheme applies (posters/<id>.<fmt>). */
+    src: relativePathSchema.optional(),
+  }),
+  /** Optional explicit thumbnail override; canonical scheme applies when absent. */
+  thumbnail: z
+    .object({
+      src: relativePathSchema,
+      alt: z.string().min(1).optional(),
+    })
+    .optional(),
+  /** ISO 8601 — when the source render was created / last re-rendered. */
+  createdAt: isoDateSchema.optional(),
+  updatedAt: isoDateSchema.optional(),
   initialView: viewSchema,
   tiles: tilesMetaSchema,
   hotspots: z.array(hotspotSchema),
@@ -127,7 +207,7 @@ export const floorSchema = z.object({
   name: requiredText('floor name'),
   description: z.string().optional(),
   /** Optional floorplan image (v1.x F13), path relative to the package root. */
-  floorplan: z.string().min(1).optional(),
+  floorplan: relativePathSchema.optional(),
   rooms: z.array(roomSchema).nonempty(),
 });
 export type Floor = z.infer<typeof floorSchema>;
@@ -140,15 +220,32 @@ export const buildingSchema = z.object({
 });
 export type Building = z.infer<typeof buildingSchema>;
 
+/** Structured project metadata (portfolio card + about panel — doc 11 §5). */
+export const projectMetadataSchema = z.object({
+  author: z.string().min(1).optional(),
+  software: z.string().min(1).optional(),
+  renderEngine: z.string().min(1).optional(),
+  year: z.number().int().min(1900).max(2100).optional(),
+  client: z.string().min(1).optional(),
+  license: z.string().min(1).optional(),
+  website: z.string().url().optional(),
+  location: z.string().min(1).optional(),
+  categories: z.array(z.string().min(1)).optional(),
+});
+export type ProjectMetadata = z.infer<typeof projectMetadataSchema>;
+
 export const projectManifestSchema = z.object({
-  formatVersion: z.literal(PACKAGE_FORMAT_VERSION),
+  /** Semantic version of the manifest contract; same-major is accepted. */
+  schemaVersion: z
+    .string()
+    .regex(/^\d+\.\d+\.\d+$/, 'must be a semantic version (e.g. "1.0.0")')
+    .refine((v) => Number(v.split('.')[0]) === SUPPORTED_SCHEMA_MAJOR, {
+      message: `unsupported schemaVersion major — this engine reads ${String(SUPPORTED_SCHEMA_MAJOR)}.x.x`,
+    }),
   id: slugSchema,
   title: requiredText('project title'),
   description: requiredText('project description'),
-  /** Project metadata line: Location · Year · Client (doc 11 §5). */
-  location: z.string().min(1).optional(),
-  year: z.number().int().min(1900).max(2100).optional(),
-  client: z.string().min(1).optional(),
+  metadata: projectMetadataSchema.optional(),
   /** Panorama the walkthrough starts at (F8 "Enter walkthrough"). */
   entrancePanorama: slugSchema,
   /** Panorama whose poster fronts the project card and OG image. */

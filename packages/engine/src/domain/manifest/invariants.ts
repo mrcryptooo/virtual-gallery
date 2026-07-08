@@ -56,12 +56,14 @@ export function validateProjectInvariants(project: ProjectManifest): readonly st
         for (const panorama of room.panoramas) {
           const targets: string[] = [];
           for (const hotspot of panorama.hotspots) {
-            if (hotspot.type !== 'link') continue;
+            // Only navigation hotspots carry targets; information is self-contained,
+            // media/external are reserved contract types (no v1 semantics).
+            if (hotspot.type !== 'navigation') continue;
             if (hotspot.target === panorama.id) {
-              issues.push(`panorama "${panorama.id}": link hotspot targets itself`);
+              issues.push(`panorama "${panorama.id}": navigation hotspot targets itself`);
             } else if (!panoramaIds.has(hotspot.target)) {
               issues.push(
-                `panorama "${panorama.id}": link target "${hotspot.target}" does not exist`,
+                `panorama "${panorama.id}": navigation target "${hotspot.target}" does not exist`,
               );
             } else {
               targets.push(hotspot.target);

@@ -17,13 +17,54 @@ describe('projectManifestSchema (seeded defects)', () => {
     expect(parseProjectManifest(makeProject()).ok).toBe(true);
   });
 
+  it('accepts the RESERVED hotspot types (media, external) without v1 semantics', () => {
+    const data = broken((p) => {
+      firstPano(p).hotspots.push(
+        {
+          type: 'external',
+          yaw: 0,
+          pitch: 0,
+          label: 'Product page',
+          url: 'https://example.com/product',
+        },
+        {
+          type: 'media',
+          yaw: 10,
+          pitch: 0,
+          label: 'Ambience recording',
+          media: { kind: 'audio', src: 'media/ambience.opus' },
+        },
+      );
+    });
+    expect(parseProjectManifest(data).ok).toBe(true);
+  });
+
+  it('accepts full panorama metadata (tags, thumbnail, dates, poster override)', () => {
+    const data = broken((p) => {
+      const pano = firstPano(p);
+      pano.tags = ['lobby', 'daylight'];
+      pano.thumbnail = { src: 'posters/custom-thumb.png', alt: 'Custom thumb' };
+      pano.poster.src = 'posters/custom-poster.png';
+      pano.createdAt = '2026-07-01';
+      pano.updatedAt = '2026-07-09T12:30:00Z';
+    });
+    expect(parseProjectManifest(data).ok).toBe(true);
+  });
+
   it.each([
     [
-      'wrong formatVersion',
+      'malformed schemaVersion (not semver)',
       broken((p) => {
-        (p as { formatVersion: number }).formatVersion = 2;
+        (p as { schemaVersion: string }).schemaVersion = '1.0';
       }),
-      /formatVersion/,
+      /semantic version/,
+    ],
+    [
+      'unsupported schemaVersion major',
+      broken((p) => {
+        (p as { schemaVersion: string }).schemaVersion = '2.0.0';
+      }),
+      /unsupported schemaVersion major/,
     ],
     [
       'non-kebab-case id',
@@ -42,7 +83,7 @@ describe('projectManifestSchema (seeded defects)', () => {
     [
       'missing poster alt text',
       broken((p) => {
-        firstPano(p).posterAlt = '';
+        firstPano(p).poster.alt = '';
       }),
       /alt text is required/,
     ],
@@ -52,6 +93,67 @@ describe('projectManifestSchema (seeded defects)', () => {
         firstPano(p).hotspots[0]!.label = '';
       }),
       /hotspot label is required/,
+    ],
+    [
+      'unknown hotspot type',
+      broken((p) => {
+        (firstPano(p).hotspots[0] as { type: string }).type = 'teleport';
+      }),
+      /type/,
+    ],
+    [
+      'external hotspot with invalid url',
+      broken((p) => {
+        firstPano(p).hotspots.push({
+          type: 'external',
+          yaw: 0,
+          pitch: 0,
+          label: 'Broken',
+          url: 'not-a-url',
+        });
+      }),
+      /url/i,
+    ],
+    [
+      'media hotspot with path traversal',
+      broken((p) => {
+        firstPano(p).hotspots.push({
+          type: 'media',
+          yaw: 0,
+          pitch: 0,
+          label: 'Escape attempt',
+          media: { kind: 'image', src: '../outside.png' },
+        });
+      }),
+      /package-relative/,
+    ],
+    [
+      'poster override with an absolute path',
+      broken((p) => {
+        firstPano(p).poster.src = '/etc/anything.png';
+      }),
+      /package-relative/,
+    ],
+    [
+      'invalid createdAt date',
+      broken((p) => {
+        firstPano(p).createdAt = '09.07.2026';
+      }),
+      /ISO 8601/,
+    ],
+    [
+      'invalid metadata website url',
+      broken((p) => {
+        p.metadata = { ...p.metadata, website: 'not a url' };
+      }),
+      /url/i,
+    ],
+    [
+      'metadata year out of range',
+      broken((p) => {
+        p.metadata = { ...p.metadata, year: 1500 };
+      }),
+      /year/,
     ],
     [
       'yaw out of range',
@@ -68,7 +170,7 @@ describe('projectManifestSchema (seeded defects)', () => {
       /fov/,
     ],
     [
-      'link hotspot without arrivalView',
+      'navigation hotspot without arrivalView',
       broken((p) => {
         // @ts-expect-error seeding a structural defect
         delete firstPano(p).hotspots[0].arrivalView;
@@ -136,7 +238,7 @@ describe('projectManifestSchema (seeded defects)', () => {
     const data = broken((p) => {
       p.title = '';
       p.description = '';
-      firstPano(p).posterAlt = '';
+      firstPano(p).poster.alt = '';
     });
     const result = parseProjectManifest(data);
     expect(result.ok).toBe(false);
@@ -148,11 +250,11 @@ describe('projectManifestSchema (seeded defects)', () => {
   it('issue strings carry the field path', () => {
     const result = parseProjectManifest(
       broken((p) => {
-        firstPano(p).posterAlt = '';
+        firstPano(p).poster.alt = '';
       }),
     );
     if (!result.ok) {
-      expect(result.issues[0]).toContain('buildings.0.floors.0.rooms.0.panoramas.0.posterAlt');
+      expect(result.issues[0]).toContain('buildings.0.floors.0.rooms.0.panoramas.0.poster.alt');
     }
   });
 });

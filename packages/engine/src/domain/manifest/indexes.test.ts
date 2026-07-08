@@ -10,7 +10,7 @@ describe('buildProjectIndex', () => {
   });
 
   it('returns panoramas by id', () => {
-    expect(index.getPanorama('pano-c')?.name).toBe('Panorama pano-c');
+    expect(index.getPanorama('pano-c')?.title).toBe('Panorama pano-c');
     expect(index.getPanorama('nope')).toBeUndefined();
   });
 

@@ -58,8 +58,8 @@
 
 ## ADR-010 — Manifests validated by zod; the package format is a public contract — **accepted**
 
-**Decision.** zod schemas in the engine's `domain/manifest/` define `Project → Building → Floor → Room → Panorama` (+ hotspots, views, tiles, `formatVersion`). The pipeline validates at package build; CI validates all of `public/projects/`; the engine re-validates at load (defense in depth — packages can be dropped in by hand per F9). Gates: schema; tile/preview/poster existence; hotspot targets resolve; **names, descriptions, and poster alt text required — missing text fails validation**; link-graph connectivity (no orphan panoramas); id uniqueness.
-**Consequences.** The schema + package layout is the contract for future editors, CMSes, and other engine adopters; `formatVersion` gives it an evolution path.
+**Decision.** zod schemas in the engine's `domain/manifest/` define `Project → Building → Floor → Room → Panorama` (+ hotspots, views, tiles, semver `schemaVersion`). The pipeline validates at package build; CI validates all of `public/projects/`; the engine re-validates at load (defense in depth — packages can be dropped in by hand per F9). Gates: schema; tile/preview/poster existence; hotspot targets resolve; **names, descriptions, and poster alt text required — missing text fails validation**; link-graph connectivity (no orphan panoramas); id uniqueness.
+**Consequences.** The schema + package layout is the contract for future editors, CMSes, and other engine adopters; semver `schemaVersion` gives it an evolution path (renamed from `formatVersion` by owner amendment, 2026-07-09).
 
 ## ADR-011 — Privacy: self-hosted everything — **accepted**
 

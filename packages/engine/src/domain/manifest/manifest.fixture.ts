@@ -16,13 +16,13 @@ export const validTiles = {
 export function makePanorama(id: string, targets: string[] = []): Panorama {
   return {
     id,
-    name: `Panorama ${id}`,
+    title: `Panorama ${id}`,
     description: `Description of ${id}.`,
-    posterAlt: `Poster of ${id}.`,
+    poster: { alt: `Poster of ${id}.` },
     initialView: { yaw: 0, pitch: 0, fov: 90 },
     tiles: { ...validTiles, formats: ['png'] },
     hotspots: targets.map((target) => ({
-      type: 'link' as const,
+      type: 'navigation' as const,
       yaw: 10,
       pitch: -5,
       label: `Go to ${target}`,
@@ -38,10 +38,18 @@ export function makePanorama(id: string, targets: string[] = []): Panorama {
  */
 export function makeProject(): ProjectManifest {
   return {
-    formatVersion: 1,
+    schemaVersion: '1.0.0',
     id: 'test-project',
     title: 'Test Project',
     description: 'A valid baseline project.',
+    metadata: {
+      author: 'Test Artist',
+      software: 'Lumion',
+      renderEngine: 'Lumion Ray Tracing',
+      year: 2026,
+      license: 'All rights reserved',
+      categories: ['architecture', 'interior'],
+    },
     entrancePanorama: 'pano-a',
     coverPanorama: 'pano-a',
     buildings: [
