@@ -37,6 +37,7 @@ Core philosophy, in priority order:
 | # | Document | What it defines |
 |---|----------|-----------------|
 | 12 | [Implementation Plan: Phase 0 → 1](12-implementation-plan-phase-0-1.md) | Milestone-level execution plan implementing the frozen architecture — small, independently buildable and testable milestones, each ending in a review checkpoint. |
+| 13 | [Implementation Contract](13-implementation-contract.md) | **Binding** engineering rules for every milestone: Definition of Done, review/testing/commit/PR rules, error/logging/TS standards, security, dependency and refactoring policy, release checklist. Mandatory from M0.2 onward. |
 
 ## Governance rules
 
