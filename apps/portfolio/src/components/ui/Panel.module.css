@@ -1,0 +1,13 @@
+/* Panel: hairline first, shadow only for true overlays (doc 11 §1 elevation). */
+.panel {
+  background: var(--color-surface);
+  border: var(--hairline) solid var(--color-line);
+  border-radius: var(--radius-m);
+  padding: var(--space-5);
+}
+
+.raised {
+  background: var(--color-surface-raised);
+  border: none;
+  box-shadow: var(--shadow-overlay);
+}

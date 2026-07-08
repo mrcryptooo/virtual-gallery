@@ -1,0 +1,37 @@
+/* IconButton (doc 11 §2): 44×44, circular on chrome. */
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--hit-target);
+  height: var(--hit-target);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-ink);
+  cursor: pointer;
+  transition:
+    background-color var(--motion-instant) var(--ease-standard),
+    color var(--motion-instant) var(--ease-standard),
+    opacity var(--motion-instant) var(--ease-standard);
+}
+
+.iconButton:hover:not(:disabled) {
+  background: var(--color-surface);
+  color: var(--color-accent);
+}
+
+.iconButton:active:not(:disabled) {
+  background: var(--color-surface-raised);
+}
+
+.iconButton:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+}
+
+.icon {
+  display: inline-flex;
+  pointer-events: none;
+}

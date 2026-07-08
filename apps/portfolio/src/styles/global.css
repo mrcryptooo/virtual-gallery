@@ -1,0 +1,124 @@
+/**
+ * Global styles: self-hosted fonts (ADR-011), reset, base typography roles,
+ * and the focus-visible standard (doc 11 §3). Values come exclusively from
+ * tokens.css — token-lint enforces this on the built CSS.
+ */
+
+/* ── Self-hosted fonts (latin subsets; budget ≤ 120 KB, doc 08 §3) ────── */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('./fonts/inter-latin-400-600.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./fonts/playfair-display-latin-500.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ── Reset ─────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line);
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+picture,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+/* ── Focus standard: identical everywhere (doc 11 §3 / doc 09 §3) ─────── */
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* ── Typography roles (doc 11 §1) ──────────────────────────────────────── */
+.type-display {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: var(--type-display-size);
+  line-height: var(--type-display-line);
+  letter-spacing: var(--type-display-tracking);
+}
+
+.type-title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: var(--type-title-size);
+  line-height: var(--type-title-line);
+}
+
+.type-heading {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--type-heading-size);
+  line-height: var(--type-heading-line);
+  letter-spacing: var(--type-heading-tracking);
+}
+
+.type-body {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line);
+}
+
+.type-caption {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--type-caption-size);
+  line-height: var(--type-caption-line);
+  color: var(--color-ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.type-label {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--type-label-size);
+  line-height: var(--type-label-line);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+}

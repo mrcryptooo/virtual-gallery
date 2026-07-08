@@ -1,0 +1,6 @@
+/* Scrim (doc 11 §1/§2): overlay backdrop over page or panorama content. */
+.scrim {
+  position: fixed;
+  inset: 0;
+  background: var(--scrim);
+}

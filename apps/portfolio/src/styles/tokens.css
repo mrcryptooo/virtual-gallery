@@ -1,0 +1,80 @@
+/**
+ * Design tokens — transcribed verbatim from docs/11-design-system.md §1 (visual)
+ * and docs/10-animation-guidelines.md §2 (motion). FROZEN: no values may be
+ * added or changed without an owner-approved amendment to those documents.
+ * This file is the single source of truth scripts/token-lint.mjs checks against.
+ */
+:root {
+  /* ── Color (doc 11 §1) ─────────────────────────────────────────────── */
+  --color-bg: #0c0c0e;
+  --color-surface: #161618;
+  --color-surface-raised: #1e1e21;
+  --color-ink: #f4f4f5;
+  --color-ink-soft: #a1a1aa;
+  --color-line: #2a2a2e;
+  --color-accent: #c8a560;
+  --color-focus-ring: #7db4ff;
+  --scrim: rgba(12, 12, 14, 0.55);
+  --scrim-edge: linear-gradient(to bottom, rgba(12, 12, 14, 0.6), rgba(12, 12, 14, 0));
+  --scrim-edge-size: 120px;
+  --color-paper: #fafaf9;
+  --color-paper-ink: #111112;
+
+  /* ── Typography (doc 11 §1) ────────────────────────────────────────── */
+  --font-serif: 'Playfair Display', georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+
+  --type-display-size: clamp(2.75rem, 7vw, 5.5rem);
+  --type-display-line: 1.02;
+  --type-display-tracking: -0.01em;
+  --type-title-size: 2rem;
+  --type-title-line: 1.15;
+  --type-heading-size: 1.125rem;
+  --type-heading-line: 1.3;
+  --type-heading-tracking: 0.01em;
+  --type-body-size: 1rem;
+  --type-body-line: 1.6;
+  --type-caption-size: 0.875rem;
+  --type-caption-line: 1.5;
+  --type-label-size: 0.75rem;
+  --type-label-line: 1.2;
+  --type-label-tracking: 0.08em;
+
+  /* ── Spacing — 4px base scale (doc 11 §1) ──────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  /* ── Radius & elevation (doc 11 §1) ────────────────────────────────── */
+  --radius-s: 4px;
+  --radius-m: 8px;
+  --radius-full: 999px;
+  --hairline: 1px;
+  --shadow-overlay: 0 12px 48px rgba(0, 0, 0, 0.5);
+
+  /* ── Layout (doc 11 §1) ────────────────────────────────────────────── */
+  --layout-max: 1280px;
+  --reading-max: 680px;
+
+  /* ── Interaction constants (doc 11 §2/§3) ──────────────────────────── */
+  --hit-target: 44px;
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  --hover-scale: 1.02;
+  --disabled-opacity: 0.4;
+
+  /* ── Motion (doc 10 §2 — mirrored into engine constants at M1.x) ───── */
+  --motion-instant: 100ms;
+  --motion-quick: 200ms;
+  --motion-standard: 300ms;
+  --motion-scene: 900ms;
+  --motion-slow: 1400ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+}

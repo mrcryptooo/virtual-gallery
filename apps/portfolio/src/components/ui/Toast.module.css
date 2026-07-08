@@ -1,0 +1,13 @@
+/* Toast (doc 11 §2): raised surface, label-adjacent body type. */
+.toast {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--color-surface-raised);
+  color: var(--color-ink);
+  border-radius: var(--radius-m);
+  box-shadow: var(--shadow-overlay);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--type-caption-size);
+  line-height: var(--type-caption-line);
+}
