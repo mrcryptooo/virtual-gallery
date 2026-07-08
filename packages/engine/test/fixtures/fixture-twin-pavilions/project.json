@@ -1,0 +1,265 @@
+{
+  "formatVersion": 1,
+  "id": "fixture-twin-pavilions",
+  "title": "Twin Pavilions (Fixture)",
+  "description": "Permanent test package: two buildings, three floors, six panoramas, one cross-floor and one cross-building link. Placeholder imagery — never a real project.",
+  "location": "Test Suite",
+  "year": 2026,
+  "entrancePanorama": "north-lobby-entry",
+  "coverPanorama": "north-lobby-entry",
+  "buildings": [
+    {
+      "id": "north-pavilion",
+      "name": "North Pavilion",
+      "description": "Two-storey pavilion exercising multi-floor navigation.",
+      "floors": [
+        {
+          "id": "ground",
+          "name": "Ground Floor",
+          "rooms": [
+            {
+              "id": "lobby",
+              "name": "Lobby",
+              "description": "Entry space with two viewpoints.",
+              "panoramas": [
+                {
+                  "id": "north-lobby-entry",
+                  "name": "Lobby — Entry",
+                  "description": "The lobby seen from the entrance doors.",
+                  "posterAlt": "Solid indigo placeholder poster for the lobby entry viewpoint.",
+                  "initialView": { "yaw": 0, "pitch": 0, "fov": 90 },
+                  "tiles": {
+                    "projection": "cube",
+                    "version": "a1b2c3d4",
+                    "tileSize": 512,
+                    "faceSize": 1024,
+                    "previewSize": 256,
+                    "formats": ["png"]
+                  },
+                  "hotspots": [
+                    {
+                      "type": "link",
+                      "yaw": 35,
+                      "pitch": -8,
+                      "label": "Go to the stair landing",
+                      "target": "north-lobby-stair",
+                      "arrivalView": { "yaw": 20, "pitch": 0, "fov": 90 }
+                    },
+                    {
+                      "type": "link",
+                      "yaw": -120,
+                      "pitch": -5,
+                      "label": "Cross to the South Pavilion courtyard",
+                      "target": "south-court",
+                      "arrivalView": { "yaw": 60, "pitch": 0, "fov": 90 }
+                    },
+                    {
+                      "type": "info",
+                      "yaw": 90,
+                      "pitch": 10,
+                      "label": "About the lobby materials",
+                      "title": "Lobby materials",
+                      "body": "Placeholder commentary used to exercise info hotspots in tests."
+                    }
+                  ]
+                },
+                {
+                  "id": "north-lobby-stair",
+                  "name": "Lobby — Stair Landing",
+                  "description": "The foot of the stair connecting to the upper gallery.",
+                  "posterAlt": "Solid teal placeholder poster for the stair landing viewpoint.",
+                  "initialView": { "yaw": 20, "pitch": 0, "fov": 90 },
+                  "tiles": {
+                    "projection": "cube",
+                    "version": "b2c3d4e5",
+                    "tileSize": 512,
+                    "faceSize": 512,
+                    "previewSize": 256,
+                    "formats": ["png"]
+                  },
+                  "hotspots": [
+                    {
+                      "type": "link",
+                      "yaw": -160,
+                      "pitch": -6,
+                      "label": "Back to the lobby entry",
+                      "target": "north-lobby-entry",
+                      "arrivalView": { "yaw": 0, "pitch": 0, "fov": 90 }
+                    },
+                    {
+                      "type": "link",
+                      "yaw": 15,
+                      "pitch": 25,
+                      "label": "Up the stair to the gallery",
+                      "target": "north-gallery",
+                      "arrivalView": { "yaw": -10, "pitch": 0, "fov": 90 }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "upper",
+          "name": "Upper Floor",
+          "rooms": [
+            {
+              "id": "gallery",
+              "name": "Gallery",
+              "description": "Long room reached by the cross-floor stair link.",
+              "panoramas": [
+                {
+                  "id": "north-gallery",
+                  "name": "Gallery",
+                  "description": "The upper gallery, arrival point of the stair.",
+                  "posterAlt": "Solid amber placeholder poster for the gallery viewpoint.",
+                  "initialView": { "yaw": -10, "pitch": 0, "fov": 90 },
+                  "tiles": {
+                    "projection": "cube",
+                    "version": "c3d4e5f6",
+                    "tileSize": 512,
+                    "faceSize": 1024,
+                    "previewSize": 256,
+                    "formats": ["png"]
+                  },
+                  "hotspots": [
+                    {
+                      "type": "link",
+                      "yaw": 170,
+                      "pitch": -25,
+                      "label": "Down the stair to the lobby",
+                      "target": "north-lobby-stair",
+                      "arrivalView": { "yaw": 20, "pitch": 0, "fov": 90 }
+                    },
+                    {
+                      "type": "link",
+                      "yaw": 45,
+                      "pitch": -4,
+                      "label": "Out to the terrace",
+                      "target": "north-terrace",
+                      "arrivalView": { "yaw": 0, "pitch": 0, "fov": 90 }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "terrace",
+              "name": "Terrace",
+              "panoramas": [
+                {
+                  "id": "north-terrace",
+                  "name": "Terrace",
+                  "description": "Open terrace off the gallery.",
+                  "posterAlt": "Solid sky-blue placeholder poster for the terrace viewpoint.",
+                  "initialView": { "yaw": 0, "pitch": 5, "fov": 95 },
+                  "tiles": {
+                    "projection": "cube",
+                    "version": "d4e5f6a7",
+                    "tileSize": 512,
+                    "faceSize": 512,
+                    "previewSize": 256,
+                    "formats": ["png"]
+                  },
+                  "hotspots": [
+                    {
+                      "type": "link",
+                      "yaw": -135,
+                      "pitch": -2,
+                      "label": "Back inside to the gallery",
+                      "target": "north-gallery",
+                      "arrivalView": { "yaw": 45, "pitch": 0, "fov": 90 }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "south-pavilion",
+      "name": "South Pavilion",
+      "floors": [
+        {
+          "id": "garden",
+          "name": "Garden Level",
+          "rooms": [
+            {
+              "id": "courtyard",
+              "name": "Courtyard",
+              "panoramas": [
+                {
+                  "id": "south-court",
+                  "name": "Courtyard",
+                  "description": "Open courtyard between the pavilions, arrival point of the cross-building link.",
+                  "posterAlt": "Solid green placeholder poster for the courtyard viewpoint.",
+                  "initialView": { "yaw": 60, "pitch": 0, "fov": 90 },
+                  "tiles": {
+                    "projection": "cube",
+                    "version": "e5f6a7b8",
+                    "tileSize": 512,
+                    "faceSize": 512,
+                    "previewSize": 256,
+                    "formats": ["png"]
+                  },
+                  "hotspots": [
+                    {
+                      "type": "link",
+                      "yaw": -110,
+                      "pitch": -4,
+                      "label": "Back to the North Pavilion lobby",
+                      "target": "north-lobby-entry",
+                      "arrivalView": { "yaw": -120, "pitch": 0, "fov": 90 }
+                    },
+                    {
+                      "type": "link",
+                      "yaw": 30,
+                      "pitch": -3,
+                      "label": "Into the lounge",
+                      "target": "south-lounge",
+                      "arrivalView": { "yaw": 0, "pitch": 0, "fov": 90 }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "lounge",
+              "name": "Lounge",
+              "panoramas": [
+                {
+                  "id": "south-lounge",
+                  "name": "Lounge",
+                  "description": "Interior lounge at the end of the tour graph.",
+                  "posterAlt": "Solid rose placeholder poster for the lounge viewpoint.",
+                  "initialView": { "yaw": 0, "pitch": 0, "fov": 90 },
+                  "tiles": {
+                    "projection": "cube",
+                    "version": "f6a7b8c9",
+                    "tileSize": 512,
+                    "faceSize": 512,
+                    "previewSize": 256,
+                    "formats": ["png"]
+                  },
+                  "hotspots": [
+                    {
+                      "type": "link",
+                      "yaw": 175,
+                      "pitch": -5,
+                      "label": "Back out to the courtyard",
+                      "target": "south-court",
+                      "arrivalView": { "yaw": 30, "pitch": 0, "fov": 90 }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

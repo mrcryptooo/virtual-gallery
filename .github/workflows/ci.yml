@@ -35,6 +35,9 @@ jobs:
       - name: Unit tests
         run: pnpm test
 
+      - name: Content validation (ADR-010)
+        run: pnpm validate:content
+
       - name: Build
         run: pnpm build
 
