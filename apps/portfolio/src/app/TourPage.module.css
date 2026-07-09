@@ -42,7 +42,7 @@
 .infoPanel {
   position: fixed;
   inset: auto var(--space-5) var(--space-5);
-  max-width: 480px;
+  max-width: var(--reading-max);
   margin-inline: auto;
   z-index: 20;
   display: flex;

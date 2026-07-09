@@ -29,7 +29,7 @@
 
 .hotspot:hover,
 .hotspot:focus-visible {
-  background: rgb(12 12 14 / 75%);
+  background: var(--color-surface-raised);
 }
 
 .hotspot:focus-visible {

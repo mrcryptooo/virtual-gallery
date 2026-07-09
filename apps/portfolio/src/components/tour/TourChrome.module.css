@@ -6,7 +6,7 @@
   position: absolute;
   inset: 0 0 auto;
   padding: var(--space-5) var(--space-5) var(--space-8);
-  background: linear-gradient(rgb(12 12 14 / 60%), transparent);
+  background: var(--scrim-edge);
   pointer-events: none;
   display: flex;
   flex-direction: column;
@@ -36,7 +36,8 @@
   position: absolute;
   inset: auto 0 0;
   padding: var(--space-6) var(--space-5) var(--space-5);
-  background: linear-gradient(transparent, rgb(12 12 14 / 60%));
+  /* Bottom counterpart of --scrim-edge (same sanctioned values, flipped) */
+  background: linear-gradient(to top, rgba(12, 12, 14, 0.6), rgba(12, 12, 14, 0));
   pointer-events: none;
   text-align: center;
   font: var(--type-caption);
