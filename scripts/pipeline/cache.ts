@@ -9,7 +9,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
 /** Bump when reprojection/tiling output would change for identical input. */
-export const PIPELINE_SALT = 'pipeline-m0.5-v1';
+export const PIPELINE_SALT = 'pipeline-m0.5-v3'; // v3: pole faces mirrored per PSV source-derived convention
 
 export const CACHE_DIR = '.asset-cache';
 

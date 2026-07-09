@@ -57,3 +57,14 @@ export {
   expectedPanoramaFiles,
   expectedPackageFiles,
 } from './domain/manifest/paths.ts';
+
+export { loadProject, ProjectLoadError } from './loader/loadProject.ts';
+
+export { createPanoramaEngine } from './PanoramaEngine.ts';
+export type {
+  PanoramaEngine,
+  EngineOptions,
+  EngineEventMap,
+  ProjectedHotspot,
+  Wayfinding,
+} from './PanoramaEngine.ts';

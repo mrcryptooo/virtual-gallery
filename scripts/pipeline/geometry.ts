@@ -64,9 +64,13 @@ export function faceDirection(face: CubeFace, i: number, j: number): Vec3 {
     case 'left':
       return { x: -1, y: b, z: -a };
     case 'up':
-      return { x: a, y: 1, z: 2 * j - 1 };
+      // Pole faces follow PSV's cubemap convention exactly, derived from its
+      // textureCoordsToSphericalCoords source (top: (−v,−u,−1), bottom:
+      // (v,−u,1) in PSV's x-forward/y-right/z-down frame) — a horizontal
+      // mirror of the naive net. 2026-07-09.
+      return { x: -a, y: 1, z: 2 * j - 1 };
     case 'down':
-      return { x: a, y: -1, z: 1 - 2 * j };
+      return { x: -a, y: -1, z: 1 - 2 * j };
   }
 }
 
@@ -98,12 +102,12 @@ export function faceUV(face: CubeFace, dir: Vec3): { i: number; j: number } {
       break;
     case 'up':
       major = dir.y;
-      a = dir.x;
+      a = -dir.x;
       b = -dir.z;
       break;
     case 'down':
       major = -dir.y;
-      a = dir.x;
+      a = -dir.x;
       b = dir.z;
       break;
   }
