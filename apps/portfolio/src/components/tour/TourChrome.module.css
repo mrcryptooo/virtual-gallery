@@ -36,8 +36,7 @@
   position: absolute;
   inset: auto 0 0;
   padding: var(--space-6) var(--space-5) var(--space-5);
-  /* Bottom counterpart of --scrim-edge (same sanctioned values, flipped) */
-  background: linear-gradient(to top, rgba(12, 12, 14, 0.6), rgba(12, 12, 14, 0));
+  background: var(--scrim-edge-bottom);
   pointer-events: none;
   text-align: center;
   font: var(--type-caption);

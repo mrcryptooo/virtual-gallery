@@ -16,6 +16,7 @@
   --color-focus-ring: #7db4ff;
   --scrim: rgba(12, 12, 14, 0.55);
   --scrim-edge: linear-gradient(to bottom, rgba(12, 12, 14, 0.6), rgba(12, 12, 14, 0));
+  --scrim-edge-bottom: linear-gradient(to top, rgba(12, 12, 14, 0.6), rgba(12, 12, 14, 0));
   --scrim-edge-size: 120px;
   --color-paper: #fafaf9;
   --color-paper-ink: #111112;
