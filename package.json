@@ -9,15 +9,18 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "esbuild"
+      "esbuild",
+      "sharp"
     ]
   },
   "scripts": {
     "dev": "pnpm --filter @virtual-gallery/portfolio dev",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck && tsc -p e2e && tsc -p scripts",
-    "test": "pnpm -r test",
+    "test": "pnpm -r test && vitest run --config scripts/vitest.config.ts",
     "e2e": "playwright test",
+    "package:build": "node scripts/build-package.ts",
+    "pipeline:synthetic": "node scripts/make-synthetic-master.ts",
     "tokens:check": "node scripts/token-lint.mjs",
     "validate:content": "node scripts/validate-packages.ts",
     "lint": "eslint .",
@@ -35,11 +38,11 @@
     ]
   },
   "devDependencies": {
-    "@virtual-gallery/engine": "workspace:*",
     "@commitlint/cli": "^19.7.0",
     "@commitlint/config-conventional": "^19.7.0",
     "@playwright/test": "^1.61.1",
     "@types/node": "^22.20.1",
+    "@virtual-gallery/engine": "workspace:*",
     "eslint": "^9.20.0",
     "eslint-plugin-boundaries": "^5.0.0",
     "eslint-plugin-jsx-a11y": "^6.10.0",
@@ -47,7 +50,9 @@
     "husky": "^9.1.7",
     "lint-staged": "^15.4.0",
     "prettier": "^3.5.0",
+    "sharp": "^0.35.3",
     "typescript": "^5.8.0",
-    "typescript-eslint": "^8.24.0"
+    "typescript-eslint": "^8.24.0",
+    "vitest": "^3.2.7"
   }
 }
