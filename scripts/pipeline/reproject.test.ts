@@ -108,7 +108,8 @@ describe('cube-edge continuity (all 12 edges)', () => {
     const dir = { x: 0, y: 1, z: -1 };
     const uvUp = faceUV('up', dir);
     const uvFront = faceUV('front', dir);
-    expect(uvUp.j).toBeCloseTo(0); // top row of `up` image faces front
+    // PSV-convention up face (mirrored net): front sits at its TOP row
+    expect(uvUp.j).toBeCloseTo(0);
     expect(uvFront.j).toBeCloseTo(0); // top row of `front` faces up
     expect(faceDirection('up', uvUp.i, uvUp.j).z).toBeCloseTo(-1);
   });

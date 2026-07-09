@@ -1,0 +1,84 @@
+/* Hotspot DOM layer (doc 02 §2.4 / doc 11 §2 NavHotspot + InfoHotspot).
+   Positioned by engine projection events; buttons are real, focusable DOM. */
+
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.hotspot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  /* ≥44px hit area on a soft scrim backing disc (doc 09 §5 / doc 11) */
+  width: var(--hit-target);
+  height: var(--hit-target);
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--scrim);
+  cursor: pointer;
+  justify-content: center;
+  transition: background-color var(--motion-instant) var(--ease-standard);
+}
+
+.hotspot:hover,
+.hotspot:focus-visible {
+  background: var(--color-surface-raised);
+}
+
+.hotspot:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.hotspot:active .core {
+  transform: scale(0.94);
+}
+
+/* The accent core mark */
+.core {
+  width: var(--space-4);
+  height: var(--space-4);
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  border: var(--hairline) solid rgb(244 244 245 / 55%);
+  transition: transform var(--motion-instant) var(--ease-standard);
+}
+
+.info .core {
+  background: var(--color-surface-raised);
+  color: var(--color-ink);
+  display: grid;
+  place-items: center;
+  font: var(--type-label);
+  border-color: var(--color-ink-soft);
+}
+
+/* Direction-aware label on hover/focus (doc 11: "Terrace →") */
+.label {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font: var(--type-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  background: var(--scrim);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-s);
+  opacity: 0;
+  transition: opacity var(--motion-quick) var(--ease-standard);
+}
+
+.hotspot:hover .label,
+.hotspot:focus-visible .label {
+  opacity: 1;
+}

@@ -27,7 +27,7 @@ describe('geometry conventions', () => {
     expect(faceDirection('front', 0.5, 0.5)).toEqual({ x: 0, y: 0, z: -1 });
     expect(faceDirection('right', 0.5, 0.5)).toEqual({ x: 1, y: 0, z: 0 });
     expect(faceDirection('back', 0.5, 0.5)).toEqual({ x: -0, y: 0, z: 1 });
-    expect(faceDirection('up', 0.5, 0.5)).toEqual({ x: 0, y: 1, z: 0 });
+    expect(faceDirection('up', 0.5, 0.5)).toEqual({ x: -0, y: 1, z: 0 });
   });
 
   it('faceUV inverts faceDirection across all faces (roundtrip)', () => {
