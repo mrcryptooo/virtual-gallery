@@ -40,9 +40,14 @@ if (!existsSync(join(DIST, 'index.html')) || !existsSync(projectsDir)) {
 
 // ── 2. Routing + headers for the prebuilt upload ────────────────────────────
 const config = JSON.parse(readFileSync('vercel.json', 'utf8'));
-delete config.installCommand;
-delete config.buildCommand;
-delete config.outputDirectory;
+// This upload is already built. The linked Vercel project carries build
+// settings from source-based deploys, so they are explicitly neutralised —
+// otherwise Vercel tries to rebuild the artifact folder and fails looking for
+// an output directory inside it.
+config.framework = null;
+config.installCommand = '';
+config.buildCommand = '';
+config.outputDirectory = '.';
 writeFileSync(join(DIST, 'vercel.json'), `${JSON.stringify(config, null, 2)}\n`);
 
 // ── 3. Reuse the existing Vercel project ────────────────────────────────────
@@ -81,18 +86,28 @@ if (deploymentUrl === undefined) {
 console.log(`[deploy] deployment ready: ${deploymentUrl}`);
 
 // ── 5. Verify what is actually served ───────────────────────────────────────
-// Per-deployment URLs sit behind Vercel's SSO on this account, so verify the
-// public production alias. `vercel inspect` lists them; prefer the shortest.
-let target = deploymentUrl;
-try {
-  const inspected = run('vercel', ['inspect', deploymentUrl], { stdio: 'pipe' });
-  const aliases = [...inspected.matchAll(/https:\/\/[a-z0-9-]+\.vercel\.app/g)]
-    .map((m) => m[0])
-    .filter((url) => url !== deploymentUrl)
-    .sort((a, b) => a.length - b.length);
-  if (aliases[0] !== undefined) target = aliases[0];
-} catch {
-  console.warn('[deploy] could not read aliases; verifying the deployment URL directly.');
+// Per-deployment URLs sit behind Vercel's SSO on this account and answer every
+// request with an HTML login redirect, so verification must target the public
+// production alias. `vercel inspect` prints the alias list on stderr, hence the
+// explicit redirect — without it the lookup silently finds nothing.
+let target = process.env['VG_PRODUCTION_URL'] ?? '';
+if (target === '') {
+  try {
+    const inspected = run('vercel', ['inspect', deploymentUrl, '2>&1'], { stdio: 'pipe' });
+    const aliases = [...inspected.matchAll(/https:\/\/[a-z0-9-]+\.vercel\.app/g)]
+      .map((m) => m[0])
+      .filter((url) => url !== deploymentUrl)
+      .sort((a, b) => a.length - b.length);
+    target = aliases[0] ?? deploymentUrl;
+  } catch {
+    target = deploymentUrl;
+  }
+}
+if (target === deploymentUrl) {
+  console.warn(
+    '[deploy] no production alias found — verifying the deployment URL, which may be ' +
+      'SSO-protected. Set VG_PRODUCTION_URL to the public alias to be sure.',
+  );
 }
 
 console.log(`[deploy] verifying ${target}`);
