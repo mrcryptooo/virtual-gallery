@@ -68,3 +68,13 @@ export type {
   ProjectedHotspot,
   Wayfinding,
 } from './PanoramaEngine.ts';
+
+export {
+  wrap180,
+  bearing,
+  horizontalFov,
+  isOnScreen,
+  clampToRect,
+  directionWord,
+} from './hotspots/projection.ts';
+export type { Bearing, Rect, Point } from './hotspots/projection.ts';

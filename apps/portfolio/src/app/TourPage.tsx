@@ -90,11 +90,22 @@ export function TourPage({ projectSlug }: { projectSlug: string }) {
     if (hotspot.type === 'information') setInfo(hotspot);
   };
 
+  // Off-screen indicator: turn toward the destination rather than jumping,
+  // so the visitor keeps their bearings (doc 10 §1).
+  const handleOrient = ({ hotspot }: ProjectedHotspot) => {
+    engineRef.current?.lookAt({ yaw: hotspot.yaw, pitch: hotspot.pitch }, 400);
+  };
+
   return (
     <div className={styles.page}>
       <div ref={containerRef} className={styles.viewer} />
 
-      <HotspotLayer hotspots={hotspots} onNavigate={handleNavigate} onInfo={handleInfo} />
+      <HotspotLayer
+        hotspots={hotspots}
+        onNavigate={handleNavigate}
+        onInfo={handleInfo}
+        onOrient={handleOrient}
+      />
 
       {project !== undefined && panorama !== undefined && (
         <TourChrome

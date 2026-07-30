@@ -20,6 +20,8 @@
     "test": "pnpm -r test && vitest run --config scripts/vitest.config.ts",
     "e2e": "playwright test",
     "package:build": "node scripts/build-package.ts",
+    "deploy:prod": "node scripts/deploy.mjs",
+    "verify:deploy": "node scripts/verify-deployment.mjs",
     "pipeline:synthetic": "node scripts/make-synthetic-master.ts",
     "tokens:check": "node scripts/token-lint.mjs",
     "validate:content": "node scripts/validate-packages.ts",

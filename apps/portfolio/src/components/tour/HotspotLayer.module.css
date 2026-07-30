@@ -8,6 +8,20 @@
   overflow: hidden;
 }
 
+/* The rectangle off-screen indicators clamp to. Insets clear the tour chrome
+   (top) and the gesture hint (bottom) and respect device safe areas, so an
+   indicator never lands under the HUD or a notch (doc 09 §5). Measured by the
+   layer at runtime; never painted. */
+.safeRect {
+  position: absolute;
+  top: calc(var(--space-8) + env(safe-area-inset-top, 0px));
+  right: calc(var(--space-6) + env(safe-area-inset-right, 0px));
+  bottom: calc(var(--space-8) + env(safe-area-inset-bottom, 0px));
+  left: calc(var(--space-6) + env(safe-area-inset-left, 0px));
+  pointer-events: none;
+  visibility: hidden;
+}
+
 .hotspot {
   position: absolute;
   transform: translate(-50%, -50%);
@@ -47,7 +61,7 @@
   height: var(--space-4);
   border-radius: var(--radius-full);
   background: var(--color-accent);
-  border: var(--hairline) solid rgb(244 244 245 / 55%);
+  border: var(--hairline) solid var(--color-ink);
   transition: transform var(--motion-instant) var(--ease-standard);
 }
 
@@ -56,7 +70,9 @@
   color: var(--color-ink);
   display: grid;
   place-items: center;
-  font: var(--type-label);
+  font-family: var(--font-sans);
+  font-size: var(--type-label-size);
+  line-height: var(--type-label-line);
   border-color: var(--color-ink-soft);
 }
 
@@ -67,8 +83,10 @@
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
-  font: var(--type-label);
-  letter-spacing: 0.08em;
+  font-family: var(--font-sans);
+  font-size: var(--type-label-size);
+  line-height: var(--type-label-line);
+  letter-spacing: var(--type-label-tracking);
   text-transform: uppercase;
   color: var(--color-ink);
   background: var(--scrim);
@@ -81,4 +99,51 @@
 .hotspot:hover .label,
 .hotspot:focus-visible .label {
   opacity: 1;
+}
+
+/* ── Edge indicator: an off-screen navigation hotspot, clamped to the safe
+   rectangle and pointing toward its direction. Tapping turns the view toward
+   it rather than teleporting (doc 10 §1: motion explains space). ───────────── */
+.edge {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  width: var(--hit-target);
+  height: var(--hit-target);
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--scrim);
+  cursor: pointer;
+  transition:
+    background-color var(--motion-instant) var(--ease-standard),
+    opacity var(--motion-quick) var(--ease-standard);
+  opacity: 0.85;
+}
+
+.edge:hover,
+.edge:focus-visible {
+  background: var(--color-surface-raised);
+  opacity: 1;
+}
+
+.edge:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Chevron pointing along the bearing; the wrapper carries the rotation. */
+.arrow {
+  width: var(--space-3);
+  height: var(--space-3);
+  border-top: var(--hairline) solid var(--color-accent);
+  border-right: var(--hairline) solid var(--color-accent);
+  border-top-width: var(--space-1);
+  border-right-width: var(--space-1);
+  transition: opacity var(--motion-instant) var(--ease-standard);
+}
+
+.edge:active .arrow {
+  opacity: 0.7;
 }

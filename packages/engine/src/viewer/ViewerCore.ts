@@ -13,6 +13,7 @@ import type { CubemapMultiTilesPanorama } from '@photo-sphere-viewer/cubemap-til
 import '@photo-sphere-viewer/core/index.css';
 import type { CubeFace, Panorama, View } from '../domain/manifest/schema.ts';
 import { levelFaceSizes, previewPath, tilePath, tilesPerAxis } from '../domain/manifest/paths.ts';
+import { bearing } from '../hotspots/projection.ts';
 
 /** FOV limits (doc 10 §3); PSV zoom 0–100 maps linearly maxFov→minFov. */
 const MIN_FOV = 30;
@@ -36,8 +37,20 @@ const PSV_TO_FACE: Record<string, CubeFace> = Object.fromEntries(
 export interface ScreenPoint {
   readonly x: number;
   readonly y: number;
-  /** False when the direction is outside the current viewport. */
-  readonly visible: boolean;
+  /** True when the direction projects inside the viewport (x/y are meaningful). */
+  readonly onScreen: boolean;
+  /**
+   * Screen-space bearing from the viewport centre toward the direction, in
+   * degrees: 0 = right, 90 = down. Defined for every direction, including
+   * ones behind the camera — this is what lets a client draw an edge-clamped
+   * indicator instead of dropping the hotspot (doc 09 §3: navigation must stay
+   * discoverable at any viewport aspect).
+   */
+  readonly angleDeg: number;
+  /** Signed yaw offset from the current view, wrapped to ±180. */
+  readonly deltaYaw: number;
+  /** Signed pitch offset from the current view. */
+  readonly deltaPitch: number;
 }
 
 export interface ViewerCoreEvents {
@@ -162,24 +175,28 @@ export class ViewerCore {
     };
   }
 
-  /** Project a manifest direction to viewer pixels (hotspot DOM layer). */
+  /**
+   * Project a manifest direction to viewer pixels (hotspot DOM layer).
+   * Always returns a usable bearing: directions that fall outside the
+   * viewport report `onScreen: false` plus the angle a client needs to clamp
+   * an indicator to the screen edge.
+   */
   project(yawDeg: number, pitchDeg: number): ScreenPoint {
-    const position: Position = { yaw: yawDeg * DEG, pitch: pitchDeg * DEG };
-    // Visibility: angular distance from the view center within a loose cone
-    const current = this.viewer.getPosition();
-    const a1 = position;
-    const cos =
-      Math.sin(a1.pitch) * Math.sin(current.pitch) +
-      Math.cos(a1.pitch) * Math.cos(current.pitch) * Math.cos(a1.yaw - current.yaw);
-    const angularDeg = Math.acos(Math.max(-1, Math.min(1, cos))) / DEG;
-    if (angularDeg > 95) {
-      return { x: 0, y: 0, visible: false };
+    const view = this.getView();
+    const { deltaYaw, deltaPitch, angleDeg } = bearing(view.yaw, view.pitch, yawDeg, pitchDeg);
+
+    // Behind the camera the projection degenerates; treat as off-screen and
+    // rely on the bearing alone.
+    if (Math.abs(deltaYaw) >= 89) {
+      return { x: 0, y: 0, onScreen: false, angleDeg, deltaYaw, deltaPitch };
     }
+
+    const position: Position = { yaw: yawDeg * DEG, pitch: pitchDeg * DEG };
     const point = this.viewer.dataHelper.sphericalCoordsToViewerCoords(position);
     const size = this.viewer.getSize();
-    const inViewport =
-      point.x >= -40 && point.y >= -40 && point.x <= size.width + 40 && point.y <= size.height + 40;
-    return { x: point.x, y: point.y, visible: inViewport };
+    const onScreen =
+      point.x >= 0 && point.y >= 0 && point.x <= size.width && point.y <= size.height;
+    return { x: point.x, y: point.y, onScreen, angleDeg, deltaYaw, deltaPitch };
   }
 
   destroy(): void {

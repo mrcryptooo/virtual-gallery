@@ -26,9 +26,17 @@ const FOV_NARROW_DEG = 12;
 
 export interface ProjectedHotspot {
   readonly hotspot: Hotspot;
+  /** Viewport pixels; meaningful only when `onScreen`. */
   readonly x: number;
   readonly y: number;
-  readonly visible: boolean;
+  /** True when the hotspot projects inside the viewport. */
+  readonly onScreen: boolean;
+  /** Bearing from the viewport centre: 0 = right, 90 = down. Always defined. */
+  readonly angleDeg: number;
+  /** Signed yaw offset from the current view, wrapped to ±180. */
+  readonly deltaYaw: number;
+  /** Signed pitch offset from the current view. */
+  readonly deltaPitch: number;
 }
 
 export interface Wayfinding {
@@ -94,7 +102,15 @@ export async function createPanoramaEngine(
     if (activeViewer === undefined || current === undefined) return;
     const projected = current.hotspots.map((hotspot) => {
       const point = activeViewer.project(hotspot.yaw, hotspot.pitch);
-      return { hotspot, x: point.x, y: point.y, visible: point.visible };
+      return {
+        hotspot,
+        x: point.x,
+        y: point.y,
+        onScreen: point.onScreen,
+        angleDeg: point.angleDeg,
+        deltaYaw: point.deltaYaw,
+        deltaPitch: point.deltaPitch,
+      };
     });
     emit('hotspotsprojected', { hotspots: projected });
   }
