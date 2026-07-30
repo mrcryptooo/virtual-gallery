@@ -9,6 +9,11 @@ dist-packages/
 # Pipeline cache (doc 07 §6)
 .asset-cache/
 
+# Panorama masters: pipeline INPUT only (doc 07 §2), never deployed.
+# 8K/16K masters are hundreds of MB per project — they live with the artist,
+# not in git. The published package under public/projects/ is what ships.
+content-src/*/panos/
+
 # Test artifacts
 coverage/
 playwright-report/

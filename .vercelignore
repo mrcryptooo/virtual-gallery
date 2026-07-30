@@ -1,0 +1,9 @@
+# Pipeline input, not deployable output (doc 07 §2): panorama masters are
+# hundreds of MB per project and are never served.
+content-src/
+.asset-cache/
+
+# Not needed to build or serve the site
+docs/
+e2e/
+packages/engine/test/fixtures/
