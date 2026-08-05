@@ -59,9 +59,9 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": -14,
-                      "pitch": -6,
-                      "label": "Walk to the west gate",
+                      "yaw": -32,
+                      "pitch": 2,
+                      "label": "West entrance",
                       "type": "navigation",
                       "target": "entrance-gate-west",
                       "arrivalView": {
@@ -71,9 +71,9 @@
                       }
                     },
                     {
-                      "yaw": 14,
-                      "pitch": -6,
-                      "label": "Walk to the east gate",
+                      "yaw": 32,
+                      "pitch": 2,
+                      "label": "East entrance",
                       "type": "navigation",
                       "target": "entrance-gate-east",
                       "arrivalView": {
@@ -113,9 +113,9 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": -15,
-                      "pitch": -6,
-                      "label": "Enter the west vault",
+                      "yaw": 0,
+                      "pitch": -12,
+                      "label": "Into the west tunnel",
                       "type": "navigation",
                       "target": "entry-tunnel-west",
                       "arrivalView": {
@@ -125,13 +125,13 @@
                       }
                     },
                     {
-                      "yaw": 165,
-                      "pitch": -6,
+                      "yaw": 41,
+                      "pitch": 0,
                       "label": "Back to the forecourt",
                       "type": "navigation",
                       "target": "museum-forecourt",
                       "arrivalView": {
-                        "yaw": -14,
+                        "yaw": 0,
                         "pitch": -2,
                         "fov": 90
                       }
@@ -167,9 +167,9 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 15,
-                      "pitch": -6,
-                      "label": "Enter the east vault",
+                      "yaw": 0,
+                      "pitch": -12,
+                      "label": "Into the east tunnel",
                       "type": "navigation",
                       "target": "entry-tunnel-east",
                       "arrivalView": {
@@ -179,13 +179,13 @@
                       }
                     },
                     {
-                      "yaw": -165,
-                      "pitch": -6,
+                      "yaw": -43,
+                      "pitch": -3,
                       "label": "Back to the forecourt",
                       "type": "navigation",
                       "target": "museum-forecourt",
                       "arrivalView": {
-                        "yaw": 14,
+                        "yaw": 0,
                         "pitch": -2,
                         "fov": 90
                       }
@@ -229,19 +229,19 @@
                   "hotspots": [
                     {
                       "yaw": 0,
-                      "pitch": -8,
-                      "label": "Down to the concourse",
+                      "pitch": -18,
+                      "label": "Through the tunnel to the concourse",
                       "type": "navigation",
                       "target": "main-concourse",
                       "arrivalView": {
-                        "yaw": -140,
-                        "pitch": -4,
+                        "yaw": 0,
+                        "pitch": 0,
                         "fov": 90
                       }
                     },
                     {
                       "yaw": 180,
-                      "pitch": -8,
+                      "pitch": -10,
                       "label": "Back to the west gate",
                       "type": "navigation",
                       "target": "entrance-gate-west",
@@ -283,19 +283,19 @@
                   "hotspots": [
                     {
                       "yaw": 0,
-                      "pitch": -8,
-                      "label": "Down to the concourse",
+                      "pitch": -18,
+                      "label": "Through the tunnel to the concourse",
                       "type": "navigation",
                       "target": "main-concourse",
                       "arrivalView": {
-                        "yaw": 125,
-                        "pitch": -4,
+                        "yaw": 0,
+                        "pitch": 0,
                         "fov": 90
                       }
                     },
                     {
                       "yaw": 180,
-                      "pitch": -8,
+                      "pitch": -10,
                       "label": "Back to the east gate",
                       "type": "navigation",
                       "target": "entrance-gate-east",
@@ -349,49 +349,49 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": -37,
-                      "pitch": -4,
-                      "label": "To the Noxx Hall concourse",
+                      "yaw": -38,
+                      "pitch": 3,
+                      "label": "The Noxx Hall",
                       "type": "navigation",
                       "target": "noxx-concourse",
                       "arrivalView": {
-                        "yaw": 0,
+                        "yaw": 5,
                         "pitch": 0,
                         "fov": 90
                       }
                     },
                     {
-                      "yaw": 37,
-                      "pitch": -4,
-                      "label": "To the Xealist Hall concourse",
+                      "yaw": 39,
+                      "pitch": 3,
+                      "label": "The Xealist Hall",
                       "type": "navigation",
                       "target": "xealist-concourse",
                       "arrivalView": {
+                        "yaw": -5,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": -147,
+                      "pitch": 18,
+                      "label": "Back up the west stair",
+                      "type": "navigation",
+                      "target": "entry-tunnel-west",
+                      "arrivalView": {
                         "yaw": 0,
                         "pitch": 0,
                         "fov": 90
                       }
                     },
                     {
-                      "yaw": -140,
-                      "pitch": -6,
-                      "label": "Up to the west vault",
-                      "type": "navigation",
-                      "target": "entry-tunnel-west",
-                      "arrivalView": {
-                        "yaw": 180,
-                        "pitch": 0,
-                        "fov": 90
-                      }
-                    },
-                    {
-                      "yaw": 125,
-                      "pitch": -6,
-                      "label": "Up to the east vault",
+                      "yaw": 147,
+                      "pitch": 18,
+                      "label": "Back up the east stair",
                       "type": "navigation",
                       "target": "entry-tunnel-east",
                       "arrivalView": {
-                        "yaw": 180,
+                        "yaw": 0,
                         "pitch": 0,
                         "fov": 90
                       }
@@ -427,9 +427,21 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": -35,
-                      "pitch": -6,
-                      "label": "To the welcome wall",
+                      "yaw": 0,
+                      "pitch": 0,
+                      "label": "Into the Noxx passage",
+                      "type": "navigation",
+                      "target": "noxx-passage",
+                      "arrivalView": {
+                        "yaw": -3,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": -34,
+                      "pitch": 0,
+                      "label": "The welcome wall",
                       "type": "navigation",
                       "target": "welcome-wall",
                       "arrivalView": {
@@ -439,9 +451,9 @@
                       }
                     },
                     {
-                      "yaw": 45,
-                      "pitch": -6,
-                      "label": "To the Noxx Hall gate",
+                      "yaw": 38,
+                      "pitch": 3,
+                      "label": "The Noxx Hall gate",
                       "type": "navigation",
                       "target": "noxx-hall-gate",
                       "arrivalView": {
@@ -457,7 +469,7 @@
                       "type": "navigation",
                       "target": "main-concourse",
                       "arrivalView": {
-                        "yaw": -37,
+                        "yaw": 0,
                         "pitch": 0,
                         "fov": 90
                       }
@@ -493,36 +505,24 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 55,
-                      "pitch": -6,
-                      "label": "Into the Noxx tunnel",
-                      "type": "navigation",
-                      "target": "noxx-passage",
-                      "arrivalView": {
-                        "yaw": -3,
-                        "pitch": 0,
-                        "fov": 90
-                      }
-                    },
-                    {
-                      "yaw": -100,
-                      "pitch": -6,
-                      "label": "Back to the concourse",
-                      "type": "navigation",
-                      "target": "noxx-concourse",
-                      "arrivalView": {
-                        "yaw": -40,
-                        "pitch": 0,
-                        "fov": 90
-                      }
-                    },
-                    {
                       "yaw": 30,
                       "pitch": 2,
                       "label": "About the museum",
                       "type": "information",
                       "title": "Welcome to the Seismic Museum",
                       "body": "The welcome text on this wall introduces the museum as a shared cultural memory — a collection assembled from the imagination of a community rather than from a single author."
+                    },
+                    {
+                      "yaw": 35,
+                      "pitch": -20,
+                      "label": "Back to the Noxx concourse",
+                      "type": "navigation",
+                      "target": "noxx-concourse",
+                      "arrivalView": {
+                        "yaw": 5,
+                        "pitch": 0,
+                        "fov": 90
+                      }
                     }
                   ]
                 },
@@ -555,36 +555,24 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": -45,
-                      "pitch": -6,
-                      "label": "Into the Noxx tunnel",
-                      "type": "navigation",
-                      "target": "noxx-passage",
-                      "arrivalView": {
-                        "yaw": -3,
-                        "pitch": 0,
-                        "fov": 90
-                      }
-                    },
-                    {
-                      "yaw": 100,
-                      "pitch": -6,
-                      "label": "Back to the concourse",
-                      "type": "navigation",
-                      "target": "noxx-concourse",
-                      "arrivalView": {
-                        "yaw": 45,
-                        "pitch": 0,
-                        "fov": 90
-                      }
-                    },
-                    {
                       "yaw": -10,
                       "pitch": 2,
                       "label": "About the Noxx Hall",
                       "type": "information",
                       "title": "The Noxx Hall",
                       "body": "One of the museum’s two great halls. Its galleries run in a long arc of bays, each given over to works from a different maker in the collection."
+                    },
+                    {
+                      "yaw": -30,
+                      "pitch": -20,
+                      "label": "Back to the Noxx concourse",
+                      "type": "navigation",
+                      "target": "noxx-concourse",
+                      "arrivalView": {
+                        "yaw": 5,
+                        "pitch": 0,
+                        "fov": 90
+                      }
                     }
                   ]
                 },
@@ -617,25 +605,37 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 35,
-                      "pitch": -6,
-                      "label": "To the statement wall",
+                      "yaw": 0,
+                      "pitch": 2,
+                      "label": "Into the Xealist passage",
                       "type": "navigation",
-                      "target": "museum-statement",
+                      "target": "xealist-passage",
                       "arrivalView": {
-                        "yaw": -30,
+                        "yaw": -3,
                         "pitch": 0,
                         "fov": 90
                       }
                     },
                     {
-                      "yaw": -45,
-                      "pitch": -6,
-                      "label": "To the Xealist Hall gate",
+                      "yaw": -34,
+                      "pitch": 3,
+                      "label": "The Xealist Hall gate",
                       "type": "navigation",
                       "target": "xealist-hall-gate",
                       "arrivalView": {
                         "yaw": 10,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": 36,
+                      "pitch": 3,
+                      "label": "The museum statement",
+                      "type": "navigation",
+                      "target": "museum-statement",
+                      "arrivalView": {
+                        "yaw": -30,
                         "pitch": 0,
                         "fov": 90
                       }
@@ -647,7 +647,7 @@
                       "type": "navigation",
                       "target": "main-concourse",
                       "arrivalView": {
-                        "yaw": 37,
+                        "yaw": 0,
                         "pitch": 0,
                         "fov": 90
                       }
@@ -683,36 +683,24 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": -55,
-                      "pitch": -6,
-                      "label": "Into the Xealist tunnel",
-                      "type": "navigation",
-                      "target": "xealist-passage",
-                      "arrivalView": {
-                        "yaw": -3,
-                        "pitch": 0,
-                        "fov": 90
-                      }
-                    },
-                    {
-                      "yaw": 100,
-                      "pitch": -6,
-                      "label": "Back to the concourse",
-                      "type": "navigation",
-                      "target": "xealist-concourse",
-                      "arrivalView": {
-                        "yaw": 40,
-                        "pitch": 0,
-                        "fov": 90
-                      }
-                    },
-                    {
                       "yaw": -30,
                       "pitch": 2,
                       "label": "The collection",
                       "type": "information",
                       "title": "Seismic Museum",
                       "body": "The statement on this wall frames the collection as a living archive: it preserves what exists, and equally the work of artists who reimagined the world in their own vision."
+                    },
+                    {
+                      "yaw": -45,
+                      "pitch": -20,
+                      "label": "Back to the Xealist concourse",
+                      "type": "navigation",
+                      "target": "xealist-concourse",
+                      "arrivalView": {
+                        "yaw": -5,
+                        "pitch": 0,
+                        "fov": 90
+                      }
                     }
                   ]
                 },
@@ -745,36 +733,24 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 45,
-                      "pitch": -6,
-                      "label": "Into the Xealist tunnel",
-                      "type": "navigation",
-                      "target": "xealist-passage",
-                      "arrivalView": {
-                        "yaw": -3,
-                        "pitch": 0,
-                        "fov": 90
-                      }
-                    },
-                    {
-                      "yaw": -100,
-                      "pitch": -6,
-                      "label": "Back to the concourse",
-                      "type": "navigation",
-                      "target": "xealist-concourse",
-                      "arrivalView": {
-                        "yaw": -45,
-                        "pitch": 0,
-                        "fov": 90
-                      }
-                    },
-                    {
                       "yaw": 10,
                       "pitch": 2,
                       "label": "About the Xealist Hall",
                       "type": "information",
                       "title": "The Xealist Hall",
                       "body": "The museum’s second great hall, laid out as a mirror of the Noxx Hall: a chain of gallery bays gathered around a central arch under an open black sky."
+                    },
+                    {
+                      "yaw": 30,
+                      "pitch": -20,
+                      "label": "Back to the Xealist concourse",
+                      "type": "navigation",
+                      "target": "xealist-concourse",
+                      "arrivalView": {
+                        "yaw": -5,
+                        "pitch": 0,
+                        "fov": 90
+                      }
                     }
                   ]
                 }
@@ -814,25 +790,37 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": -3,
-                      "pitch": -4,
+                      "yaw": 0,
+                      "pitch": -8,
                       "label": "Into the Noxx Hall",
                       "type": "navigation",
                       "target": "noxx-gallery-1",
                       "arrivalView": {
-                        "yaw": 0,
+                        "yaw": 15,
                         "pitch": 0,
                         "fov": 90
                       }
                     },
                     {
-                      "yaw": 178,
-                      "pitch": -4,
-                      "label": "Back to the gate",
+                      "yaw": 180,
+                      "pitch": -8,
+                      "label": "Back to the Noxx concourse",
                       "type": "navigation",
-                      "target": "noxx-hall-gate",
+                      "target": "noxx-concourse",
                       "arrivalView": {
-                        "yaw": -55,
+                        "yaw": 5,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": 0,
+                      "pitch": -40,
+                      "label": "Shortcut to Noxx Hall — Bay 5",
+                      "type": "navigation",
+                      "target": "noxx-gallery-5",
+                      "arrivalView": {
+                        "yaw": 15,
                         "pitch": 0,
                         "fov": 90
                       }
@@ -868,9 +856,9 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 55,
-                      "pitch": -8,
-                      "label": "On to bay 2",
+                      "yaw": 0,
+                      "pitch": 0,
+                      "label": "The guardian stand",
                       "type": "navigation",
                       "target": "noxx-gallery-2",
                       "arrivalView": {
@@ -880,13 +868,25 @@
                       }
                     },
                     {
-                      "yaw": -125,
-                      "pitch": -8,
-                      "label": "Back to the tunnel",
+                      "yaw": 58,
+                      "pitch": -3,
+                      "label": "To Bay 3",
+                      "type": "navigation",
+                      "target": "noxx-gallery-3",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": -155,
+                      "pitch": 5,
+                      "label": "Back through the passage",
                       "type": "navigation",
                       "target": "noxx-passage",
                       "arrivalView": {
-                        "yaw": 178,
+                        "yaw": -3,
                         "pitch": 0,
                         "fov": 90
                       }
@@ -922,9 +922,9 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 55,
-                      "pitch": -8,
-                      "label": "On to bay 3",
+                      "yaw": 70,
+                      "pitch": -3,
+                      "label": "To Bay 3",
                       "type": "navigation",
                       "target": "noxx-gallery-3",
                       "arrivalView": {
@@ -934,9 +934,9 @@
                       }
                     },
                     {
-                      "yaw": -125,
-                      "pitch": -8,
-                      "label": "Back to bay 1",
+                      "yaw": 0,
+                      "pitch": -30,
+                      "label": "Back to Bay 1",
                       "type": "navigation",
                       "target": "noxx-gallery-1",
                       "arrivalView": {
@@ -976,9 +976,9 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 55,
-                      "pitch": -8,
-                      "label": "On to bay 4",
+                      "yaw": 0,
+                      "pitch": 0,
+                      "label": "The dreamer stand",
                       "type": "navigation",
                       "target": "noxx-gallery-4",
                       "arrivalView": {
@@ -988,11 +988,23 @@
                       }
                     },
                     {
-                      "yaw": -125,
-                      "pitch": -8,
-                      "label": "Back to bay 2",
+                      "yaw": -70,
+                      "pitch": -3,
+                      "label": "Back to Bay 5",
                       "type": "navigation",
-                      "target": "noxx-gallery-2",
+                      "target": "noxx-gallery-5",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": 85,
+                      "pitch": -5,
+                      "label": "To Bay 1",
+                      "type": "navigation",
+                      "target": "noxx-gallery-1",
                       "arrivalView": {
                         "yaw": 15,
                         "pitch": 0,
@@ -1030,9 +1042,21 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 55,
-                      "pitch": -8,
-                      "label": "On to bay 5",
+                      "yaw": 85,
+                      "pitch": -3,
+                      "label": "Toward Bay 1",
+                      "type": "navigation",
+                      "target": "noxx-gallery-1",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": -75,
+                      "pitch": -3,
+                      "label": "To Bay 5",
                       "type": "navigation",
                       "target": "noxx-gallery-5",
                       "arrivalView": {
@@ -1042,9 +1066,9 @@
                       }
                     },
                     {
-                      "yaw": -125,
-                      "pitch": -8,
-                      "label": "Back to bay 3",
+                      "yaw": 0,
+                      "pitch": -30,
+                      "label": "Back to Bay 3",
                       "type": "navigation",
                       "target": "noxx-gallery-3",
                       "arrivalView": {
@@ -1084,9 +1108,9 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 55,
-                      "pitch": -8,
-                      "label": "On to bay 6",
+                      "yaw": -3,
+                      "pitch": 2,
+                      "label": "The artist stand",
                       "type": "navigation",
                       "target": "noxx-gallery-6",
                       "arrivalView": {
@@ -1096,13 +1120,49 @@
                       }
                     },
                     {
-                      "yaw": -125,
-                      "pitch": -8,
-                      "label": "Back to bay 4",
+                      "yaw": 88,
+                      "pitch": 2,
+                      "label": "The Roman temple",
                       "type": "navigation",
-                      "target": "noxx-gallery-4",
+                      "target": "grand-hall",
+                      "arrivalView": {
+                        "yaw": 0,
+                        "pitch": -2,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": 150,
+                      "pitch": -3,
+                      "label": "On to Bay 7",
+                      "type": "navigation",
+                      "target": "noxx-gallery-7",
                       "arrivalView": {
                         "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": -140,
+                      "pitch": -3,
+                      "label": "To Bay 3",
+                      "type": "navigation",
+                      "target": "noxx-gallery-3",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": -60,
+                      "pitch": -40,
+                      "label": "Shortcut back to the passage",
+                      "type": "navigation",
+                      "target": "noxx-passage",
+                      "arrivalView": {
+                        "yaw": -3,
                         "pitch": 0,
                         "fov": 90
                       }
@@ -1138,9 +1198,21 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 55,
-                      "pitch": -8,
-                      "label": "On to bay 7",
+                      "yaw": 86,
+                      "pitch": 2,
+                      "label": "The Roman temple",
+                      "type": "navigation",
+                      "target": "grand-hall",
+                      "arrivalView": {
+                        "yaw": 0,
+                        "pitch": -2,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": 150,
+                      "pitch": -3,
+                      "label": "To Bay 7",
                       "type": "navigation",
                       "target": "noxx-gallery-7",
                       "arrivalView": {
@@ -1150,9 +1222,21 @@
                       }
                     },
                     {
-                      "yaw": -125,
-                      "pitch": -8,
-                      "label": "Back to bay 5",
+                      "yaw": -140,
+                      "pitch": -3,
+                      "label": "To Bay 3",
+                      "type": "navigation",
+                      "target": "noxx-gallery-3",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": 0,
+                      "pitch": -30,
+                      "label": "Back to Bay 5",
                       "type": "navigation",
                       "target": "noxx-gallery-5",
                       "arrivalView": {
@@ -1192,9 +1276,9 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 55,
-                      "pitch": -8,
-                      "label": "On to bay 8",
+                      "yaw": 0,
+                      "pitch": 0,
+                      "label": "The character stand",
                       "type": "navigation",
                       "target": "noxx-gallery-8",
                       "arrivalView": {
@@ -1204,11 +1288,23 @@
                       }
                     },
                     {
-                      "yaw": -125,
-                      "pitch": -8,
-                      "label": "Back to bay 6",
+                      "yaw": -94,
+                      "pitch": 12,
+                      "label": "The Roman temple",
                       "type": "navigation",
-                      "target": "noxx-gallery-6",
+                      "target": "grand-hall",
+                      "arrivalView": {
+                        "yaw": 0,
+                        "pitch": -2,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": 145,
+                      "pitch": -3,
+                      "label": "Back to Bay 5",
+                      "type": "navigation",
+                      "target": "noxx-gallery-5",
                       "arrivalView": {
                         "yaw": 15,
                         "pitch": 0,
@@ -1246,9 +1342,9 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 55,
-                      "pitch": -8,
-                      "label": "On to the grand hall",
+                      "yaw": -95,
+                      "pitch": 8,
+                      "label": "The Roman temple",
                       "type": "navigation",
                       "target": "grand-hall",
                       "arrivalView": {
@@ -1258,9 +1354,21 @@
                       }
                     },
                     {
-                      "yaw": -125,
-                      "pitch": -8,
-                      "label": "Back to bay 7",
+                      "yaw": 145,
+                      "pitch": -3,
+                      "label": "On to Bay 5",
+                      "type": "navigation",
+                      "target": "noxx-gallery-5",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": 0,
+                      "pitch": -30,
+                      "label": "Back to Bay 7",
                       "type": "navigation",
                       "target": "noxx-gallery-7",
                       "arrivalView": {
@@ -1307,25 +1415,25 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": -3,
-                      "pitch": -4,
+                      "yaw": 0,
+                      "pitch": -10,
                       "label": "Into the Xealist Hall",
                       "type": "navigation",
                       "target": "xealist-gallery-1",
                       "arrivalView": {
-                        "yaw": 0,
+                        "yaw": 15,
                         "pitch": 0,
                         "fov": 90
                       }
                     },
                     {
-                      "yaw": 178,
-                      "pitch": -4,
-                      "label": "Back to the gate",
+                      "yaw": 180,
+                      "pitch": -8,
+                      "label": "Back to the Xealist concourse",
                       "type": "navigation",
-                      "target": "xealist-hall-gate",
+                      "target": "xealist-concourse",
                       "arrivalView": {
-                        "yaw": 55,
+                        "yaw": -5,
                         "pitch": 0,
                         "fov": 90
                       }
@@ -1361,9 +1469,9 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 55,
-                      "pitch": -8,
-                      "label": "On to bay 2",
+                      "yaw": 0,
+                      "pitch": 0,
+                      "label": "The community stand",
                       "type": "navigation",
                       "target": "xealist-gallery-2",
                       "arrivalView": {
@@ -1373,13 +1481,25 @@
                       }
                     },
                     {
-                      "yaw": -125,
-                      "pitch": -8,
-                      "label": "Back to the tunnel",
+                      "yaw": -115,
+                      "pitch": 8,
+                      "label": "Back through the passage",
                       "type": "navigation",
                       "target": "xealist-passage",
                       "arrivalView": {
-                        "yaw": 178,
+                        "yaw": -3,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": 62,
+                      "pitch": -3,
+                      "label": "On to Bay 3",
+                      "type": "navigation",
+                      "target": "xealist-gallery-3",
+                      "arrivalView": {
+                        "yaw": 15,
                         "pitch": 0,
                         "fov": 90
                       }
@@ -1415,21 +1535,9 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 55,
-                      "pitch": -8,
-                      "label": "On to bay 3",
-                      "type": "navigation",
-                      "target": "xealist-gallery-3",
-                      "arrivalView": {
-                        "yaw": 15,
-                        "pitch": 0,
-                        "fov": 90
-                      }
-                    },
-                    {
-                      "yaw": -125,
-                      "pitch": -8,
-                      "label": "Back to bay 1",
+                      "yaw": 0,
+                      "pitch": -30,
+                      "label": "Back to Bay 1",
                       "type": "navigation",
                       "target": "xealist-gallery-1",
                       "arrivalView": {
@@ -1469,9 +1577,9 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 55,
-                      "pitch": -8,
-                      "label": "On to bay 4",
+                      "yaw": 0,
+                      "pitch": 0,
+                      "label": "The introduction stand",
                       "type": "navigation",
                       "target": "xealist-gallery-4",
                       "arrivalView": {
@@ -1481,11 +1589,23 @@
                       }
                     },
                     {
-                      "yaw": -125,
-                      "pitch": -8,
-                      "label": "Back to bay 2",
+                      "yaw": 88,
+                      "pitch": -3,
+                      "label": "Back to Bay 1",
                       "type": "navigation",
-                      "target": "xealist-gallery-2",
+                      "target": "xealist-gallery-1",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": -75,
+                      "pitch": -3,
+                      "label": "On to Bay 5",
+                      "type": "navigation",
+                      "target": "xealist-gallery-5",
                       "arrivalView": {
                         "yaw": 15,
                         "pitch": 0,
@@ -1523,9 +1643,21 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 55,
-                      "pitch": -8,
-                      "label": "On to bay 5",
+                      "yaw": 100,
+                      "pitch": -3,
+                      "label": "Toward Bay 1",
+                      "type": "navigation",
+                      "target": "xealist-gallery-1",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": -78,
+                      "pitch": -3,
+                      "label": "On to Bay 5",
                       "type": "navigation",
                       "target": "xealist-gallery-5",
                       "arrivalView": {
@@ -1535,9 +1667,9 @@
                       }
                     },
                     {
-                      "yaw": -125,
-                      "pitch": -8,
-                      "label": "Back to bay 3",
+                      "yaw": 0,
+                      "pitch": -30,
+                      "label": "Back to Bay 3",
                       "type": "navigation",
                       "target": "xealist-gallery-3",
                       "arrivalView": {
@@ -1577,9 +1709,9 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 55,
-                      "pitch": -8,
-                      "label": "On to bay 6",
+                      "yaw": 0,
+                      "pitch": 0,
+                      "label": "The stand",
                       "type": "navigation",
                       "target": "xealist-gallery-6",
                       "arrivalView": {
@@ -1589,11 +1721,23 @@
                       }
                     },
                     {
-                      "yaw": -125,
-                      "pitch": -8,
-                      "label": "Back to bay 4",
+                      "yaw": 64,
+                      "pitch": -2,
+                      "label": "On to Bay 7",
                       "type": "navigation",
-                      "target": "xealist-gallery-4",
+                      "target": "xealist-gallery-7",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": -80,
+                      "pitch": -3,
+                      "label": "Back to Bay 3",
+                      "type": "navigation",
+                      "target": "xealist-gallery-3",
                       "arrivalView": {
                         "yaw": 15,
                         "pitch": 0,
@@ -1631,21 +1775,9 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 55,
-                      "pitch": -8,
-                      "label": "On to bay 7",
-                      "type": "navigation",
-                      "target": "xealist-gallery-7",
-                      "arrivalView": {
-                        "yaw": 15,
-                        "pitch": 0,
-                        "fov": 90
-                      }
-                    },
-                    {
-                      "yaw": -125,
-                      "pitch": -8,
-                      "label": "Back to bay 5",
+                      "yaw": 0,
+                      "pitch": -30,
+                      "label": "Back to Bay 5",
                       "type": "navigation",
                       "target": "xealist-gallery-5",
                       "arrivalView": {
@@ -1685,9 +1817,21 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 55,
+                      "yaw": -139,
+                      "pitch": 5,
+                      "label": "The Roman temple",
+                      "type": "navigation",
+                      "target": "grand-hall",
+                      "arrivalView": {
+                        "yaw": 0,
+                        "pitch": -2,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": -105,
                       "pitch": -8,
-                      "label": "On to bay 8",
+                      "label": "On to Bay 8",
                       "type": "navigation",
                       "target": "xealist-gallery-8",
                       "arrivalView": {
@@ -1697,11 +1841,11 @@
                       }
                     },
                     {
-                      "yaw": -125,
-                      "pitch": -8,
-                      "label": "Back to bay 6",
+                      "yaw": 130,
+                      "pitch": -3,
+                      "label": "Back to Bay 5",
                       "type": "navigation",
-                      "target": "xealist-gallery-6",
+                      "target": "xealist-gallery-5",
                       "arrivalView": {
                         "yaw": 15,
                         "pitch": 0,
@@ -1739,9 +1883,9 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 55,
+                      "yaw": -7,
                       "pitch": -8,
-                      "label": "On to the grand hall",
+                      "label": "The Roman temple",
                       "type": "navigation",
                       "target": "grand-hall",
                       "arrivalView": {
@@ -1751,13 +1895,25 @@
                       }
                     },
                     {
-                      "yaw": -125,
-                      "pitch": -8,
-                      "label": "Back to bay 7",
+                      "yaw": 65,
+                      "pitch": -3,
+                      "label": "Back to Bay 7",
                       "type": "navigation",
                       "target": "xealist-gallery-7",
                       "arrivalView": {
                         "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": -117,
+                      "pitch": 0,
+                      "label": "The silver statue",
+                      "type": "navigation",
+                      "target": "grand-hall-colonnade",
+                      "arrivalView": {
+                        "yaw": -70,
                         "pitch": 0,
                         "fov": 90
                       }
@@ -1801,8 +1957,8 @@
                   "hotspots": [
                     {
                       "yaw": 0,
-                      "pitch": 2,
-                      "label": "Up to the Keeper’s Gallery",
+                      "pitch": 7,
+                      "label": "The Keepers Gallery",
                       "type": "navigation",
                       "target": "keepers-gallery",
                       "arrivalView": {
@@ -1812,37 +1968,37 @@
                       }
                     },
                     {
-                      "yaw": 60,
-                      "pitch": -8,
-                      "label": "Into the Xealist Hall",
+                      "yaw": 75,
+                      "pitch": 0,
+                      "label": "To Bay 7",
+                      "type": "navigation",
+                      "target": "xealist-gallery-7",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": -108,
+                      "pitch": 0,
+                      "label": "To the Noxx Hall",
+                      "type": "navigation",
+                      "target": "noxx-gallery-5",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "yaw": 180,
+                      "pitch": -20,
+                      "label": "Back down the temple steps",
                       "type": "navigation",
                       "target": "xealist-gallery-8",
                       "arrivalView": {
                         "yaw": 15,
-                        "pitch": 0,
-                        "fov": 90
-                      }
-                    },
-                    {
-                      "yaw": -95,
-                      "pitch": -8,
-                      "label": "Into the Noxx Hall",
-                      "type": "navigation",
-                      "target": "noxx-gallery-8",
-                      "arrivalView": {
-                        "yaw": 15,
-                        "pitch": 0,
-                        "fov": 90
-                      }
-                    },
-                    {
-                      "yaw": 175,
-                      "pitch": -8,
-                      "label": "To the colonnade",
-                      "type": "navigation",
-                      "target": "grand-hall-colonnade",
-                      "arrivalView": {
-                        "yaw": -70,
                         "pitch": 0,
                         "fov": 90
                       }
@@ -1878,14 +2034,14 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": -115,
-                      "pitch": -8,
-                      "label": "Back to the grand hall",
+                      "yaw": -130,
+                      "pitch": -20,
+                      "label": "Back to Bay 8",
                       "type": "navigation",
-                      "target": "grand-hall",
+                      "target": "xealist-gallery-8",
                       "arrivalView": {
-                        "yaw": 175,
-                        "pitch": -2,
+                        "yaw": 15,
+                        "pitch": 0,
                         "fov": 90
                       }
                     }
@@ -1933,9 +2089,9 @@
                   },
                   "hotspots": [
                     {
-                      "yaw": 178,
-                      "pitch": -8,
-                      "label": "Back down to the grand hall",
+                      "yaw": 180,
+                      "pitch": -15,
+                      "label": "Back to the Grand Hall",
                       "type": "navigation",
                       "target": "grand-hall",
                       "arrivalView": {

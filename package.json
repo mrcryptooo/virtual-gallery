@@ -25,6 +25,7 @@
     "pipeline:synthetic": "node scripts/make-synthetic-master.ts",
     "tokens:check": "node scripts/token-lint.mjs",
     "validate:content": "node scripts/validate-packages.ts",
+    "validate:graph": "node scripts/validate-graph.mjs modern-museum museum-test",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

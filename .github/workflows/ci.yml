@@ -38,6 +38,9 @@ jobs:
       - name: Content validation (ADR-010)
         run: pnpm validate:content
 
+      - name: Navigation graph gate
+        run: pnpm validate:graph
+
       - name: Build
         run: pnpm build
 
