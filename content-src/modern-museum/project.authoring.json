@@ -703,6 +703,18 @@
                         "pitch": 0,
                         "fov": 90
                       }
+                    },
+                    {
+                      "type": "navigation",
+                      "yaw": 100,
+                      "pitch": -35,
+                      "label": "Shortcut to Bay 4",
+                      "target": "noxx-gallery-4",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
                     }
                   ]
                 },
@@ -792,6 +804,30 @@
                       "pitch": -5,
                       "label": "To Bay 1",
                       "target": "noxx-gallery-1",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "type": "navigation",
+                      "yaw": 115,
+                      "pitch": -38,
+                      "label": "Shortcut to Bay 2",
+                      "target": "noxx-gallery-2",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "type": "navigation",
+                      "yaw": -120,
+                      "pitch": -35,
+                      "label": "Shortcut to Bay 6",
+                      "target": "noxx-gallery-6",
                       "arrivalView": {
                         "yaw": 15,
                         "pitch": 0,
@@ -927,6 +963,30 @@
                         "pitch": 0,
                         "fov": 90
                       }
+                    },
+                    {
+                      "type": "navigation",
+                      "yaw": 30,
+                      "pitch": -38,
+                      "label": "Shortcut to Bay 4",
+                      "target": "noxx-gallery-4",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "type": "navigation",
+                      "yaw": 120,
+                      "pitch": -38,
+                      "label": "Shortcut to Bay 8",
+                      "target": "noxx-gallery-8",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
                     }
                   ]
                 },
@@ -1040,6 +1100,18 @@
                       "pitch": -3,
                       "label": "Back to Bay 5",
                       "target": "noxx-gallery-5",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "type": "navigation",
+                      "yaw": 60,
+                      "pitch": -35,
+                      "label": "Shortcut to Bay 6",
+                      "target": "noxx-gallery-6",
                       "arrivalView": {
                         "yaw": 15,
                         "pitch": 0,
@@ -1194,6 +1266,18 @@
                       "pitch": -3,
                       "label": "On to Bay 3",
                       "target": "xealist-gallery-3",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "type": "navigation",
+                      "yaw": 120,
+                      "pitch": -35,
+                      "label": "Shortcut to Bay 4",
+                      "target": "xealist-gallery-4",
                       "arrivalView": {
                         "yaw": 15,
                         "pitch": 0,
@@ -1382,6 +1466,18 @@
                       "pitch": -3,
                       "label": "Back to Bay 3",
                       "target": "xealist-gallery-3",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "type": "navigation",
+                      "yaw": -130,
+                      "pitch": -35,
+                      "label": "Shortcut to Bay 4",
+                      "target": "xealist-gallery-4",
                       "arrivalView": {
                         "yaw": 15,
                         "pitch": 0,
@@ -1589,6 +1685,42 @@
                       "pitch": -20,
                       "label": "Back down the temple steps",
                       "target": "xealist-gallery-8",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "type": "navigation",
+                      "yaw": -140,
+                      "pitch": -30,
+                      "label": "Shortcut to Bay 6",
+                      "target": "noxx-gallery-6",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "type": "navigation",
+                      "yaw": -60,
+                      "pitch": -30,
+                      "label": "Shortcut to Bay 7",
+                      "target": "noxx-gallery-7",
+                      "arrivalView": {
+                        "yaw": 15,
+                        "pitch": 0,
+                        "fov": 90
+                      }
+                    },
+                    {
+                      "type": "navigation",
+                      "yaw": -25,
+                      "pitch": -30,
+                      "label": "Shortcut to Bay 8",
+                      "target": "noxx-gallery-8",
                       "arrivalView": {
                         "yaw": 15,
                         "pitch": 0,

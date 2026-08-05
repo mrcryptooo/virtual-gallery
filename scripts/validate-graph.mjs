@@ -5,7 +5,8 @@
  *   • every navigation target exists            • no self-links
  *   • no dangling links                         • no duplicate hotspots
  *   • every scene reachable from the entrance   • no scene traps the visitor
- *   • every route reversible (directly, or by a path back)
+ *   • every route reversible by a DIRECT reverse hotspot — a longer path back
+ *     through other panoramas is explicitly not accepted (owner rule, 2026-08-05)
  *   • every non-detail scene offers onward navigation
  *   • every detail/zoom scene has a return route
  *   • arrival views land on a real view of the destination
@@ -90,20 +91,23 @@ for (const slug of slugs) {
       problems.push(`${p.id}: traps the visitor (no path back to the entrance)`);
   }
 
-  // ── reversibility of every route ──────────────────────────────────────────
-  const oneWay = [];
+  // ── reversibility: every A -> B must have a direct B -> A ────────────────
+  // Reachability is deliberately NOT accepted as a substitute here.
+  const unpaired = [];
   for (const p of panoramas) {
     for (const h of nav(p)) {
       const target = byId.get(h.target);
       if (!target) continue;
-      const direct = nav(target).some((x) => x.target === p.id);
-      if (direct) continue;
-      // no direct reverse: a path back must exist, otherwise it is a trap
-      const back = walk(h.target, forward);
-      if (!back.has(p.id))
-        problems.push(`${p.id} -> ${h.target}: no reverse route and no path back`);
-      else oneWay.push(`${p.id} -> ${h.target}`);
+      if (!nav(target).some((x) => x.target === p.id)) {
+        unpaired.push(`${p.id} -> ${h.target}`);
+        problems.push(`${p.id} -> ${h.target}: no direct reverse hotspot in "${h.target}"`);
+      }
     }
+  }
+
+  const edgeCount = panoramas.reduce((n, q) => n + nav(q).length, 0);
+  if (edgeCount % 2 !== 0) {
+    problems.push(`odd navigation edge count (${String(edgeCount)}): every edge must be paired`);
   }
 
   // ── onward navigation / detail returns ────────────────────────────────────
@@ -120,10 +124,8 @@ for (const slug of slugs) {
   console.log(`  reachable from entrance: ${String(reachable.size)}/${String(panoramas.length)}`);
   console.log(`  can return to entrance:  ${String(canReturn.size)}/${String(panoramas.length)}`);
   console.log(`  detail scenes (1 exit):  ${String(notes.length)}`);
-  if (oneWay.length > 0) {
-    console.log(`  intentional one-way jump cuts (path back verified): ${String(oneWay.length)}`);
-    for (const o of oneWay) console.log(`    · ${o}`);
-  }
+  console.log(`  unpaired navigation edges: ${String(unpaired.length)} (must be 0)`);
+  console.log(`  edge count even:           ${edgeCount % 2 === 0 ? 'yes' : 'NO'}`);
   if (problems.length > 0) {
     failed = true;
     console.error(`  ✗ ${String(problems.length)} problem(s):`);
