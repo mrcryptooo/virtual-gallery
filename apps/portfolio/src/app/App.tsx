@@ -6,9 +6,17 @@ import { DevTokensPage } from './DevTokensPage';
 const TourPage = lazy(() => import('./TourPage').then((module) => ({ default: module.TourPage })));
 
 /**
+ * Routes served by the Marzipano static export rather than this SPA. The
+ * server rewrites them before React ever loads (vercel.json in production,
+ * a matching dev middleware in vite.config.ts); this guard is a safety net so
+ * the engine can never take the route if a rewrite is missing.
+ */
+const STATIC_TOUR_ROUTES = new Set(['modern-museum']);
+
+/**
  * Route handling is deliberately minimal until M1.6 (react-router + deep
  * links + URL view sync). Recognized today:
- *   /p/<project-slug>   → walkthrough (integration test)
+ *   /p/<project-slug>   → walkthrough (engine-rendered projects)
  *   /dev/tokens         → design-system showcase (dev builds only)
  */
 export function App() {
@@ -16,6 +24,12 @@ export function App() {
 
   if (import.meta.env.DEV && path === '/dev/tokens') {
     return <DevTokensPage />;
+  }
+
+  const staticMatch = /^\/p\/([a-z0-9-]+)\/?$/.exec(path)?.[1];
+  if (staticMatch !== undefined && STATIC_TOUR_ROUTES.has(staticMatch)) {
+    window.location.replace(`/tour/${staticMatch}/index.html`);
+    return null;
   }
 
   const tourMatch = /^\/p\/([a-z0-9-]+)\/?$/.exec(path);

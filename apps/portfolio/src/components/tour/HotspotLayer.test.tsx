@@ -13,6 +13,10 @@ import {
 import { HotspotLayer } from './HotspotLayer';
 
 /**
+ * Scope note (2026-08-11): modern-museum is now served by its own Marzipano
+ * export at /p/modern-museum and is no longer rendered by this engine, so it is
+ * not exercised here. Its integrity is gated by scripts/verify-marzipano.mjs.
+ *
  * The guarantee this file exists to protect (owner requirement, 2026-07-31):
  * no scene may load without at least one discoverable navigation control
  * while it has outgoing navigation — at ANY viewport aspect, portrait phones
@@ -169,8 +173,8 @@ describe('HotspotLayer', () => {
 
   it('has no accessibility violations with a mix of on- and off-screen hotspots', async () => {
     stubLayout(390, 844);
-    const panoramas = loadPanoramas('modern-museum');
-    const scene = panoramas.find((p) => p.hotspots.length > 2) ?? panoramas[0]!;
+    const panoramas = loadPanoramas('museum-test');
+    const scene = panoramas.find((p) => p.hotspots.length > 1) ?? panoramas[0]!;
     const { container } = render(
       <HotspotLayer
         hotspots={projectAt(scene, 390, 844)}
@@ -184,42 +188,38 @@ describe('HotspotLayer', () => {
 });
 
 describe.each(VIEWPORTS)('discoverable navigation at $name', ({ w, h }) => {
-  it.each(['modern-museum', 'museum-test'])(
-    'every %s scene with outgoing navigation exposes a control',
-    (slug) => {
-      const panoramas = loadPanoramas(slug);
-      const withNavigation = panoramas.filter((p) =>
-        p.hotspots.some((hotspot) => hotspot.type === 'navigation'),
-      );
-      expect(withNavigation.length).toBeGreaterThan(0);
+  it.each(['museum-test'])('every %s scene with outgoing navigation exposes a control', (slug) => {
+    const panoramas = loadPanoramas(slug);
+    const withNavigation = panoramas.filter((p) =>
+      p.hotspots.some((hotspot) => hotspot.type === 'navigation'),
+    );
+    expect(withNavigation.length).toBeGreaterThan(0);
 
-      const bare: string[] = [];
-      for (const panorama of withNavigation) {
-        stubLayout(w, h);
-        const { unmount } = render(
-          <HotspotLayer
-            hotspots={projectAt(panorama, w, h)}
-            onNavigate={noop}
-            onInfo={noop}
-            onOrient={noop}
-          />,
-        );
-        const controls = screen.queryAllByRole('button');
-        if (controls.length === 0) bare.push(panorama.id);
-        unmount();
-        vi.restoreAllMocks();
-      }
-      expect(bare, `scenes with no navigation control at ${String(w)}×${String(h)}`).toEqual([]);
-    },
-  );
+    const bare: string[] = [];
+    for (const panorama of withNavigation) {
+      stubLayout(w, h);
+      const { unmount } = render(
+        <HotspotLayer
+          hotspots={projectAt(panorama, w, h)}
+          onNavigate={noop}
+          onInfo={noop}
+          onOrient={noop}
+        />,
+      );
+      const controls = screen.queryAllByRole('button');
+      if (controls.length === 0) bare.push(panorama.id);
+      unmount();
+      vi.restoreAllMocks();
+    }
+    expect(bare, `scenes with no navigation control at ${String(w)}×${String(h)}`).toEqual([]);
+  });
 });
 
 describe('portrait regression', () => {
-  it('exercises the edge-indicator path: portrait pushes gallery hotspots off-screen', () => {
-    const panoramas = loadPanoramas('modern-museum');
-    const galleries = panoramas.filter((p) => p.id.includes('-gallery-'));
-    const offScreenInPortrait = galleries.filter((p) =>
-      projectAt(p, 390, 844).every((h) => !h.onScreen),
+  it('exercises the edge-indicator path: portrait pushes hotspots off-screen', () => {
+    const panoramas = loadPanoramas('museum-test');
+    const offScreenInPortrait = panoramas.filter(
+      (p) => p.hotspots.length > 0 && projectAt(p, 390, 844).every((h) => !h.onScreen),
     );
     // If this ever hits zero the indicators are dead code and the guarantee
     // above would pass vacuously — keep the regression honest.

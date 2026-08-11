@@ -8,3 +8,6 @@ coverage/
 .asset-cache/
 .husky/_/
 apps/portfolio/public/projects/
+
+# Vendored Marzipano export — preserved byte-for-byte, never reformatted
+apps/portfolio/public/tour/
