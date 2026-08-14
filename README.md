@@ -54,10 +54,13 @@ load-bearing, not preferences:
   files; a plain upload trips Vercel's per-account limit of 5,000 file uploads
   per 24 h (`api-upload-free`). The constraint is _file count_, not bytes, so
   this stays necessary even after the AVIF ladder lands.
-- **The deploy is verified.** `pnpm verify:deploy <url>` re-checks each project's
-  manifest, preview tile, deepest tile and poster with content-type assertions —
-  the SPA fallback returns HTML with a 200 for missing files, so status codes
-  alone would hide a broken upload.
+- **The deploy is verified, twice, fail-closed.** [`scripts/verify-deployment.mjs`](scripts/verify-deployment.mjs)
+  re-checks each engine-rendered project's manifest, preview tile, deepest tile
+  and poster with content-type assertions, and
+  [`scripts/verify-marzipano-deploy.mjs`](scripts/verify-marzipano-deploy.mjs) does
+  the same for the Marzipano `modern-museum` tour — both run automatically as
+  part of `pnpm deploy:prod`. The SPA fallback returns HTML with a 200 for
+  missing files, so status codes alone would hide a broken upload.
 
 One-time setup in a fresh checkout: `vercel link` (or set `VERCEL_PROJECT_ID`
 and `VERCEL_ORG_ID`), so the deploy reuses the existing Vercel project.
