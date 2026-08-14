@@ -112,4 +112,8 @@ if (target === deploymentUrl) {
 
 console.log(`[deploy] verifying ${target}`);
 run('node', ['scripts/verify-deployment.mjs', target], { stdio: 'inherit', cwd: process.cwd() });
+run('node', ['scripts/verify-marzipano-deploy.mjs', target], {
+  stdio: 'inherit',
+  cwd: process.cwd(),
+});
 console.log(`\n[deploy] done — live at ${target}`);

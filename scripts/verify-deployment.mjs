@@ -10,7 +10,10 @@
  */
 
 const [, , baseUrl, ...slugArgs] = process.argv;
-const slugs = slugArgs.length > 0 ? slugArgs : ['modern-museum', 'museum-test'];
+// modern-museum is served as a static Marzipano export, not an engine-rendered
+// project package, so it has no /projects/<slug>/project.json manifest to
+// check here — it is covered separately by verify-marzipano-deploy.mjs.
+const slugs = slugArgs.length > 0 ? slugArgs : ['museum-test'];
 
 if (baseUrl === undefined) {
   console.error('Usage: node scripts/verify-deployment.mjs <baseUrl> [slug ...]');

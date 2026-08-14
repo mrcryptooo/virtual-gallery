@@ -17,7 +17,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const slugs = process.argv.slice(2);
-if (slugs.length === 0) slugs.push('modern-museum');
+// modern-museum is served as a static Marzipano export (verify-marzipano.mjs),
+// not an engine-rendered project package, so it is no longer a valid default here.
+if (slugs.length === 0) slugs.push('museum-test');
 
 let failed = false;
 
