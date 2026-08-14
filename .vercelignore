@@ -1,0 +1,14 @@
+# Deploys ship apps/portfolio/dist only (see scripts/deploy.mjs). These entries
+# are belt-and-braces for anyone who runs `vercel deploy` from the repo root.
+
+# Pipeline input, never served (doc 07 §2): panorama masters are hundreds of MB
+content-src/
+.asset-cache/
+
+# Built output is deployed directly, never as part of a source upload
+apps/portfolio/dist/
+
+# Not needed to build or serve
+docs/
+e2e/
+packages/engine/test/fixtures/

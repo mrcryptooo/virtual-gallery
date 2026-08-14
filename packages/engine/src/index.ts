@@ -57,3 +57,24 @@ export {
   expectedPanoramaFiles,
   expectedPackageFiles,
 } from './domain/manifest/paths.ts';
+
+export { loadProject, ProjectLoadError } from './loader/loadProject.ts';
+
+export { createPanoramaEngine } from './PanoramaEngine.ts';
+export type {
+  PanoramaEngine,
+  EngineOptions,
+  EngineEventMap,
+  ProjectedHotspot,
+  Wayfinding,
+} from './PanoramaEngine.ts';
+
+export {
+  wrap180,
+  bearing,
+  horizontalFov,
+  isOnScreen,
+  clampToRect,
+  directionWord,
+} from './hotspots/projection.ts';
+export type { Bearing, Rect, Point } from './hotspots/projection.ts';

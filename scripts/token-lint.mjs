@@ -54,6 +54,10 @@ try {
 
 for (const file of cssFiles) {
   const css = readFileSync(join(DIST_ASSETS, file), 'utf8');
+  // Vendor exemption: PSV's own stylesheet ships in the engine chunk
+  // (ADR-002 foundation, not a design-system surface — its visible UI is
+  // disabled). Identified by its namespaced .psv- selectors.
+  if (css.includes('.psv-container')) continue;
   for (const [kind, re] of [
     ['hex', HEX_RE],
     ['px', PX_RE],

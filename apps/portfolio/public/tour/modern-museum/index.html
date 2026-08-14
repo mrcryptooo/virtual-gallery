@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- Integration: the tour is served at /p/modern-museum but its files live at
+     /tour/modern-museum/. This base tag is the only edit to the Marzipano
+     export; it makes every relative asset path resolve against the real asset
+     directory instead of the public route. -->
+<base href="/tour/modern-museum/">
+<title>Seismic Museum</title>
+<meta charset="utf-8">
+<meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
+<style> @-ms-viewport { width: device-width; } </style>
+<link rel="stylesheet" href="vendor/reset.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="multiple-scenes ">
+
+<div id="pano"></div>
+
+<div id="sceneList">
+  <ul class="scenes">
+    
+      <a href="javascript:void(0)" class="scene" data-id="0-01">
+        <li class="text">01</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="1-02">
+        <li class="text">02</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="2-03">
+        <li class="text">03</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="3-04">
+        <li class="text">04</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="4-05">
+        <li class="text">05</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="5-06">
+        <li class="text">06</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="6-07">
+        <li class="text">07</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="7-08">
+        <li class="text">08</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="8-85">
+        <li class="text">8.5</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="9-09">
+        <li class="text">09</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="10-95">
+        <li class="text">9.5</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="11-10">
+        <li class="text">10</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="12-11">
+        <li class="text">11</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="13-12">
+        <li class="text">12</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="14-13">
+        <li class="text">13</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="15-14">
+        <li class="text">14</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="16-15">
+        <li class="text">15</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="17-16">
+        <li class="text">16</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="18-17">
+        <li class="text">17</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="19-18">
+        <li class="text">18</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="20-19">
+        <li class="text">19</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="21-20">
+        <li class="text">20</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="22-21">
+        <li class="text">21</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="23-22">
+        <li class="text">22</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="24-23">
+        <li class="text">23</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="25-24">
+        <li class="text">24</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="26-25">
+        <li class="text">25</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="27-26">
+        <li class="text">26</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="28-27">
+        <li class="text">27</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="29-28">
+        <li class="text">28</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="30-29">
+        <li class="text">29</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="31-30">
+        <li class="text">30</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="32-31">
+        <li class="text">31</li>
+      </a>
+    
+  </ul>
+</div>
+
+<div id="titleBar">
+  <h1 class="sceneName"></h1>
+</div>
+
+<a href="javascript:void(0)" id="autorotateToggle">
+  <img class="icon off" src="img/play.png">
+  <img class="icon on" src="img/pause.png">
+</a>
+
+<a href="javascript:void(0)" id="fullscreenToggle">
+  <img class="icon off" src="img/fullscreen.png">
+  <img class="icon on" src="img/windowed.png">
+</a>
+
+<a href="javascript:void(0)" id="sceneListToggle">
+  <img class="icon off" src="img/expand.png">
+  <img class="icon on" src="img/collapse.png">
+</a>
+
+<a href="javascript:void(0)" id="viewUp" class="viewControlButton viewControlButton-1">
+  <img class="icon" src="img/up.png">
+</a>
+<a href="javascript:void(0)" id="viewDown" class="viewControlButton viewControlButton-2">
+  <img class="icon" src="img/down.png">
+</a>
+<a href="javascript:void(0)" id="viewLeft" class="viewControlButton viewControlButton-3">
+  <img class="icon" src="img/left.png">
+</a>
+<a href="javascript:void(0)" id="viewRight" class="viewControlButton viewControlButton-4">
+  <img class="icon" src="img/right.png">
+</a>
+<a href="javascript:void(0)" id="viewIn" class="viewControlButton viewControlButton-5">
+  <img class="icon" src="img/plus.png">
+</a>
+<a href="javascript:void(0)" id="viewOut" class="viewControlButton viewControlButton-6">
+  <img class="icon" src="img/minus.png">
+</a>
+
+<script src="vendor/screenfull.min.js" ></script>
+<script src="vendor/bowser.min.js" ></script>
+<script src="vendor/marzipano.js" ></script>
+
+<script src="data.js"></script>
+<script src="index.js"></script>
+
+</body>
+</html>

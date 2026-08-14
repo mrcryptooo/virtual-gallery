@@ -38,8 +38,17 @@ jobs:
       - name: Content validation (ADR-010)
         run: pnpm validate:content
 
+      - name: Navigation graph gate (engine-rendered projects)
+        run: pnpm validate:graph
+
+      - name: Marzipano tour gate (source tree)
+        run: pnpm validate:marzipano
+
       - name: Build
         run: pnpm build
+
+      - name: Marzipano tour gate (production build)
+        run: node scripts/verify-marzipano.mjs apps/portfolio/dist
 
       - name: Token lint (design-system gate)
         run: pnpm tokens:check

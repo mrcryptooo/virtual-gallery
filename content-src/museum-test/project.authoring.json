@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "museum-test",
+  "title": "t00ns Museum (Test)",
+  "description": "Temporary production integration test: a three-scene walkthrough from the plaza, through the entrance court, into the gallery hall. Test assets — not portfolio work.",
+  "metadata": {
+    "author": "Manav",
+    "software": "Test render",
+    "renderEngine": "Test",
+    "year": 2026,
+    "license": "All rights reserved",
+    "location": "Integration Test",
+    "categories": ["test"]
+  },
+  "entrancePanorama": "plaza-approach",
+  "coverPanorama": "plaza-approach",
+  "buildings": [
+    {
+      "id": "museum",
+      "name": "t00ns Museum",
+      "floors": [
+        {
+          "id": "ground",
+          "name": "Ground Floor",
+          "rooms": [
+            {
+              "id": "grounds",
+              "name": "Museum Grounds",
+              "description": "The checkerboard plaza and entrance court outside the museum.",
+              "panoramas": [
+                {
+                  "id": "plaza-approach",
+                  "title": "Plaza Approach",
+                  "description": "Open checkerboard plaza facing the museum building and the illuminated t00ns museum entrance canopy with its winged statue.",
+                  "tags": ["exterior", "test"],
+                  "poster": {
+                    "alt": "Wide plaza of checkered tiles at night, with the glowing t00ns museum entrance canopy and the museum building in the distance."
+                  },
+                  "createdAt": "2026-07-09",
+                  "initialView": { "yaw": -20, "pitch": -2, "fov": 90 },
+                  "hotspots": [
+                    {
+                      "type": "navigation",
+                      "yaw": 2,
+                      "pitch": -4,
+                      "label": "Walk to the entrance court",
+                      "target": "entrance-court",
+                      "arrivalView": { "yaw": -2, "pitch": 0, "fov": 90 }
+                    }
+                  ]
+                },
+                {
+                  "id": "entrance-court",
+                  "title": "Entrance Court",
+                  "description": "The forecourt between the entrance canopy and the museum building, facing the open doorway into the galleries.",
+                  "tags": ["exterior", "test"],
+                  "poster": {
+                    "alt": "The museum building seen up close from its forecourt, with the entrance canopy and statue to the right."
+                  },
+                  "createdAt": "2026-07-09",
+                  "initialView": { "yaw": 0, "pitch": 0, "fov": 90 },
+                  "hotspots": [
+                    {
+                      "type": "navigation",
+                      "yaw": -2,
+                      "pitch": -2,
+                      "label": "Enter the gallery",
+                      "target": "gallery-hall",
+                      "arrivalView": { "yaw": 0, "pitch": 0, "fov": 90 }
+                    },
+                    {
+                      "type": "navigation",
+                      "yaw": 68,
+                      "pitch": -5,
+                      "label": "Back to the plaza",
+                      "target": "plaza-approach",
+                      "arrivalView": { "yaw": -25, "pitch": -2, "fov": 90 }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "gallery",
+              "name": "Gallery",
+              "description": "The main exhibition corridor.",
+              "panoramas": [
+                {
+                  "id": "gallery-hall",
+                  "title": "Gallery Hall",
+                  "description": "Interior gallery corridor with framed character artworks hung along both illuminated walls, checkered floor and ceiling openings.",
+                  "tags": ["interior", "test"],
+                  "poster": {
+                    "alt": "A gallery corridor with colorful framed cartoon artworks on white walls, lit by vertical wall lights."
+                  },
+                  "createdAt": "2026-07-09",
+                  "initialView": { "yaw": 0, "pitch": 0, "fov": 90 },
+                  "hotspots": [
+                    {
+                      "type": "navigation",
+                      "yaw": 180,
+                      "pitch": -5,
+                      "label": "Back to the entrance court",
+                      "target": "entrance-court",
+                      "arrivalView": { "yaw": 68, "pitch": -3, "fov": 90 }
+                    },
+                    {
+                      "type": "information",
+                      "yaw": -55,
+                      "pitch": 3,
+                      "label": "About this exhibition",
+                      "title": "t00ns Museum",
+                      "body": "A temporary integration-test exhibition. These panoramas validate the tile pipeline, streaming, hotspots, and transitions before the real Lumion portfolio is produced."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
