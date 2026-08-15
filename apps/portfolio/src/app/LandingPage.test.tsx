@@ -3,13 +3,13 @@ import { describe, expect, it } from 'vitest';
 import { LandingPage } from './LandingPage';
 
 describe('LandingPage (production landing route)', () => {
-  it('renders the background field, identity block, stone hero, tagline, and CTA', () => {
+  it('renders the fallback field, identity block, stone hero, tagline, and CTA', () => {
     const { container } = render(<LandingPage />);
 
-    expect(container.querySelector('[class*="background"]')).toBeTruthy();
+    expect(container.querySelector('[class*="fallback"]')).toBeTruthy();
 
     expect(screen.getByText('Seismic Museum')).toBeInTheDocument();
-    expect(screen.getByText(/Stone \/ #51343B/i)).toBeInTheDocument();
+    expect(screen.queryByText(/#[0-9a-f]{6}/i)).not.toBeInTheDocument();
 
     expect(screen.getByRole('button', { name: 'Enter the Seismic Museum' })).toBeInTheDocument();
 
@@ -19,7 +19,7 @@ describe('LandingPage (production landing route)', () => {
     expect(cta).toHaveAttribute('href', '/p/modern-museum');
   });
 
-  it('renders the reference video as a silent, non-autoplaying, controls-free scrub target', () => {
+  it('renders the reference video as a silent, non-autoplaying, controls-free full-bleed layer', () => {
     const { container } = render(<LandingPage />);
     const video = container.querySelector('video');
     expect(video).toBeTruthy();

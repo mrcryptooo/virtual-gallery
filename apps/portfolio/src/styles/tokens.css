@@ -82,34 +82,19 @@
   /* ── Landing-page Seismic Stone hero (NOT in docs/11 yet — see
      apps/portfolio/src/components/hero; shipping on the landing route,
      pending a doc-11/doc-10 amendment to formalize) ─────────────────────── */
-  --color-stone-body: #51343b; /* sampled from the reference video's plate faces */
-  --color-stone-glow: #d494af;
-
-  /* Video-matched hero field — pixel-sampled from the reference video's own
-     frame (ffmpeg crop, not guessed): top corners are the darkest point in
-     frame (~rgb167-174), brightness rises across a broad soft overhead
-     highlight band across most of the top width, and rises further toward
-     the bottom edge (~rgb205-219), so the 4-stop sweep below runs dark-top
-     to light-bottom, not the simpler single center-out radial this
-     replaced. Same scoped exception as above, not a doc-11 palette change. */
-  --color-stone-field-light: #d3d3d3;
+  /* Fallback fill shown only for the brief moment before the full-bleed
+     hero video has decoded its first frame -- a mid-tone pixel-sampled from
+     the reference video's own background field (ffmpeg crop, not guessed). */
   --color-stone-field: #c6c6c6;
-  --color-stone-field-low: #b4b4b4;
-  --color-stone-field-dim: #a8a8a8;
-  /* The grounding-shadow gradient's rgba(20,15,17, 0.10 / 0) — the build's
-     CSS minifier collapses rgba() into 8-digit hex+alpha, so token-lint
-     needs the exact resulting literals registered here, not the rgba()
-     source form. */
-  --color-stone-shadow: #140f111a;
-  --color-stone-shadow-transparent: #140f1100;
-  /* Same minifier note — rgba(0,0,0,0.15) and rgba(17,17,18,0.32) */
+  /* Same minifier note — rgba(0,0,0,0.15) and rgba(17,17,18,0.32); the
+     build's CSS minifier collapses rgba() into 8-digit hex+alpha, so
+     token-lint needs the exact resulting literals registered here. */
   --color-swatch-inset: #00000026;
   --color-cta-border: #11111252;
 
-  /* Breakpoints — the landing hero is the first responsive @media use in
+  /* Breakpoint — the landing hero is the first responsive @media use in
      this app; custom properties can't be read inside a media condition, so
-     these exist only as the documented source of truth for the literal
-     values used in component CSS (not consumed via var()). */
+     this exists only as the documented source of truth for the literal
+     value used in component CSS (not consumed via var()). */
   --breakpoint-compact: 640px;
-  --breakpoint-wide: 1600px;
 }

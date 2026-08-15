@@ -5,7 +5,9 @@ import styles from './HeroDevPage.module.css';
  * Isolated dev harness for the Seismic Stone hero. The real production
  * surface is the landing route (`/`, see LandingPage.tsx), which renders the
  * same SeismicStoneVideo component. Excluded from production by the DEV
- * gate in App, same as DevTokensPage.
+ * gate in App, same as DevTokensPage. SeismicStoneVideo positions itself
+ * full-viewport via `position: fixed` regardless of where it's mounted, so
+ * this harness only needs to float its note text above it.
  */
 export function HeroDevPage() {
   return (
@@ -15,9 +17,7 @@ export function HeroDevPage() {
         away to let it settle closed. Click/tap or press Enter/Space to enter the museum.
         Reduced-motion and keyboard activation both work.
       </p>
-      <div className={styles['stage']}>
-        <SeismicStoneVideo interactive />
-      </div>
+      <SeismicStoneVideo interactive />
     </main>
   );
 }

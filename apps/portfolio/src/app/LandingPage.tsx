@@ -3,24 +3,20 @@ import { SeismicStoneVideo } from '@/components/hero/SeismicStoneVideo';
 import styles from './LandingPage.module.css';
 
 const MUSEUM_HREF = '/p/modern-museum';
-// Sampled from the reference stone video's plate faces (mirrors
-// --color-stone-body in tokens.css) — shown as museum/catalog metadata,
-// not a debug value.
-const STONE_HEX = '#51343B';
 
 // Total entrance choreography length: stone resolve (0ms) -> wordmark (200ms)
-// -> metadata (400ms) -> tagline (600ms, 600ms duration) -> CTA (900ms, 300ms
-// duration) settles by ~1200ms. Matches the transition-delay values in
-// LandingPage.module.css, all composed from tokens.css motion tokens.
+// -> tagline (600ms, 600ms duration) -> CTA (900ms, 300ms duration) settles
+// by ~1200ms. Matches the transition-delay values in LandingPage.module.css,
+// all composed from tokens.css motion tokens.
 const ENTRANCE_SETTLE_MS = 1250;
 
 /**
  * Public landing page (`/`) — a single full-viewport museum entrance. The
- * Seismic Stone hero is the reference video itself (see
- * components/hero/SeismicStoneVideo), pointer/touch-scrubbed between a
- * measured closed and open frame range; the page background is not a plain
- * fill but a reproduction of the video's own sampled tonal field so the
- * video box has no visible edge against it.
+ * Seismic Stone reference video (see components/hero/SeismicStoneVideo) IS
+ * the viewport's visual field: a fixed, full-bleed, object-fit: cover layer,
+ * not a rectangle sitting on a separate page background. Overlay UI
+ * (wordmark, tagline, CTA) floats above it; there is no other background
+ * layer to seam-match, since cover always fully covers the viewport.
  */
 export function LandingPage() {
   const [entranceReady, setEntranceReady] = useState(false);
@@ -64,21 +60,14 @@ export function LandingPage() {
     <div
       className={`${styles['page'] ?? ''} ${entranceReady ? (styles['entranceReady'] ?? '') : ''}`}
     >
-      <div className={styles['background']} aria-hidden="true" />
+      <div className={styles['fallback']} aria-hidden="true" />
+      <SeismicStoneVideo href={MUSEUM_HREF} interactive={interactive} revealed={entranceReady} />
 
       <header className={styles['identity']}>
         <p className={styles['wordmark']}>Seismic Museum</p>
-        <div className={styles['metadata']}>
-          <span className={styles['swatch']} aria-hidden="true" />
-          <p className={styles['metaLabel']}>Stone / {STONE_HEX}</p>
-        </div>
       </header>
 
       <main className={styles['stage']}>
-        <div className={styles['stoneWrap']}>
-          <SeismicStoneVideo href={MUSEUM_HREF} interactive={interactive} />
-        </div>
-
         <p className={styles['tagline']}>
           <span className={styles['taglineInner']}>The Community Is the Legacy</span>
         </p>

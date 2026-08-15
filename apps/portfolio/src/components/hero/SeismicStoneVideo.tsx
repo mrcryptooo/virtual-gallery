@@ -3,11 +3,16 @@ import styles from './SeismicStoneVideo.module.css';
 
 /**
  * Seismic Stone hero — the reference video itself is the visual asset (no
- * WebGL reconstruction). The stone's open/closed state is driven entirely by
- * scrubbing `video.currentTime` across a single deterministic CLOSED→OPEN
- * range, smoothed by a damped pointer-following target so it feels tactile
- * rather than "hover = play". See docs note in LandingPage.tsx for the
- * measured timing/geometry this was derived from.
+ * WebGL reconstruction), rendered as a fixed, full-viewport background layer
+ * (object-fit: cover) so there is no visible video rectangle against the
+ * page. The stone's open/closed state is driven entirely by scrubbing
+ * `video.currentTime` across a single deterministic CLOSED→OPEN range,
+ * smoothed by a damped pointer-following target so it feels tactile rather
+ * than "hover = play". A separate, invisible hit-area element (sized to
+ * match the video's own on-screen cover geometry, see .hitArea in the CSS)
+ * carries all pointer/touch/keyboard handling — the full-bleed video itself
+ * is never the interactive surface, since most of its frame is empty field
+ * around the stone.
  */
 
 const VIDEO_SRC = '/hero/seismic-stone.mp4';
@@ -31,9 +36,9 @@ const CLOSED_TIME = 0.08;
 const FULL_OPEN_TIME = 2.85;
 
 // Interaction hit-area: a normalized ellipse over the stone itself (not the
-// full 16:9 frame, most of which is empty background). Center is offset
-// slightly above the geometric middle of the video box because the stone's
-// own visual mass — and its grounding shadow — sit a little low in frame.
+// full video frame, most of which is empty background). Center is offset
+// slightly above the geometric middle because the stone's own visual mass —
+// and its grounding shadow — sit a little low in frame.
 const HIT_CENTER_Y = 0.47;
 const HIT_RADIUS_X = 0.4;
 const HIT_RADIUS_Y = 0.38;
@@ -41,25 +46,37 @@ const HIT_RADIUS_Y = 0.38;
 // the outer ring just past the stone's edge still registers a soft ~15-20%
 // open, per spec, before falling to fully closed.
 const OUTER_FALLOFF = 1.32;
+// Dead-zone: pointer moves smaller than this (device px) since the last
+// accepted sample are ignored outright, so sub-pixel mouse tremor can't
+// perturb the target even before smoothing gets to it.
+const MOVE_DEAD_ZONE_PX = 3;
 
-const OPEN_RATE = 0.16;
-const CLOSE_RATE = 0.07;
-const ACTIVATE_RATE = 0.4;
+// Tuned for a "directly controlled but never twitchy" feel: opening responds
+// noticeably faster than closing, so the stone reads as eager to react but
+// settles rather than snapping shut the instant the pointer drifts.
+const OPEN_RATE = 0.15;
+const CLOSE_RATE = 0.085;
 const ACTIVATE_TOTAL_MS = 420;
 const TAP_MOVE_THRESHOLD_PX = 14;
 const TAP_MAX_MS = 320;
+// Deliberately mid-range -- audible as an intentional beat without being
+// jarring against whatever the visitor already has playing.
+const ACTIVATE_VOLUME = 0.45;
 
 export interface SeismicStoneVideoProps {
   href?: string;
   label?: string;
   /** Interaction stays disabled until the entrance choreography finishes. */
   interactive: boolean;
+  /** Drives the video's own entrance fade-in (first step of the choreography). */
+  revealed?: boolean;
 }
 
 export function SeismicStoneVideo({
   href = '/p/modern-museum',
   label = 'Enter the Seismic Museum',
   interactive,
+  revealed = true,
 }: SeismicStoneVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hitAreaRef = useRef<HTMLButtonElement>(null);
@@ -70,11 +87,12 @@ export function SeismicStoneVideo({
   const targetProgressRef = useRef(0);
   const smoothedProgressRef = useRef(0);
   const lastSetTimeRef = useRef(CLOSED_TIME);
+  const lastSampleClientRef = useRef<{ x: number; y: number } | null>(null);
   const activatingRef = useRef(false);
   const rafRef = useRef<number | undefined>(undefined);
   const lastFrameAtRef = useRef(0);
   const touchStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
-  const unlockedIOSRef = useRef(false);
+  const audioUnlockedRef = useRef(false);
   const navigateTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
@@ -115,6 +133,9 @@ export function SeismicStoneVideo({
   // RAF loop: damped follow of targetProgress -> smoothedProgress -> a single
   // video.currentTime write per frame. Never seeks directly from pointer
   // events, and never re-renders React on pointer movement (refs only).
+  // Suspended entirely while activating -- that phase hands the video to
+  // real playback (see handleActivate) so the audible entry beat and the
+  // manual seek loop never fight over currentTime.
   useEffect(() => {
     lastFrameAtRef.current = performance.now();
 
@@ -123,12 +144,14 @@ export function SeismicStoneVideo({
       lastFrameAtRef.current = now;
 
       const video = videoRef.current;
-      if (video && metadataReadyRef.current && !reducedMotionRef.current) {
-        const rate = activatingRef.current
-          ? ACTIVATE_RATE
-          : targetProgressRef.current > smoothedProgressRef.current
-            ? OPEN_RATE
-            : CLOSE_RATE;
+      if (
+        video &&
+        metadataReadyRef.current &&
+        !reducedMotionRef.current &&
+        !activatingRef.current
+      ) {
+        const rate =
+          targetProgressRef.current > smoothedProgressRef.current ? OPEN_RATE : CLOSE_RATE;
         const factor = 1 - Math.pow(1 - rate, dt * 60);
         smoothedProgressRef.current +=
           (targetProgressRef.current - smoothedProgressRef.current) * factor;
@@ -146,14 +169,15 @@ export function SeismicStoneVideo({
           lastSetTimeRef.current = t;
         }
 
-        const container = hitAreaRef.current;
-        if (container) {
-          // Extremely subtle lift + scale as the stone opens — never rotation
-          // or perspective, the source video already provides the real motion.
-          const p = smoothedProgressRef.current;
-          container.style.setProperty('--stone-parallax-y', `${(-p * 3).toFixed(3)}px`);
-          container.style.setProperty('--stone-parallax-scale', (1 + p * 0.008).toFixed(4));
-        }
+        // Extremely subtle lift + scale as the stone opens — never rotation
+        // or perspective, the source video already provides the real motion.
+        // Applied to the full-bleed video itself: object-fit: cover already
+        // crops beyond the viewport on at least one axis, so a few px of
+        // extra scale/shift only deepens that existing crop margin and can
+        // never expose an edge.
+        const p = smoothedProgressRef.current;
+        video.style.setProperty('--stone-parallax-y', `${(-p * 3).toFixed(3)}px`);
+        video.style.setProperty('--stone-parallax-scale', (1 + p * 0.008).toFixed(4));
       }
 
       rafRef.current = requestAnimationFrame(tick);
@@ -166,6 +190,10 @@ export function SeismicStoneVideo({
   }, []);
 
   const updateTargetFromClient = useCallback((clientX: number, clientY: number) => {
+    const last = lastSampleClientRef.current;
+    if (last && Math.hypot(clientX - last.x, clientY - last.y) < MOVE_DEAD_ZONE_PX) return;
+    lastSampleClientRef.current = { x: clientX, y: clientY };
+
     const el = hitAreaRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
@@ -178,31 +206,45 @@ export function SeismicStoneVideo({
     targetProgressRef.current = Math.max(0, Math.min(1, p));
   }, []);
 
-  const unlockIOSVideoOnce = useCallback(() => {
-    if (unlockedIOSRef.current) return;
-    unlockedIOSRef.current = true;
+  // Unmuting itself never requires a user gesture (only an unmuted *play()*
+  // call does) -- doing it as early as the first hover/touch just means the
+  // later, gesture-backed play() call in handleActivate is already primed.
+  // Idempotent and cheap, so it's safe to call from every pointer/touch entry
+  // handler rather than threading a single "first interaction" event.
+  const unlockAudioOnce = useCallback(() => {
+    if (audioUnlockedRef.current) return;
+    audioUnlockedRef.current = true;
     const video = videoRef.current;
     if (!video) return;
-    video
-      .play()
-      .then(() => {
-        video.pause();
-      })
-      .catch(() => {
-        // Autoplay-without-gesture rejection is expected here on some
-        // browsers; scrubbing still works via currentTime regardless.
-      });
+    video.muted = false;
+    video.volume = ACTIVATE_VOLUME;
   }, []);
 
   const handleActivate = useCallback(() => {
     if (activatingRef.current) return;
     activatingRef.current = true;
     targetProgressRef.current = 1;
+    const video = videoRef.current;
     if (reducedMotionRef.current) {
       window.location.assign(href);
       return;
     }
+    if (video) {
+      // Hand the frame to real playback for the entry beat only -- this is
+      // the one moment the video actually plays (rather than being seeked
+      // while paused), which is what makes it audible, and why normal
+      // hover-scrub interaction never produces sound: a paused video seek
+      // is always silent on every browser, so there is nothing to "chop" or
+      // duck during ordinary scrubbing by construction.
+      video.muted = false;
+      video.volume = ACTIVATE_VOLUME;
+      video.play().catch(() => {
+        // Autoplay/gesture rejection on some browsers -- the timed
+        // navigation below still fires regardless, just silently.
+      });
+    }
     navigateTimeout.current = setTimeout(() => {
+      video?.pause();
       window.location.assign(href);
     }, ACTIVATE_TOTAL_MS);
   }, [href]);
@@ -216,10 +258,12 @@ export function SeismicStoneVideo({
 
   const handlePointerEnter = useCallback(
     (event: React.PointerEvent<HTMLButtonElement>) => {
-      if (!interactiveRef.current || activatingRef.current || event.pointerType === 'touch') return;
+      if (event.pointerType === 'touch') return;
+      unlockAudioOnce();
+      if (!interactiveRef.current || activatingRef.current) return;
       updateTargetFromClient(event.clientX, event.clientY);
     },
-    [updateTargetFromClient],
+    [updateTargetFromClient, unlockAudioOnce],
   );
 
   const handlePointerMove = useCallback(
@@ -232,19 +276,20 @@ export function SeismicStoneVideo({
 
   const handlePointerLeave = useCallback((event: React.PointerEvent<HTMLButtonElement>) => {
     if (event.pointerType === 'touch') return;
+    lastSampleClientRef.current = null;
     if (!activatingRef.current) targetProgressRef.current = 0;
   }, []);
 
   const handleTouchStart = useCallback(
     (event: React.TouchEvent<HTMLButtonElement>) => {
+      unlockAudioOnce();
       if (!interactiveRef.current || activatingRef.current) return;
-      unlockIOSVideoOnce();
       const touch = event.touches[0];
       if (!touch) return;
       touchStartRef.current = { x: touch.clientX, y: touch.clientY, t: performance.now() };
       updateTargetFromClient(touch.clientX, touch.clientY);
     },
-    [updateTargetFromClient, unlockIOSVideoOnce],
+    [updateTargetFromClient, unlockAudioOnce],
   );
 
   const handleTouchMove = useCallback(
@@ -287,23 +332,11 @@ export function SeismicStoneVideo({
   );
 
   return (
-    <button
-      ref={hitAreaRef}
-      type="button"
-      className={styles['hitArea']}
-      aria-label={label}
-      onPointerEnter={handlePointerEnter}
-      onPointerMove={handlePointerMove}
-      onPointerLeave={handlePointerLeave}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onClick={handleActivate}
-      onKeyDown={handleKeyDown}
-    >
+    <>
       <video
         ref={videoRef}
-        className={styles['video']}
+        className={styles['backgroundVideo']}
+        data-revealed={revealed}
         src={VIDEO_SRC}
         muted
         playsInline
@@ -312,6 +345,20 @@ export function SeismicStoneVideo({
         aria-hidden="true"
         tabIndex={-1}
       />
-    </button>
+      <button
+        ref={hitAreaRef}
+        type="button"
+        className={styles['hitArea']}
+        aria-label={label}
+        onPointerEnter={handlePointerEnter}
+        onPointerMove={handlePointerMove}
+        onPointerLeave={handlePointerLeave}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onClick={handleActivate}
+        onKeyDown={handleKeyDown}
+      />
+    </>
   );
 }

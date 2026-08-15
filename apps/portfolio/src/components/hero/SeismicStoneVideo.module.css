@@ -1,9 +1,49 @@
+/* Full-viewport background layer. object-fit: cover means the video always
+   fully covers the viewport (cropping, never gapping) regardless of aspect
+   ratio, so there is no separate background rectangle to seam-match against
+   -- the video IS the field. position: fixed so it never affects/is affected
+   by page scroll or layout. */
+.backgroundVideo {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(var(--stone-parallax-y, 0px)) scale(var(--stone-parallax-scale, 1));
+  transition: opacity var(--motion-scene) var(--ease-standard);
+  will-change: transform, opacity;
+}
+
+.backgroundVideo[data-revealed='true'] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backgroundVideo {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Invisible interaction region only -- carries no visible content of its
+   own (the video behind it is the only visible layer). Sized to exactly the
+   box object-fit: cover renders the 16:9 video into at the current viewport
+   (the same "max of the two covering dimensions" math the browser itself
+   uses for cover), so the stone-centered hit ellipse in SeismicStoneVideo.tsx
+   tracks the stone's actual on-screen position at any aspect ratio. */
 .hitArea {
-  position: relative;
-  display: block;
-  width: min(58vw, 42rem, calc((100dvh - 21rem) * 16 / 9));
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: max(100vw, 100dvh * 16 / 9);
   aspect-ratio: 16 / 9;
+  transform: translate(-50%, -50%);
   padding: 0;
+  margin: 0;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -15,28 +55,4 @@
 .hitArea:focus-visible {
   outline: var(--focus-ring-width) solid var(--color-focus-ring);
   outline-offset: var(--focus-ring-offset);
-  border-radius: var(--radius-m);
-}
-
-.video {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  pointer-events: none;
-  background: transparent;
-  transform: translateY(var(--stone-parallax-y, 0px)) scale(var(--stone-parallax-scale, 1));
-  will-change: transform;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .video {
-    transform: none;
-  }
-}
-
-@media (max-width: 640px) {
-  .hitArea {
-    width: min(84vw, calc((100dvh - 19rem) * 16 / 9));
-  }
 }
