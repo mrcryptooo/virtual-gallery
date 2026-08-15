@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { DevTokensPage } from './DevTokensPage';
+import { HeroDevPage } from './HeroDevPage';
 
 // Lazy: the tour page pulls the engine (PSV + three) — it must stay out of
 // the shell chunk (doc 08 §4). Visitors who never open a tour never load it.
@@ -24,6 +25,10 @@ export function App() {
 
   if (import.meta.env.DEV && path === '/dev/tokens') {
     return <DevTokensPage />;
+  }
+
+  if (import.meta.env.DEV && path === '/dev/hero') {
+    return <HeroDevPage />;
   }
 
   const staticMatch = /^\/p\/([a-z0-9-]+)\/?$/.exec(path)?.[1];

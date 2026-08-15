@@ -1,0 +1,24 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-7);
+  background: var(--color-bg);
+  padding: var(--space-6);
+}
+
+.note {
+  color: var(--color-ink-soft);
+  font: inherit;
+  max-width: var(--reading-max);
+  text-align: center;
+}
+
+.stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
