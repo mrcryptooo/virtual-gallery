@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { DevTokensPage } from './DevTokensPage';
 import { HeroDevPage } from './HeroDevPage';
+import { LandingPage } from './LandingPage';
 
 // Lazy: the tour page pulls the engine (PSV + three) — it must stay out of
 // the shell chunk (doc 08 §4). Visitors who never open a tour never load it.
@@ -17,8 +18,10 @@ const STATIC_TOUR_ROUTES = new Set(['modern-museum']);
 /**
  * Route handling is deliberately minimal until M1.6 (react-router + deep
  * links + URL view sync). Recognized today:
+ *   /                   → landing page (Seismic Stone hero)
  *   /p/<project-slug>   → walkthrough (engine-rendered projects)
  *   /dev/tokens         → design-system showcase (dev builds only)
+ *   /dev/hero           → isolated Seismic Stone dev harness (dev builds only)
  */
 export function App() {
   const path = window.location.pathname;
@@ -44,6 +47,10 @@ export function App() {
         <TourPage projectSlug={tourMatch[1]} />
       </Suspense>
     );
+  }
+
+  if (path === '/') {
+    return <LandingPage />;
   }
 
   return (

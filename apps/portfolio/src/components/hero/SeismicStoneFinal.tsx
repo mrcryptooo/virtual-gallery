@@ -2,10 +2,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 /**
  * PROVISIONAL, OWNER-APPROVED EXCEPTION to the frozen app/three boundary
  * (doc 02 §8: "apps/portfolio/components/ → NO psv, NO three, NO engine
- * internals"). Carried forward from SeismicStone3D.tsx (V2) -- see that
- * file's history for the full context. Still unresolved before this leaves
- * /dev/hero: move this rendering into the engine behind a typed public API,
- * or formally amend doc 02 §8 for non-panorama WebGL surfaces.
+ * internals"). Explicitly scoped to this single landing-page WebGL Hero
+ * only -- not a precedent for other components. Now shipping in production
+ * (landing route `/`, lazy-loaded from LandingPage.tsx) with this exception
+ * still open. Follow-up (not blocking this release): either move this
+ * rendering into the engine behind a typed public API, or formally amend
+ * doc 02 §8 for non-panorama WebGL surfaces.
  */
 // eslint-disable-next-line boundaries/external
 import * as THREE from 'three';

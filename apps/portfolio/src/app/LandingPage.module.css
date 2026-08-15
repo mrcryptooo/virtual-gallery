@@ -1,0 +1,32 @@
+.page {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Background layer -- deliberately plain today; real background motion is
+   future work and must not be baked into the stone's canvas. */
+.background {
+  position: absolute;
+  inset: 0;
+  background: var(--color-bg);
+}
+
+.stoneLayer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Reserves the exact footprint of SeismicStoneFinal's own .stage box so
+   swapping the lazy chunk in causes no layout shift. */
+.stonePlaceholder {
+  width: min(70vw, 32rem);
+  aspect-ratio: 4 / 5;
+}

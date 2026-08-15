@@ -79,9 +79,9 @@
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
 
-  /* ── Landing-page hero prototype (NOT in docs/11 yet — see
-     apps/portfolio/src/components/hero; pending owner review before any
-     doc-11/doc-10 amendment) ───────────────────────────────────────────── */
+  /* ── Landing-page Seismic Stone hero (NOT in docs/11 yet — see
+     apps/portfolio/src/components/hero; shipping on the landing route,
+     pending a doc-11/doc-10 amendment to formalize) ─────────────────────── */
   --color-stone-body: #593d49;
   --color-stone-glow: #d494af;
 }
