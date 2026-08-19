@@ -3,11 +3,13 @@ import { expect, test } from '@playwright/test';
 /**
  * M0.2 smoke spec: the built app boots and renders its heading.
  * Deliberately trivial — golden-path journeys arrive with their milestones.
+ * Updated for the Seismic Museum landing page (feat/landing-page, merged
+ * 2026-08-19), which replaced the M0.3 bootstrap placeholder at `/`.
  */
-test('app boots and shows the heading', async ({ page }) => {
+test('app boots and shows the landing entrance', async ({ page }) => {
   await page.goto('/');
-  await expect(page).toHaveTitle('Virtual Gallery');
-  await expect(page.getByRole('heading', { level: 1, name: 'Virtual Gallery' })).toBeVisible();
+  await expect(page).toHaveTitle('Seismic Museum');
+  await expect(page.getByRole('button', { name: 'Enter the Seismic Museum' })).toBeVisible();
 });
 
 /**
