@@ -21,11 +21,7 @@ const ALLOWED_CONTENT_TYPES = [
 
 const MAX_UPLOAD_BYTES = 80 * 1024 * 1024;
 
-export default async function handler(request: Request): Promise<Response> {
-  if (request.method !== 'POST') {
-    return new Response('Method Not Allowed', { status: 405 });
-  }
-
+export async function POST(request: Request): Promise<Response> {
   const body = (await request.json()) as HandleUploadBody;
 
   try {

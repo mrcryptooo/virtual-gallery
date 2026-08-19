@@ -5,7 +5,7 @@ const putMock: Mock<(pathname: string, body: string) => Promise<{ url: string }>
 );
 vi.mock('@vercel/blob', () => ({ put: putMock }));
 
-const { default: handler } = await import('./submissions.js');
+const { POST: handler } = await import('./submissions.js');
 
 function jsonRequest(body: unknown): Request {
   return new Request('http://localhost/api/submissions', {
@@ -36,11 +36,6 @@ const validBody = {
 };
 
 describe('POST /api/submissions', () => {
-  it('rejects non-POST methods', async () => {
-    const res = await handler(new Request('http://localhost/api/submissions'));
-    expect(res.status).toBe(405);
-  });
-
   it('persists a valid submission and returns its id', async () => {
     putMock.mockClear();
     const res = await handler(jsonRequest(validBody));

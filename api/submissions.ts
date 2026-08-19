@@ -45,11 +45,7 @@ function isSubmissionMedia(value: unknown): value is SubmissionMedia {
   );
 }
 
-export default async function handler(request: Request): Promise<Response> {
-  if (request.method !== 'POST') {
-    return new Response('Method Not Allowed', { status: 405 });
-  }
-
+export async function POST(request: Request): Promise<Response> {
   let input: SubmissionInput;
   try {
     input = (await request.json()) as SubmissionInput;

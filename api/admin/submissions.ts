@@ -30,11 +30,7 @@ function isAuthorized(request: Request): boolean {
   return match !== null && match[1] === expected;
 }
 
-export default async function handler(request: Request): Promise<Response> {
-  if (request.method !== 'GET') {
-    return new Response('Method Not Allowed', { status: 405 });
-  }
-
+export async function GET(request: Request): Promise<Response> {
   if (!isAuthorized(request)) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }

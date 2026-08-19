@@ -5,7 +5,7 @@ const headMock = vi.fn();
 vi.mock('@vercel/blob', () => ({ list: listMock, head: headMock }));
 
 const originalFetch = global.fetch;
-const { default: handler } = await import('./submissions.js');
+const { GET: handler } = await import('./submissions.js');
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -15,14 +15,6 @@ afterEach(() => {
 });
 
 describe('GET /api/admin/submissions', () => {
-  it('rejects non-GET methods', async () => {
-    vi.stubEnv('ADMIN_API_TOKEN', 'secret');
-    const res = await handler(
-      new Request('http://localhost/api/admin/submissions', { method: 'POST' }),
-    );
-    expect(res.status).toBe(405);
-  });
-
   it('fails closed with no token configured', async () => {
     vi.stubEnv('ADMIN_API_TOKEN', '');
     const res = await handler(
