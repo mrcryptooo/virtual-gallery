@@ -1,5 +1,8 @@
 import { put } from '@vercel/blob';
-import type { SubmissionMedia, SubmissionRecord } from '../apps/portfolio/src/lib/community/types';
+import type {
+  SubmissionMedia,
+  SubmissionRecord,
+} from '../apps/portfolio/src/lib/community/types.js';
 
 /**
  * Stores Submit Your Art metadata (small JSON only -- media bytes already

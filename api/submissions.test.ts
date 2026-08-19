@@ -5,7 +5,7 @@ const putMock: Mock<(pathname: string, body: string) => Promise<{ url: string }>
 );
 vi.mock('@vercel/blob', () => ({ put: putMock }));
 
-const { default: handler } = await import('./submissions');
+const { default: handler } = await import('./submissions.js');
 
 function jsonRequest(body: unknown): Request {
   return new Request('http://localhost/api/submissions', {

@@ -5,7 +5,7 @@ const headMock = vi.fn();
 vi.mock('@vercel/blob', () => ({ list: listMock, head: headMock }));
 
 const originalFetch = global.fetch;
-const { default: handler } = await import('./submissions');
+const { default: handler } = await import('./submissions.js');
 
 afterEach(() => {
   vi.unstubAllEnvs();

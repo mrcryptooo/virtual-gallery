@@ -1,5 +1,5 @@
 import { head, list } from '@vercel/blob';
-import type { SubmissionRecord } from '../../apps/portfolio/src/lib/community/types';
+import type { SubmissionRecord } from '../../apps/portfolio/src/lib/community/types.js';
 
 /**
  * Internal, authenticated read access to Submit Your Art records for the
