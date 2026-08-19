@@ -6,7 +6,7 @@ describe('LandingPage (production landing route)', () => {
   it('renders the fallback field, identity block, stone hero, tagline, and CTA', () => {
     const { container } = render(<LandingPage />);
 
-    expect(container.querySelector('[class*="fallback"]')).toBeTruthy();
+    expect(container.querySelector('[class*="field"]')).toBeTruthy();
 
     expect(screen.getByText('Seismic Museum')).toBeInTheDocument();
     expect(screen.queryByText(/#[0-9a-f]{6}/i)).not.toBeInTheDocument();

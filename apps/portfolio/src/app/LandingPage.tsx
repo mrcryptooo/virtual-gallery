@@ -4,11 +4,11 @@ import styles from './LandingPage.module.css';
 
 const MUSEUM_HREF = '/p/modern-museum';
 
-// Total entrance choreography length: stone resolve (0ms) -> wordmark (200ms)
-// -> tagline (600ms, 600ms duration) -> CTA (900ms, 300ms duration) settles
-// by ~1200ms. Matches the transition-delay values in LandingPage.module.css,
-// all composed from tokens.css motion tokens.
-const ENTRANCE_SETTLE_MS = 1250;
+// Total entrance choreography length: stone resolve (0ms, 600ms duration) ->
+// wordmark (200ms) -> tagline (450ms, 600ms duration) -> CTA (750ms, 600ms
+// duration) settles by 1350ms. Matches the transition-delay values in
+// LandingPage.module.css, all composed from tokens.css motion tokens.
+const ENTRANCE_SETTLE_MS = 1400;
 
 /**
  * Public landing page (`/`) — a single full-viewport museum entrance. The
@@ -60,7 +60,7 @@ export function LandingPage() {
     <div
       className={`${styles['page'] ?? ''} ${entranceReady ? (styles['entranceReady'] ?? '') : ''}`}
     >
-      <div className={styles['fallback']} aria-hidden="true" />
+      <div className={styles['field']} aria-hidden="true" />
       <SeismicStoneVideo href={MUSEUM_HREF} interactive={interactive} revealed={entranceReady} />
 
       <header className={styles['identity']}>

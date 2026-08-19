@@ -1,8 +1,54 @@
-/* Full-viewport background layer. object-fit: cover means the video always
-   fully covers the viewport (cropping, never gapping) regardless of aspect
-   ratio, so there is no separate background rectangle to seam-match against
-   -- the video IS the field. position: fixed so it never affects/is affected
-   by page scroll or layout. */
+/* Mask-ellipse note: radial-gradient's explicit <size> percentages resolve
+   against the FULL box dimension (rx: 100% = box width), so the box's own
+   edge sits at 50% of an "100% 100%" ellipse, not 100% -- using "50% 50%"
+   below makes 100% of the gradient land exactly on each layer's own edge,
+   which is what every fade stop is actually measured against.
+
+   Two layers, deliberately different scales: the sharp core (0.83, see
+   STONE_SCALE) and a blurred ring scaled slightly larger (0.95) so its own
+   edge sits further out on screen than the sharp layer's, giving the blur
+   real room to extend past the sharp edge before .field (a plain gradient)
+   takes over. Because the scale gap is modest, the extra margin shows
+   only slightly different-lit content, and 45px of blur smooths that
+   over completely -- a wider gap (an earlier attempt used 1.18-1.35)
+   showed a visibly different crop of the frame and produced its own seam
+   instead of curing one. */
+.backgroundVideoBlurRing {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-9vh) scale(0.95);
+  filter: blur(var(--stone-mask-blur));
+  transition: opacity calc(var(--motion-standard) * 2) var(--ease-standard);
+  will-change: opacity;
+  mask-image: radial-gradient(
+    ellipse 50% 50% at 50% 50%,
+    var(--color-mask-opaque) 55%,
+    var(--color-mask-opaque) 78%,
+    rgb(0 0 0 / 55%) 90%,
+    transparent 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 50% 50% at 50% 50%,
+    var(--color-mask-opaque) 55%,
+    var(--color-mask-opaque) 78%,
+    rgb(0 0 0 / 55%) 90%,
+    transparent 100%
+  );
+}
+
+.backgroundVideoBlurRing[data-revealed='true'] {
+  opacity: 1;
+}
+
+/* Full-viewport sharp layer, then scaled down ~17% in place (see
+   STONE_SCALE in SeismicStoneVideo.tsx) to reduce the stone's apparent size
+   without reintroducing a boxed video. */
 .backgroundVideo {
   position: fixed;
   inset: 0;
@@ -12,36 +58,99 @@
   object-position: center;
   pointer-events: none;
   opacity: 0;
-  transform: translateY(var(--stone-parallax-y, 0px)) scale(var(--stone-parallax-scale, 1));
-  transition: opacity var(--motion-scene) var(--ease-standard);
+  transform: translateY(calc(-9vh + var(--stone-parallax-y, 0px))) scale(0.83);
+  transition: opacity calc(var(--motion-standard) * 2) var(--ease-standard);
   will-change: transform, opacity;
+  /* Stone's own real extent (pixel-measured) reaches ~74% of this box's
+     half-dimension; opaque core matches that, then fades to the blurred
+     ring layer over the small remaining margin before this box's edge. */
+  mask-image: radial-gradient(
+    ellipse 50% 50% at 50% 50%,
+    var(--color-mask-opaque) 76%,
+    rgb(0 0 0 / 85%) 84%,
+    rgb(0 0 0 / 45%) 92%,
+    transparent 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 50% 50% at 50% 50%,
+    var(--color-mask-opaque) 76%,
+    rgb(0 0 0 / 85%) 84%,
+    rgb(0 0 0 / 45%) 92%,
+    transparent 100%
+  );
 }
 
 .backgroundVideo[data-revealed='true'] {
   opacity: 1;
 }
 
+/* Portrait/narrow viewports: object-fit: cover crops far more aggressively
+   off a 16:9 source at these aspects (effectively zooming in), so an
+   ellipse fitted to the box's own (now very tall, narrow) aspect ratio
+   stretches into a visible pill shape instead of following the stone. A
+   circular fade sized to the narrower dimension avoids the elongation. */
+@media (max-aspect-ratio: 4/5) {
+  .backgroundVideoBlurRing {
+    mask-image: radial-gradient(
+      circle closest-side,
+      var(--color-mask-opaque) 55%,
+      var(--color-mask-opaque) 78%,
+      rgb(0 0 0 / 55%) 90%,
+      transparent 100%
+    );
+    -webkit-mask-image: radial-gradient(
+      circle closest-side,
+      var(--color-mask-opaque) 55%,
+      var(--color-mask-opaque) 78%,
+      rgb(0 0 0 / 55%) 90%,
+      transparent 100%
+    );
+  }
+
+  .backgroundVideo {
+    mask-image: radial-gradient(
+      circle closest-side,
+      var(--color-mask-opaque) 90%,
+      rgb(0 0 0 / 85%) 94%,
+      rgb(0 0 0 / 45%) 97%,
+      transparent 100%
+    );
+    -webkit-mask-image: radial-gradient(
+      circle closest-side,
+      var(--color-mask-opaque) 90%,
+      rgb(0 0 0 / 85%) 94%,
+      rgb(0 0 0 / 45%) 97%,
+      transparent 100%
+    );
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .backgroundVideoBlurRing {
+    transition: none;
+    opacity: 1;
+  }
+
   .backgroundVideo {
     transition: none;
     opacity: 1;
-    transform: none;
+    transform: translateY(-9vh) scale(0.83);
   }
 }
 
 /* Invisible interaction region only -- carries no visible content of its
-   own (the video behind it is the only visible layer). Sized to exactly the
-   box object-fit: cover renders the 16:9 video into at the current viewport
-   (the same "max of the two covering dimensions" math the browser itself
-   uses for cover), so the stone-centered hit ellipse in SeismicStoneVideo.tsx
-   tracks the stone's actual on-screen position at any aspect ratio. */
+   own. Sized identically to .backgroundVideo (same "cover" box, same 0.83
+   scale) so getBoundingClientRect() -- which reports the post-transform,
+   already-scaled box -- naturally matches the stone's real on-screen size;
+   the ellipse math in SeismicStoneVideo.tsx needs no separate scale-aware
+   logic as a result. */
 .hitArea {
   position: fixed;
   top: 50%;
   left: 50%;
   width: max(100vw, 100dvh * 16 / 9);
   aspect-ratio: 16 / 9;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) translateY(-9vh) scale(0.83);
   padding: 0;
   margin: 0;
   border: none;
