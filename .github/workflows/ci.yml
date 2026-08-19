@@ -13,7 +13,7 @@ jobs:
     # install stalling for hours instead of its normal ~1-2 min) fails fast
     # and reports instead of silently occupying a runner until GitHub's own
     # 360-minute default cutoff.
-    timeout-minutes: 25
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v5
 
@@ -77,7 +77,11 @@ jobs:
         run: pnpm exec playwright install chromium
 
       - name: Install Playwright (webkit, with OS deps)
-        timeout-minutes: 10
+        # The last run wasn't hung: it was still actively fetching packages
+        # (ffmpeg/gstreamer codec libs webkit depends on) right up to the
+        # previous 10-minute cutoff. Genuinely slow, not stuck -- give it
+        # more room instead of treating every failure as another hang.
+        timeout-minutes: 18
         run: pnpm exec playwright install --with-deps webkit
 
       - name: E2E smoke (chromium + webkit)
