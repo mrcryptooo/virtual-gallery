@@ -25,36 +25,6 @@
   );
 }
 
-/* ── Identity block (top-left) ──────────────────────────────────────────── */
-.identity {
-  position: fixed;
-  top: clamp(1.25rem, 4vh, 2.5rem);
-  left: clamp(1.25rem, 4vw, 3rem);
-  z-index: 2;
-  max-width: 16rem;
-}
-
-.wordmark {
-  margin: 0;
-  font-family: var(--font-serif);
-  font-size: clamp(1rem, 1.5vw, 1.3rem);
-  font-weight: 500;
-  color: var(--color-paper-ink);
-  letter-spacing: 0.02em;
-  text-shadow: 0 1px 12px var(--color-swatch-inset);
-  opacity: 0;
-  transform: translateY(0.6rem);
-  transition:
-    opacity var(--motion-standard) var(--ease-standard),
-    transform var(--motion-standard) var(--ease-standard);
-  transition-delay: var(--motion-quick);
-}
-
-.entranceReady .wordmark {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 /* ── Overlay stage: tagline + CTA, anchored to the lower third so they never
    compete with the stone's own visual mass centered in the video ────────── */
 .stage {
@@ -171,7 +141,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wordmark,
   .taglineInner,
   .cta {
     transition: none;
@@ -194,12 +163,6 @@
 
 /* ── Responsive ─────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
-  .identity {
-    top: clamp(1rem, 3.5vh, 1.5rem);
-    left: clamp(1rem, 4vw, 1.5rem);
-    max-width: calc(100vw - 2rem);
-  }
-
   .stage {
     padding-bottom: clamp(2rem, 6vh, 3rem);
     gap: clamp(0.75rem, 2vh, 1rem);

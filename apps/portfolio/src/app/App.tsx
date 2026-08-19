@@ -1,7 +1,9 @@
 import { lazy, Suspense } from 'react';
+import { CompetitionPage } from './CompetitionPage';
 import { DevTokensPage } from './DevTokensPage';
 import { HeroDevPage } from './HeroDevPage';
 import { LandingPage } from './LandingPage';
+import { SubmitArtPage } from './SubmitArtPage';
 
 // Lazy: the tour page pulls the engine (PSV + three) — it must stay out of
 // the shell chunk (doc 08 §4). Visitors who never open a tour never load it.
@@ -20,6 +22,8 @@ const STATIC_TOUR_ROUTES = new Set(['modern-museum']);
  * links + URL view sync). Recognized today:
  *   /                   → landing page (Seismic Stone hero)
  *   /p/<project-slug>   → walkthrough (engine-rendered projects)
+ *   /competition        → Competitions (coming soon)
+ *   /submit             → Submit Your Art
  *   /dev/tokens         → design-system showcase (dev builds only)
  *   /dev/hero           → isolated Seismic Stone dev harness (dev builds only)
  */
@@ -51,6 +55,14 @@ export function App() {
 
   if (path === '/') {
     return <LandingPage />;
+  }
+
+  if (path === '/competition') {
+    return <CompetitionPage />;
+  }
+
+  if (path === '/submit') {
+    return <SubmitArtPage />;
   }
 
   return (

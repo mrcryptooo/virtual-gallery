@@ -114,6 +114,8 @@
   --stone-mask-blur: 45px;
   /* Text-shadow blur radius softening the tagline against the video. */
   --text-shadow-blur: 20px;
+  /* Inline validation-error text (Submit Your Art form). */
+  --color-error: #a13b3b;
 
   /* Breakpoint — the landing hero is the first responsive @media use in
      this app; custom properties can't be read inside a media condition, so

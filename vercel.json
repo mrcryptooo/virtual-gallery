@@ -6,7 +6,7 @@
   "rewrites": [
     { "source": "/p/modern-museum", "destination": "/tour/modern-museum/index.html" },
     { "source": "/p/modern-museum/", "destination": "/tour/modern-museum/index.html" },
-    { "source": "/((?!tour/).*)", "destination": "/index.html" }
+    { "source": "/((?!tour/|api/).*)", "destination": "/index.html" }
   ],
   "headers": [
     {
