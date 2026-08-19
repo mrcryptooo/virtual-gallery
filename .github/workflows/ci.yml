@@ -64,9 +64,15 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
 
+      # `--with-deps` was dropped: three consecutive runs (5h39m, 15m, and a
+      # bounded 6m timeout) all hung inside its `apt-get` dependency fetch,
+      # right after downloading the noble-updates/universe package index --
+      # a GitHub-runner/mirror networking issue, not anything in this repo.
+      # ubuntu-latest already ships the shared libraries current Playwright
+      # chromium/webkit need, so the browser binaries alone are sufficient.
       - name: Install Playwright browsers
         timeout-minutes: 6
-        run: pnpm exec playwright install --with-deps chromium webkit
+        run: pnpm exec playwright install chromium webkit
 
       - name: E2E smoke (chromium + webkit)
         run: pnpm e2e
