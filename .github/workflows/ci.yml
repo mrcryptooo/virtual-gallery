@@ -13,7 +13,7 @@ jobs:
     # install stalling for hours instead of its normal ~1-2 min) fails fast
     # and reports instead of silently occupying a runner until GitHub's own
     # 360-minute default cutoff.
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v5
 
@@ -64,15 +64,21 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
 
-      # `--with-deps` was dropped: three consecutive runs (5h39m, 15m, and a
-      # bounded 6m timeout) all hung inside its `apt-get` dependency fetch,
-      # right after downloading the noble-updates/universe package index --
-      # a GitHub-runner/mirror networking issue, not anything in this repo.
-      # ubuntu-latest already ships the shared libraries current Playwright
-      # chromium/webkit need, so the browser binaries alone are sufficient.
-      - name: Install Playwright browsers
-        timeout-minutes: 6
-        run: pnpm exec playwright install chromium webkit
+      # Split in two: plain `chromium` installs fast with no apt step and no
+      # host deps (proven). `webkit` genuinely needs OS shared libraries
+      # (libgtk-4, libgstreamer*, etc.) that only `--with-deps` provides, so
+      # it keeps the apt-get call -- scoped to webkit alone rather than
+      # chromium+webkit together, since three earlier runs hung inside that
+      # apt-get's dependency fetch (a GitHub-runner/mirror networking issue,
+      # not anything in this repo) and a smaller transaction is less likely
+      # to hit it.
+      - name: Install Playwright (chromium)
+        timeout-minutes: 4
+        run: pnpm exec playwright install chromium
+
+      - name: Install Playwright (webkit, with OS deps)
+        timeout-minutes: 10
+        run: pnpm exec playwright install --with-deps webkit
 
       - name: E2E smoke (chromium + webkit)
         run: pnpm e2e
