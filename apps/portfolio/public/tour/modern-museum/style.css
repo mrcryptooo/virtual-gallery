@@ -828,3 +828,145 @@ body.view-control-buttons .viewControlButton {
 .viewControlButton-6 {
   margin-left: 105px;
 }
+
+/* Seismic Museum addition -- camera / snapshot control. Deliberately not
+   styled like the generic Marzipano grey icon buttons above: a refined
+   circular glass control echoing the Seismic Museum identity (warm gold
+   accent on dark glass), anchored bottom-right. */
+.screenshotButton {
+  position: absolute;
+  z-index: 20;
+  right: 20px;
+  bottom: 20px;
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  border: 1px solid rgba(200, 165, 96, 0.55);
+  background: rgba(17, 17, 18, 0.62);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  color: #f4f4f5;
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.mobile .screenshotButton {
+  width: 56px;
+  height: 56px;
+  right: 16px;
+  bottom: 16px;
+}
+
+.screenshotButton:hover {
+  border-color: rgba(200, 165, 96, 0.9);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(200, 165, 96, 0.25);
+  transform: translateY(-1px);
+}
+
+.screenshotButton:active {
+  transform: translateY(0) scale(0.94);
+}
+
+.screenshotButton:focus-visible {
+  outline: 2px solid #c8a560;
+  outline-offset: 3px;
+}
+
+.screenshotButton-icon {
+  width: 22px;
+  height: 22px;
+  position: relative;
+  z-index: 1;
+}
+
+.screenshotButton-ring {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  border-radius: 999px;
+  border: 1px solid rgba(200, 165, 96, 0.9);
+  opacity: 0;
+  transform: scale(0.8);
+  pointer-events: none;
+}
+
+/* Shutter pulse: a brief expanding gold ring, no full-screen flash. */
+.screenshotButton.did-capture .screenshotButton-ring {
+  animation: screenshotShutterPulse 0.55s ease-out;
+}
+
+.screenshotButton.is-capturing {
+  cursor: progress;
+}
+
+.screenshotButton.is-capturing .screenshotButton-icon {
+  animation: screenshotIconPress 0.4s ease-in-out infinite;
+}
+
+@keyframes screenshotShutterPulse {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+@keyframes screenshotIconPress {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screenshotButton,
+  .screenshotButton-icon,
+  .screenshotButton.did-capture .screenshotButton-ring {
+    transition: none;
+    animation: none;
+  }
+}
+
+.screenshotStatus {
+  position: absolute;
+  z-index: 20;
+  right: 20px;
+  bottom: 80px;
+  max-width: 240px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(17, 17, 18, 0.85);
+  color: #f4f4f5;
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: right;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.mobile .screenshotStatus {
+  right: 16px;
+  bottom: 82px;
+}
+
+.screenshotStatus:not(:empty) {
+  opacity: 1;
+}
+
+.screenshotStatus.is-error {
+  background: rgba(120, 30, 30, 0.9);
+}

@@ -1,13 +1,21 @@
 import { lazy, Suspense } from 'react';
-import { CompetitionPage } from './CompetitionPage';
 import { DevTokensPage } from './DevTokensPage';
 import { HeroDevPage } from './HeroDevPage';
 import { LandingPage } from './LandingPage';
-import { SubmitArtPage } from './SubmitArtPage';
 
 // Lazy: the tour page pulls the engine (PSV + three) — it must stay out of
 // the shell chunk (doc 08 §4). Visitors who never open a tour never load it.
 const TourPage = lazy(() => import('./TourPage').then((module) => ({ default: module.TourPage })));
+
+// Lazy: Competition/Submit are secondary routes visited far less than the
+// landing page. SubmitArtPage in particular pulls in @vercel/blob/client's
+// upload machinery, which the landing bundle has no reason to carry.
+const CompetitionPage = lazy(() =>
+  import('./CompetitionPage').then((module) => ({ default: module.CompetitionPage })),
+);
+const SubmitArtPage = lazy(() =>
+  import('./SubmitArtPage').then((module) => ({ default: module.SubmitArtPage })),
+);
 
 /**
  * Routes served by the Marzipano static export rather than this SPA. The
@@ -58,11 +66,19 @@ export function App() {
   }
 
   if (path === '/competition') {
-    return <CompetitionPage />;
+    return (
+      <Suspense fallback={null}>
+        <CompetitionPage />
+      </Suspense>
+    );
   }
 
   if (path === '/submit') {
-    return <SubmitArtPage />;
+    return (
+      <Suspense fallback={null}>
+        <SubmitArtPage />
+      </Suspense>
+    );
   }
 
   return (
