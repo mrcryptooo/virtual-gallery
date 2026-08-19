@@ -1,0 +1,20 @@
+.page {
+  position: relative;
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.note {
+  position: fixed;
+  top: var(--space-6);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  color: var(--color-ink-soft);
+  background: var(--color-surface);
+  border-radius: var(--radius-m);
+  padding: var(--space-3) var(--space-4);
+  font: inherit;
+  max-width: var(--reading-max);
+  text-align: center;
+}

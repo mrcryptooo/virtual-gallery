@@ -1,0 +1,211 @@
+.page {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+/* The field the video's masked/blurred edge (see .backgroundVideo and
+   .backgroundVideoBlurRing in SeismicStoneVideo.module.css) blends into.
+   Only ever a thin sliver is visible around the video's own soft edge --
+   most of this gradient sits behind fully-opaque video -- so it only needs
+   to roughly continue the video's dark-top/light-bottom sweep, not match
+   any single exact boundary point. Also the pre-decode flash guard for the
+   brief moment before the video has painted its first frame. */
+.field {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: linear-gradient(
+    to bottom,
+    var(--color-stone-field-dim) 0%,
+    var(--color-stone-field-low) 55%,
+    var(--color-stone-field) 82%,
+    var(--color-stone-field-light) 100%
+  );
+}
+
+/* ── Identity block (top-left) ──────────────────────────────────────────── */
+.identity {
+  position: fixed;
+  top: clamp(1.25rem, 4vh, 2.5rem);
+  left: clamp(1.25rem, 4vw, 3rem);
+  z-index: 2;
+  max-width: 16rem;
+}
+
+.wordmark {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1rem, 1.5vw, 1.3rem);
+  font-weight: 500;
+  color: var(--color-paper-ink);
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 12px var(--color-swatch-inset);
+  opacity: 0;
+  transform: translateY(0.6rem);
+  transition:
+    opacity var(--motion-standard) var(--ease-standard),
+    transform var(--motion-standard) var(--ease-standard);
+  transition-delay: var(--motion-quick);
+}
+
+.entranceReady .wordmark {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Overlay stage: tagline + CTA, anchored to the lower third so they never
+   compete with the stone's own visual mass centered in the video ────────── */
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  /* 24-36px tagline-to-CTA breathing room, per composition spec. */
+  gap: clamp(1.5rem, 2.6vh, 2.25rem);
+  padding: clamp(1.25rem, 6vw, 3rem);
+  padding-bottom: clamp(3.5rem, 10vh, 6rem);
+  pointer-events: none;
+}
+
+.stage > * {
+  pointer-events: auto;
+}
+
+.tagline {
+  margin: 0;
+  overflow: hidden;
+  padding: 0.15em 0;
+}
+
+.taglineInner {
+  display: block;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(1.85rem, 3vw, 3.1rem);
+  line-height: 1.2;
+  letter-spacing: 0.008em;
+  color: var(--color-paper-ink);
+  text-align: center;
+  text-shadow: 0 1px var(--text-shadow-blur) var(--color-swatch-inset);
+  opacity: 0;
+  transform: translateY(1rem);
+  transition:
+    opacity calc(var(--motion-standard) * 2) var(--ease-standard),
+    transform calc(var(--motion-standard) * 2) var(--ease-standard),
+    letter-spacing calc(var(--motion-standard) * 2) var(--ease-standard);
+  transition-delay: calc(var(--motion-standard) * 1.5);
+}
+
+.entranceReady .taglineInner {
+  opacity: 1;
+  transform: translateY(0);
+  letter-spacing: 0.01em;
+}
+
+/* ── CTA ────────────────────────────────────────────────────────────────── */
+.cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-7);
+  border: var(--hairline) solid var(--color-cta-border);
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--color-paper-ink);
+  font-family: var(--font-sans);
+  font-size: var(--type-label-size);
+  font-weight: 600;
+  letter-spacing: calc(var(--type-label-tracking) * 1.4);
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  min-height: var(--hit-target);
+  opacity: 0;
+  transform: translateY(0.6rem);
+  transition:
+    opacity var(--motion-standard) var(--ease-standard),
+    transform var(--motion-standard) var(--ease-standard),
+    background-color var(--motion-quick) var(--ease-standard),
+    color var(--motion-quick) var(--ease-standard),
+    border-color var(--motion-quick) var(--ease-standard);
+  transition-delay: calc(var(--motion-standard) * 2.5);
+}
+
+.entranceReady .cta {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.cta:hover {
+  background: var(--color-stone-body);
+  color: var(--color-paper);
+  border-color: var(--color-stone-body);
+}
+
+.cta:active {
+  transform: scale(0.98);
+}
+
+.entranceReady .cta:hover {
+  transform: translateY(0);
+}
+
+.cta:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.ctaArrow {
+  display: inline-block;
+  transition: transform var(--motion-quick) var(--ease-standard);
+}
+
+.cta:hover .ctaArrow {
+  transform: translateX(0.2rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wordmark,
+  .taglineInner,
+  .cta {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .cta:hover,
+  .cta:active,
+  .entranceReady .cta:hover {
+    transform: none;
+  }
+
+  .ctaArrow,
+  .cta:hover .ctaArrow {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .identity {
+    top: clamp(1rem, 3.5vh, 1.5rem);
+    left: clamp(1rem, 4vw, 1.5rem);
+    max-width: calc(100vw - 2rem);
+  }
+
+  .stage {
+    padding-bottom: clamp(2rem, 6vh, 3rem);
+    gap: clamp(0.75rem, 2vh, 1rem);
+  }
+
+  .cta {
+    padding: var(--space-3) var(--space-5);
+  }
+}

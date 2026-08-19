@@ -78,4 +78,46 @@
   --motion-slow: 1400ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  /* ── Landing-page Seismic Stone hero (NOT in docs/11 yet — see
+     apps/portfolio/src/components/hero; shipping on the landing route,
+     pending a doc-11/doc-10 amendment to formalize) ─────────────────────── */
+  /* Seam-matched field the hero video sits on (see LandingPage.module.css
+     .field) -- pixel-sampled from the reference video's own frame (ffmpeg
+     crop, not guessed): top corners are the darkest point in frame
+     (~rgb167-174), brightness rises across a broad soft overhead highlight
+     band across most of the top width, and rises further toward the bottom
+     edge (~rgb205-219). Needed again now that the video is deliberately
+     scaled down ~17% (STONE_SCALE) to reduce its apparent size, which
+     exposes a margin of this field around it. */
+  --color-stone-field-light: #d3d3d3;
+  --color-stone-field: #c6c6c6;
+  --color-stone-field-low: #b4b4b4;
+  --color-stone-field-dim: #a8a8a8;
+  /* Sampled from the reference video's own stone plate faces -- the CTA's
+     hover accent, so the control visually belongs to the stone it activates. */
+  --color-stone-body: #51343b;
+  /* The grounding-shadow gradient's rgba(20,15,17, 0.10 / 0) — the build's
+     CSS minifier collapses rgba() into 8-digit hex+alpha, so token-lint
+     needs the exact resulting literals registered here, not the rgba()
+     source form. */
+  --color-stone-shadow: #140f111a;
+  --color-stone-shadow-transparent: #140f1100;
+  /* Same minifier note — rgba(0,0,0,0.15) and rgba(17,17,18,0.32) */
+  --color-swatch-inset: #00000026;
+  --color-cta-border: #11111252;
+  /* Opaque mask-gradient stop color (radial-gradient alpha masks on the
+     hero video layers, SeismicStoneVideo.module.css) — token-lint needs
+     the literal 3-digit form since that's what appears in the built CSS. */
+  --color-mask-opaque: #000;
+  /* Blur radius for the hero video's blurred edge-blend ring layer. */
+  --stone-mask-blur: 45px;
+  /* Text-shadow blur radius softening the tagline against the video. */
+  --text-shadow-blur: 20px;
+
+  /* Breakpoint — the landing hero is the first responsive @media use in
+     this app; custom properties can't be read inside a media condition, so
+     this exists only as the documented source of truth for the literal
+     value used in component CSS (not consumed via var()). */
+  --breakpoint-compact: 640px;
 }
