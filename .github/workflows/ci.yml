@@ -9,6 +9,11 @@ jobs:
   verify:
     name: Lint · Typecheck · Test · Build
     runs-on: ubuntu-latest
+    # Bounds the whole job so a hung step (observed: Playwright browser
+    # install stalling for hours instead of its normal ~1-2 min) fails fast
+    # and reports instead of silently occupying a runner until GitHub's own
+    # 360-minute default cutoff.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
 
@@ -53,7 +58,14 @@ jobs:
       - name: Token lint (design-system gate)
         run: pnpm tokens:check
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
       - name: Install Playwright browsers
+        timeout-minutes: 6
         run: pnpm exec playwright install --with-deps chromium webkit
 
       - name: E2E smoke (chromium + webkit)
