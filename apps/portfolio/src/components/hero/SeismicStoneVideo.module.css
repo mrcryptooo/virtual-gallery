@@ -4,8 +4,8 @@
    below makes 100% of the gradient land exactly on each layer's own edge,
    which is what every fade stop is actually measured against.
 
-   Two layers, deliberately different scales: the sharp core (0.83, see
-   STONE_SCALE) and a blurred ring scaled slightly larger (0.95) so its own
+   Two layers, deliberately different scales: the sharp core (0.58, see
+   STONE_SCALE) and a blurred ring scaled slightly larger (0.66) so its own
    edge sits further out on screen than the sharp layer's, giving the blur
    real room to extend past the sharp edge before .field (a plain gradient)
    takes over. Because the scale gap is modest, the extra margin shows
@@ -22,7 +22,7 @@
   object-position: center;
   pointer-events: none;
   opacity: 0;
-  transform: translateY(-9vh) scale(0.95);
+  transform: translateY(-6vh) scale(0.66);
   filter: blur(var(--stone-mask-blur));
   transition: opacity calc(var(--motion-standard) * 2) var(--ease-standard);
   will-change: opacity;
@@ -46,7 +46,7 @@
   opacity: 1;
 }
 
-/* Full-viewport sharp layer, then scaled down ~17% in place (see
+/* Full-viewport sharp layer, then scaled down ~30% in place (see
    STONE_SCALE in SeismicStoneVideo.tsx) to reduce the stone's apparent size
    without reintroducing a boxed video. */
 .backgroundVideo {
@@ -58,7 +58,7 @@
   object-position: center;
   pointer-events: none;
   opacity: 0;
-  transform: translateY(calc(-9vh + var(--stone-parallax-y, 0px))) scale(0.83);
+  transform: translateY(calc(-6vh + var(--stone-parallax-y, 0px))) scale(0.58);
   transition: opacity calc(var(--motion-standard) * 2) var(--ease-standard);
   will-change: transform, opacity;
   /* Stone's own real extent (pixel-measured) reaches ~74% of this box's
@@ -134,12 +134,12 @@
   .backgroundVideo {
     transition: none;
     opacity: 1;
-    transform: translateY(-9vh) scale(0.83);
+    transform: translateY(-6vh) scale(0.58);
   }
 }
 
 /* Invisible interaction region only -- carries no visible content of its
-   own. Sized identically to .backgroundVideo (same "cover" box, same 0.83
+   own. Sized identically to .backgroundVideo (same "cover" box, same 0.58
    scale) so getBoundingClientRect() -- which reports the post-transform,
    already-scaled box -- naturally matches the stone's real on-screen size;
    the ellipse math in SeismicStoneVideo.tsx needs no separate scale-aware
@@ -150,7 +150,7 @@
   left: 50%;
   width: max(100vw, 100dvh * 16 / 9);
   aspect-ratio: 16 / 9;
-  transform: translate(-50%, -50%) translateY(-9vh) scale(0.83);
+  transform: translate(-50%, -50%) translateY(-6vh) scale(0.58);
   padding: 0;
   margin: 0;
   border: none;

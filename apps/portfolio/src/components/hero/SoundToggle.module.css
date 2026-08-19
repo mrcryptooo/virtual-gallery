@@ -1,0 +1,22 @@
+.toggle {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--hit-target);
+  height: var(--hit-target);
+  color: var(--color-paper-ink);
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  filter: drop-shadow(0 1px 8px var(--color-swatch-inset));
+  transition: opacity var(--motion-quick) var(--ease-standard);
+}
+
+.toggle:hover {
+  opacity: 0.7;
+}
+
+.toggle:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}

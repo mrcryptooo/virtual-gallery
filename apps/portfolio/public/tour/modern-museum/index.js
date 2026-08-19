@@ -61,9 +61,22 @@
   }
 
   // Viewer options.
+  //
+  // Seismic Museum addition: `stage.preserveDrawingBuffer` is set so the
+  // camera/snapshot feature below can read the WebGL canvas synchronously at
+  // click time. Marzipano's render loop is render-on-demand (it only draws
+  // when the view changes), so without this the drawing buffer can already
+  // be cleared by the time a screenshot is requested, producing a blank
+  // capture. This is a standard, documented Marzipano stage option (not a
+  // patch to vendor internals) and has no effect on scene data, hotspot
+  // topology, or navigation -- it only affects how the WebGL canvas retains
+  // its buffer between paints.
   var viewerOpts = {
     controls: {
       mouseViewMode: data.settings.mouseViewMode
+    },
+    stage: {
+      preserveDrawingBuffer: true
     }
   };
 
@@ -388,5 +401,233 @@
 
   // Display the initial scene.
   switchScene(scenes[0]);
+
+  // ------------------------------------------------------------------
+  // Seismic Museum addition: snapshot / screenshot system.
+  //
+  // Purely additive -- reads the existing viewer/canvas and DOM, does not
+  // touch scene authoring, hotspot topology, or navigation. See the
+  // `stage.preserveDrawingBuffer` note above for why the capture is
+  // reliable regardless of when the visitor clicks.
+  // ------------------------------------------------------------------
+  (function initScreenshot() {
+    var screenshotButton = document.querySelector('#screenshotButton');
+    var screenshotStatusElement = document.querySelector('#screenshotStatus');
+    if (!screenshotButton) {
+      return;
+    }
+
+    // Configurable overlay branding. The owner has not supplied a final PNG
+    // yet, so this ships disabled (`enabled: false`) and the capture engine
+    // must work completely without it. Once the final asset arrives, drop
+    // it in `img/` and flip `enabled: true` (and adjust the other values as
+    // needed) -- no capture logic needs to change.
+    var SCREENSHOT_OVERLAY = {
+      assetPath: 'img/overlay.png',
+      enabled: false,
+      anchor: 'bottom-right', // 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center'
+      widthRatio: 0.22, // overlay width as a fraction of the captured image's width
+      maxWidthPx: 420, // hard cap so the overlay never dominates a large capture
+      opacity: 1,
+      margin: 28, // px inset from the frame edge for corner anchors
+      offsetX: 0, // px fine-tune nudge, applied after anchor + margin
+      offsetY: 0
+    };
+
+    // Long-edge cap on the exported PNG. Marzipano already sizes the WebGL
+    // canvas backing buffer by devicePixelRatio (so raw captures are already
+    // retina-sharp); this only guards against absurdly large files on
+    // high-DPR mobile/tablet screens by downscaling the *captured* bitmap,
+    // never the live panorama render itself.
+    var MAX_CAPTURE_DIMENSION = 2400;
+
+    var busy = false;
+
+    function currentSceneId() {
+      var el = document.querySelector('#sceneList .scene.current');
+      return el ? el.getAttribute('data-id') : 'scene';
+    }
+
+    function sanitizeForFilename(value) {
+      var safe = String(value)
+        .toLowerCase()
+        .replace(/[^a-z0-9-]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      return safe || 'scene';
+    }
+
+    function buildFilename() {
+      var scene = sanitizeForFilename(currentSceneId());
+      var ts = new Date().toISOString().replace(/[:.]/g, '-');
+      return 'seismic-museum-' + scene + '-' + ts + '.png';
+    }
+
+    function setStatus(message, isError) {
+      if (!screenshotStatusElement) {
+        return;
+      }
+      screenshotStatusElement.textContent = message || '';
+      screenshotStatusElement.classList.toggle('is-error', !!isError);
+    }
+
+    function exportCanvas(canvas, callback) {
+      if (canvas.toBlob) {
+        canvas.toBlob(function(blob) {
+          if (!blob) {
+            callback(new Error('Canvas produced an empty capture'));
+            return;
+          }
+          callback(null, blob);
+        }, 'image/png');
+        return;
+      }
+      // Fallback for browsers without HTMLCanvasElement.toBlob.
+      try {
+        var dataUrl = canvas.toDataURL('image/png');
+        var binary = atob(dataUrl.split(',')[1]);
+        var bytes = new Uint8Array(binary.length);
+        for (var i = 0; i < binary.length; i++) {
+          bytes[i] = binary.charCodeAt(i);
+        }
+        callback(null, new Blob([bytes], { type: 'image/png' }));
+      } catch (err) {
+        callback(err);
+      }
+    }
+
+    function compositeOverlayAndExport(sourceCanvas, callback) {
+      if (!SCREENSHOT_OVERLAY.enabled) {
+        exportCanvas(sourceCanvas, callback);
+        return;
+      }
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function() {
+        try {
+          var out = document.createElement('canvas');
+          out.width = sourceCanvas.width;
+          out.height = sourceCanvas.height;
+          var ctx = out.getContext('2d');
+          ctx.drawImage(sourceCanvas, 0, 0);
+
+          var targetW = Math.min(SCREENSHOT_OVERLAY.maxWidthPx, out.width * SCREENSHOT_OVERLAY.widthRatio);
+          var scale = targetW / img.naturalWidth;
+          var targetH = img.naturalHeight * scale;
+          var margin = SCREENSHOT_OVERLAY.margin;
+          var x, y;
+
+          switch (SCREENSHOT_OVERLAY.anchor) {
+            case 'top-left':
+              x = margin;
+              y = margin;
+              break;
+            case 'top-right':
+              x = out.width - targetW - margin;
+              y = margin;
+              break;
+            case 'bottom-left':
+              x = margin;
+              y = out.height - targetH - margin;
+              break;
+            case 'center':
+              x = (out.width - targetW) / 2;
+              y = (out.height - targetH) / 2;
+              break;
+            case 'bottom-right':
+            default:
+              x = out.width - targetW - margin;
+              y = out.height - targetH - margin;
+              break;
+          }
+
+          x += SCREENSHOT_OVERLAY.offsetX || 0;
+          y += SCREENSHOT_OVERLAY.offsetY || 0;
+
+          ctx.globalAlpha = SCREENSHOT_OVERLAY.opacity;
+          ctx.drawImage(img, x, y, targetW, targetH);
+          ctx.globalAlpha = 1;
+          exportCanvas(out, callback);
+        } catch (err) {
+          callback(err);
+        }
+      };
+      img.onerror = function() {
+        // Overlay asset missing/broken: fail open with the plain capture
+        // rather than blocking the whole feature on a branding asset.
+        exportCanvas(sourceCanvas, callback);
+      };
+      img.src = SCREENSHOT_OVERLAY.assetPath;
+    }
+
+    function captureCurrentView(callback) {
+      try {
+        var sourceCanvas = panoElement.querySelector('canvas');
+        if (!sourceCanvas || !sourceCanvas.width || !sourceCanvas.height) {
+          callback(new Error('Panorama canvas is not ready'));
+          return;
+        }
+
+        var longEdge = Math.max(sourceCanvas.width, sourceCanvas.height);
+        var scale = longEdge > MAX_CAPTURE_DIMENSION ? MAX_CAPTURE_DIMENSION / longEdge : 1;
+
+        if (scale === 1) {
+          compositeOverlayAndExport(sourceCanvas, callback);
+          return;
+        }
+
+        var scaledCanvas = document.createElement('canvas');
+        scaledCanvas.width = Math.round(sourceCanvas.width * scale);
+        scaledCanvas.height = Math.round(sourceCanvas.height * scale);
+        var ctx = scaledCanvas.getContext('2d');
+        ctx.drawImage(sourceCanvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
+        compositeOverlayAndExport(scaledCanvas, callback);
+      } catch (err) {
+        callback(err);
+      }
+    }
+
+    function downloadBlob(blob, filename) {
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(function() {
+        URL.revokeObjectURL(url);
+      }, 4000);
+    }
+
+    screenshotButton.addEventListener('click', function() {
+      if (busy) {
+        return;
+      }
+      busy = true;
+      screenshotButton.classList.add('is-capturing');
+      setStatus('');
+
+      captureCurrentView(function(err, blob) {
+        screenshotButton.classList.remove('is-capturing');
+        busy = false;
+
+        if (err || !blob) {
+          if (window.console && window.console.error) {
+            window.console.error('Seismic Museum: screenshot capture failed', err);
+          }
+          setStatus('Unable to capture this view. Please try again.', true);
+          return;
+        }
+
+        screenshotButton.classList.add('did-capture');
+        setTimeout(function() {
+          screenshotButton.classList.remove('did-capture');
+        }, 600);
+
+        downloadBlob(blob, buildFilename());
+        setStatus('Snapshot saved.');
+      });
+    });
+  })();
 
 })();

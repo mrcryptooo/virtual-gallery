@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { SeismicStoneVideo } from '@/components/hero/SeismicStoneVideo';
+import { SoundToggle } from '@/components/hero/SoundToggle';
+import { SiteHeader } from '@/components/nav/SiteHeader';
 import styles from './LandingPage.module.css';
 
 const MUSEUM_HREF = '/p/modern-museum';
+const SOUND_PREFERENCE_KEY = 'seismic-museum:sound-enabled';
 
 // Total entrance choreography length: stone resolve (0ms, 600ms duration) ->
 // wordmark (200ms) -> tagline (450ms, 600ms duration) -> CTA (750ms, 600ms
@@ -10,17 +13,32 @@ const MUSEUM_HREF = '/p/modern-museum';
 // LandingPage.module.css, all composed from tokens.css motion tokens.
 const ENTRANCE_SETTLE_MS = 1400;
 
+function readStoredSoundPreference(): boolean {
+  if (typeof window === 'undefined') return true;
+  try {
+    const stored = window.localStorage.getItem(SOUND_PREFERENCE_KEY);
+    // Default ON: the owner's explicit requirement is that opening the
+    // stone produces sound: mute is an opt-out, not an opt-in.
+    return stored === null ? true : stored === '1';
+  } catch {
+    // Storage can throw in locked-down/private-browsing contexts -- default
+    // to the same "sound on" behavior rather than failing the page.
+    return true;
+  }
+}
+
 /**
  * Public landing page (`/`) — a single full-viewport museum entrance. The
  * Seismic Stone reference video (see components/hero/SeismicStoneVideo) IS
  * the viewport's visual field: a fixed, full-bleed, object-fit: cover layer,
  * not a rectangle sitting on a separate page background. Overlay UI
- * (wordmark, tagline, CTA) floats above it; there is no other background
- * layer to seam-match, since cover always fully covers the viewport.
+ * (nav, tagline, CTA) floats above it; there is no other background layer
+ * to seam-match, since cover always fully covers the viewport.
  */
 export function LandingPage() {
   const [entranceReady, setEntranceReady] = useState(false);
   const [interactive, setInteractive] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(readStoredSoundPreference);
 
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -56,16 +74,32 @@ export function LandingPage() {
     };
   }, []);
 
+  const handleSoundToggle = useCallback((next: boolean) => {
+    setSoundEnabled(next);
+    try {
+      window.localStorage.setItem(SOUND_PREFERENCE_KEY, next ? '1' : '0');
+    } catch {
+      // Best-effort persistence only -- the in-memory state still works for
+      // the rest of this session even if storage is unavailable.
+    }
+  }, []);
+
   return (
     <div
       className={`${styles['page'] ?? ''} ${entranceReady ? (styles['entranceReady'] ?? '') : ''}`}
     >
       <div className={styles['field']} aria-hidden="true" />
-      <SeismicStoneVideo href={MUSEUM_HREF} interactive={interactive} revealed={entranceReady} />
+      <SeismicStoneVideo
+        href={MUSEUM_HREF}
+        interactive={interactive}
+        revealed={entranceReady}
+        soundEnabled={soundEnabled}
+      />
 
-      <header className={styles['identity']}>
-        <p className={styles['wordmark']}>Seismic Museum</p>
-      </header>
+      <SiteHeader
+        revealed={entranceReady}
+        trailing={<SoundToggle enabled={soundEnabled} onToggle={handleSoundToggle} />}
+      />
 
       <main className={styles['stage']}>
         <p className={styles['tagline']}>

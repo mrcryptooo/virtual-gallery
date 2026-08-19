@@ -13,11 +13,14 @@
       "sharp"
     ]
   },
+  "dependencies": {
+    "@vercel/blob": "^0.27.3"
+  },
   "scripts": {
     "dev": "pnpm --filter @virtual-gallery/portfolio dev",
     "build": "pnpm -r build",
-    "typecheck": "pnpm -r typecheck && tsc -p e2e && tsc -p scripts",
-    "test": "pnpm -r test && vitest run --config scripts/vitest.config.ts",
+    "typecheck": "pnpm -r typecheck && tsc -p e2e && tsc -p scripts && tsc -p api",
+    "test": "pnpm -r test && vitest run --config scripts/vitest.config.ts && vitest run --config api/vitest.config.ts",
     "e2e": "playwright test",
     "package:build": "node scripts/build-package.ts",
     "deploy:prod": "node scripts/deploy.mjs",

@@ -7,6 +7,16 @@ import { LandingPage } from './LandingPage';
 // the shell chunk (doc 08 §4). Visitors who never open a tour never load it.
 const TourPage = lazy(() => import('./TourPage').then((module) => ({ default: module.TourPage })));
 
+// Lazy: Competition/Submit are secondary routes visited far less than the
+// landing page. SubmitArtPage in particular pulls in @vercel/blob/client's
+// upload machinery, which the landing bundle has no reason to carry.
+const CompetitionPage = lazy(() =>
+  import('./CompetitionPage').then((module) => ({ default: module.CompetitionPage })),
+);
+const SubmitArtPage = lazy(() =>
+  import('./SubmitArtPage').then((module) => ({ default: module.SubmitArtPage })),
+);
+
 /**
  * Routes served by the Marzipano static export rather than this SPA. The
  * server rewrites them before React ever loads (vercel.json in production,
@@ -20,6 +30,8 @@ const STATIC_TOUR_ROUTES = new Set(['modern-museum']);
  * links + URL view sync). Recognized today:
  *   /                   → landing page (Seismic Stone hero)
  *   /p/<project-slug>   → walkthrough (engine-rendered projects)
+ *   /competition        → Competitions (coming soon)
+ *   /submit             → Submit Your Art
  *   /dev/tokens         → design-system showcase (dev builds only)
  *   /dev/hero           → isolated Seismic Stone dev harness (dev builds only)
  */
@@ -51,6 +63,22 @@ export function App() {
 
   if (path === '/') {
     return <LandingPage />;
+  }
+
+  if (path === '/competition') {
+    return (
+      <Suspense fallback={null}>
+        <CompetitionPage />
+      </Suspense>
+    );
+  }
+
+  if (path === '/submit') {
+    return (
+      <Suspense fallback={null}>
+        <SubmitArtPage />
+      </Suspense>
+    );
   }
 
   return (

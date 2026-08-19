@@ -56,14 +56,16 @@ const FULL_OPEN_TIME = 2.85;
 // imperceptible fraction of a frame.
 const SEEK_EPSILON = 1 / 90;
 
-// Reduces the stone's on-screen scale ~17% (see LandingPage.module.css'
-// .fallbackField, which is the seam-matched tonal field this exposes at the
-// video's new, smaller edge) without reintroducing a boxed video: the video
-// element itself stays sized to the full viewport (for the cover math and
-// the hit-area's matching geometry below), and is scaled down in place via
-// CSS transform around its own center. The hit-area is scaled identically
-// so the invisible interaction region always matches what's actually drawn.
-export const STONE_SCALE = 0.83;
+// Reduces the stone's on-screen scale (~30% smaller than the previous
+// production size: 0.83 * 0.70 ≈ 0.58) without reintroducing a boxed video:
+// the video element itself stays sized to the full viewport (for the cover
+// math and the hit-area's matching geometry below), and is scaled down in
+// place via CSS transform around its own center; a same-source blurred ring
+// (see SeismicStoneVideo.module.css) fills the extra margin this exposes.
+// The hit-area is scaled identically so the invisible interaction region
+// always matches what's actually drawn -- both live in the CSS file since
+// this constant only documents the value, it isn't read at runtime.
+export const STONE_SCALE = 0.58;
 
 // Interaction hit-area: a normalized ellipse over the stone itself (not the
 // full video frame, most of which is empty background). Center is offset
@@ -93,6 +95,15 @@ const PROGRESS_EPSILON = 0.002;
 // the same at 30fps, 60fps, or a stalled/throttled tab.
 const OPEN_RATE = 0.15;
 const CLOSE_RATE = 0.085;
+// Second smoothing stage: raw pointer -> targetProgress -> smoothedProgress
+// (above) -> displayProgress (this) -> desired video time. A single extra
+// damped follow removes the last bit of high-frequency jitter a single
+// exponential filter alone still lets through on fast, noisy pointer
+// input (mouse micro-jitter, trackpad noise), without adding perceptible
+// lag -- it's fast enough to still read as "directly connected" to the
+// pointer, just smoother in the small.
+const DISPLAY_RATE = 0.4;
+const DISPLAY_EPSILON = 0.0015;
 const ACTIVATE_TOTAL_MS = 420;
 const TAP_MOVE_THRESHOLD_PX = 14;
 const TAP_MAX_MS = 320;
@@ -124,6 +135,10 @@ export interface SeismicStoneVideoProps {
   interactive: boolean;
   /** Drives the video's own entrance fade-in (first step of the choreography). */
   revealed?: boolean;
+  /** SOUND OFF must be absolutely silent regardless of open progress. */
+  soundEnabled?: boolean;
+  /** Fires once on the first genuine pointer/touch gesture, for audio-unlock bookkeeping owned by the parent (e.g. the sound toggle's own first click). */
+  onFirstInteraction?: () => void;
 }
 
 export function SeismicStoneVideo({
@@ -131,6 +146,8 @@ export function SeismicStoneVideo({
   label = 'Enter the Seismic Museum',
   interactive,
   revealed = true,
+  soundEnabled = true,
+  onFirstInteraction,
 }: SeismicStoneVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const backdropVideoRef = useRef<HTMLVideoElement>(null);
@@ -140,8 +157,10 @@ export function SeismicStoneVideo({
   const metadataReadyRef = useRef(false);
   const reducedMotionRef = useRef(false);
   const interactiveRef = useRef(interactive);
+  const soundEnabledRef = useRef(soundEnabled);
   const targetProgressRef = useRef(0);
   const smoothedProgressRef = useRef(0);
+  const displayProgressRef = useRef(0);
   const lastSetTimeRef = useRef(CLOSED_TIME);
   const lastSampleClientRef = useRef<{ x: number; y: number } | null>(null);
   const activatingRef = useRef(false);
@@ -155,6 +174,20 @@ export function SeismicStoneVideo({
   useEffect(() => {
     interactiveRef.current = interactive;
   }, [interactive]);
+
+  useEffect(() => {
+    soundEnabledRef.current = soundEnabled;
+    if (!soundEnabled) {
+      // SOUND OFF must be immediate and absolute -- don't wait for the RAF
+      // fade-out to notice on its next tick.
+      const audio = audioRef.current;
+      if (audio) {
+        audio.pause();
+        audio.volume = 0;
+      }
+      audioPlayingRef.current = false;
+    }
+  }, [soundEnabled]);
 
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -241,7 +274,19 @@ export function SeismicStoneVideo({
           smoothedProgressRef.current = targetProgressRef.current;
         }
 
-        const t = CLOSED_TIME + smoothedProgressRef.current * (FULL_OPEN_TIME - CLOSED_TIME);
+        // Second stage: raw pointer -> targetProgress -> smoothedProgress
+        // (above) -> displayProgress (here) -> desired video time. This is
+        // what actually drives playback -- a second damped follow catches
+        // the residual high-frequency noise a single exponential filter
+        // passes through on fast/noisy pointer input.
+        const displayFactor = 1 - Math.pow(1 - DISPLAY_RATE, dt * 60);
+        displayProgressRef.current +=
+          (smoothedProgressRef.current - displayProgressRef.current) * displayFactor;
+        if (Math.abs(smoothedProgressRef.current - displayProgressRef.current) < DISPLAY_EPSILON) {
+          displayProgressRef.current = smoothedProgressRef.current;
+        }
+
+        const t = CLOSED_TIME + displayProgressRef.current * (FULL_OPEN_TIME - CLOSED_TIME);
         if (Math.abs(t - lastSetTimeRef.current) > SEEK_EPSILON) {
           try {
             video.currentTime = t;
@@ -264,7 +309,7 @@ export function SeismicStoneVideo({
         // Scale itself stays fixed at STONE_SCALE (the size reduction); this
         // just nudges within that, and object-fit: cover's existing crop
         // margin absorbs it without ever exposing an edge.
-        const p = smoothedProgressRef.current;
+        const p = displayProgressRef.current;
         video.style.setProperty('--stone-parallax-y', `${(-p * 3).toFixed(3)}px`);
       }
 
@@ -275,11 +320,13 @@ export function SeismicStoneVideo({
       // reduced-motion or mid-activation.
       const audio = audioRef.current;
       if (audio) {
-        const p = activatingRef.current
-          ? 1
-          : reducedMotionRef.current
-            ? 0
-            : smoothedProgressRef.current;
+        const p = !soundEnabledRef.current
+          ? 0
+          : activatingRef.current
+            ? 1
+            : reducedMotionRef.current
+              ? 0
+              : displayProgressRef.current;
         const wantPlaying =
           p > (audioPlayingRef.current ? AUDIO_CLOSE_THRESHOLD : AUDIO_OPEN_THRESHOLD);
 
@@ -344,13 +391,15 @@ export function SeismicStoneVideo({
   const unlockAudioOnce = useCallback(() => {
     if (audioUnlockedRef.current) return;
     audioUnlockedRef.current = true;
-  }, []);
+    onFirstInteraction?.();
+  }, [onFirstInteraction]);
 
   const handleActivate = useCallback(() => {
     if (activatingRef.current) return;
     activatingRef.current = true;
     targetProgressRef.current = 1;
     smoothedProgressRef.current = 1;
+    displayProgressRef.current = 1;
     if (reducedMotionRef.current) {
       window.location.assign(href);
       return;
