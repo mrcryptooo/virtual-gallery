@@ -19,6 +19,10 @@ export interface SubmissionMedia {
 export interface SubmissionRecord {
   id: string;
   createdAt: string;
+  /** Real users.id when submitted while signed in, null for an
+      anonymous submission -- derived server-side from the session,
+      never trusted from the client (see api/submissions.ts). */
+  userId: string | null;
   artistName: string;
   email: string;
   socialLinks: string;
@@ -53,18 +57,13 @@ export interface CompetitionRecord {
  * A museum snapshot (see the camera control in the modern-museum tour)
  * persisted server-side, metadata separate from the image bytes (the PNG
  * lives in Blob storage; this record only holds a reference to it -- see
- * api/screenshots.ts). `userId` is nullable on purpose: there is no
- * authentication system yet (Requirement 2/"Profile System" in this
- * milestone's spec is documented as blocked, not faked), so every capture
- * is currently anonymous. The field exists now so that once real
- * authentication exists, captures can be attributed to a user without a
- * schema migration -- this is exactly the "ready for user association"
- * shape the spec asks for.
+ * api/screenshots.ts). `userId` is real users.id when captured while
+ * signed in, null for an anonymous capture -- derived server-side from
+ * the session, never trusted from the client.
  */
 export interface ScreenshotRecord {
   id: string;
   createdAt: string;
-  /** null until real authentication exists (see docs note above). */
   userId: string | null;
   /** Which static tour export this came from, e.g. "modern-museum". */
   projectId: string;

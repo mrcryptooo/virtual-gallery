@@ -1,5 +1,6 @@
 import { put } from '@vercel/blob';
 import { notifyAdmin } from './_lib/telegram.js';
+import { getSessionUser } from './_lib/session.js';
 import type {
   ScreenshotRecord,
   SubmissionMedia,
@@ -10,15 +11,14 @@ import type {
  * lives in Blob storage by the time this runs, see screenshot-upload.ts)
  * as its own record under screenshots/records/<id>.json. Same "Blob as
  * the whole persistence layer" pattern as submissions.ts, for the same
- * reason: `list({ prefix: 'screenshots/' })` is enough for a future admin
+ * reason: `list({ prefix: 'screenshots/' })` is enough for the admin
  * dashboard / profile gallery to enumerate every capture without a
- * database.
+ * separate media database.
  *
- * `userId` is always null right now -- there is no authentication system
- * in this project yet (see docs note on ScreenshotRecord). This endpoint
- * accepts an already-null userId and does not invent one; wiring a real
- * user into this record is exactly the kind of change that becomes
- * possible without a migration once real auth exists.
+ * `userId` is derived from the session -- never trusted from the request
+ * body. Anonymous visitors (no session cookie, or an expired/invalid
+ * one) get userId: null exactly as before; signed-in visitors get their
+ * real users.id.
  */
 
 const MAX_DIMENSION = 8000; // sanity bound, not a real camera-sensor size
@@ -88,10 +88,12 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ error: 'Missing or invalid image dimensions.' }, { status: 400 });
   }
 
+  const sessionUser = await getSessionUser(request);
+
   const record: ScreenshotRecord = {
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
-    userId: null,
+    userId: sessionUser?.user.id ?? null,
     projectId,
     panoramaId,
     media: input.media,
