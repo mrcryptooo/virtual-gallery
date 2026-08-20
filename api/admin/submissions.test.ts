@@ -5,10 +5,10 @@ const headMock = vi.fn();
 vi.mock('@vercel/blob', () => ({ list: listMock, head: headMock }));
 
 const requireAdminMock = vi.fn();
-vi.mock('../_lib/adminAuth.js', () => ({ requireAdmin: requireAdminMock }));
+vi.mock('../_lib/_adminAuth.js', () => ({ requireAdmin: requireAdminMock }));
 
 const originalFetch = global.fetch;
-const { handleSubmissions: handler } = await import('./submissions.js');
+const { handleSubmissions: handler } = await import('./_submissions.js');
 
 const UNAUTHORIZED = {
   ok: false,

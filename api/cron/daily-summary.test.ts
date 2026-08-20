@@ -5,7 +5,7 @@ const putMock: Mock = vi.fn(() => Promise.resolve({ url: 'https://blob.test/mark
 vi.mock('@vercel/blob', () => ({ list: listMock, put: putMock }));
 
 const sendTelegramMessageMock: Mock = vi.fn(() => Promise.resolve(true));
-vi.mock('../_lib/telegram.js', () => ({ sendTelegramMessage: sendTelegramMessageMock }));
+vi.mock('../_lib/_telegram.js', () => ({ sendTelegramMessage: sendTelegramMessageMock }));
 
 const { GET: handler } = await import('./daily-summary.js');
 

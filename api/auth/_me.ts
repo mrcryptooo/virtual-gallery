@@ -1,4 +1,4 @@
-import { getSessionUser } from '../_lib/session.js';
+import { getSessionUser } from '../_lib/_session.js';
 
 /**
  * GET /api/auth/me -- current session's profile, or `{ user: null }`.

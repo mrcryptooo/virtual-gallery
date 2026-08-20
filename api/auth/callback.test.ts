@@ -1,24 +1,24 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { encodeOAuthCookie } from '../_lib/oauth.js';
+import { encodeOAuthCookie } from '../_lib/_oauth.js';
 
 const { exchangeCodeForXProfileMock } = vi.hoisted(() => ({
   exchangeCodeForXProfileMock: vi.fn(),
 }));
-vi.mock('../_lib/oauth.js', async () => {
-  const actual = await vi.importActual<typeof import('../_lib/oauth.js')>('../_lib/oauth.js');
+vi.mock('../_lib/_oauth.js', async () => {
+  const actual = await vi.importActual<typeof import('../_lib/_oauth.js')>('../_lib/_oauth.js');
   return { ...actual, exchangeCodeForXProfile: exchangeCodeForXProfileMock };
 });
 
 const fromMock = vi.fn();
-vi.mock('../_lib/supabase.js', () => ({ getSupabase: () => ({ from: fromMock }) }));
+vi.mock('../_lib/_supabase.js', () => ({ getSupabase: () => ({ from: fromMock }) }));
 
 const createSessionMock = vi.fn(() => Promise.resolve('signed-session-cookie'));
-vi.mock('../_lib/session.js', () => ({
+vi.mock('../_lib/_session.js', () => ({
   createSession: createSessionMock,
   sessionCookieHeader: (v: string) => `seismic_session=${v}`,
 }));
 
-const { handleCallback: handler } = await import('./callback.js');
+const { handleCallback: handler } = await import('./_callback.js');
 
 function requestWithOAuthCookie(
   params: Record<string, string>,

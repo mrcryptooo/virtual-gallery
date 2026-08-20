@@ -1,4 +1,4 @@
-import { getSessionUser, type SessionUser } from './session.js';
+import { getSessionUser, type SessionUser } from './_session.js';
 
 /**
  * Real admin RBAC: session → user → role, deny-by-default. Replaces the

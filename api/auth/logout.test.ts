@@ -1,15 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { encodeSessionCookieValue } from '../_lib/session.js';
+import { encodeSessionCookieValue } from '../_lib/_session.js';
 
 const { revokeSessionMock } = vi.hoisted(() => ({
   revokeSessionMock: vi.fn(() => Promise.resolve()),
 }));
-vi.mock('../_lib/session.js', async () => {
-  const actual = await vi.importActual<typeof import('../_lib/session.js')>('../_lib/session.js');
+vi.mock('../_lib/_session.js', async () => {
+  const actual = await vi.importActual<typeof import('../_lib/_session.js')>('../_lib/_session.js');
   return { ...actual, revokeSession: revokeSessionMock };
 });
 
-const { handleLogout: handler } = await import('./logout.js');
+const { handleLogout: handler } = await import('./_logout.js');
 
 afterEach(() => {
   vi.unstubAllEnvs();

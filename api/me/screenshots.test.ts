@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const getSessionUserMock = vi.fn();
-vi.mock('../_lib/session.js', () => ({ getSessionUser: getSessionUserMock }));
+vi.mock('../_lib/_session.js', () => ({ getSessionUser: getSessionUserMock }));
 
 const listMock = vi.fn();
 vi.mock('@vercel/blob', () => ({ list: listMock }));

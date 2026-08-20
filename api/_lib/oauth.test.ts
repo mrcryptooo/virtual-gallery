@@ -8,7 +8,7 @@ import {
   generateState,
   oauthCookieHeader,
   readOAuthCookie,
-} from './oauth.js';
+} from './_oauth.js';
 
 afterEach(() => {
   vi.unstubAllEnvs();

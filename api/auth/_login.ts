@@ -6,7 +6,7 @@ import {
   generatePkcePair,
   generateState,
   oauthCookieHeader,
-} from '../_lib/oauth.js';
+} from '../_lib/_oauth.js';
 
 /**
  * GET /api/auth/login -- starts the X OAuth 2.0 + PKCE flow. A plain

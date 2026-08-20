@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { notifyAdmin, sendTelegramMessage } from './telegram.js';
+import { notifyAdmin, sendTelegramMessage } from './_telegram.js';
 
 const originalFetch = global.fetch;
 

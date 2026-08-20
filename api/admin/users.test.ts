@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const requireAdminMock = vi.fn();
-vi.mock('../_lib/adminAuth.js', () => ({ requireAdmin: requireAdminMock }));
+vi.mock('../_lib/_adminAuth.js', () => ({ requireAdmin: requireAdminMock }));
 
 const fromMock = vi.fn();
-vi.mock('../_lib/supabase.js', () => ({ getSupabase: () => ({ from: fromMock }) }));
+vi.mock('../_lib/_supabase.js', () => ({ getSupabase: () => ({ from: fromMock }) }));
 
-const { handleUsers: handler } = await import('./users.js');
+const { handleUsers: handler } = await import('./_users.js');
 
 const UNAUTHORIZED = {
   ok: false,

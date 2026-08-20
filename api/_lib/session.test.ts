@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const fromMock = vi.fn();
 const supabaseClient = { from: fromMock };
-vi.mock('./supabase.js', () => ({ getSupabase: () => supabaseClient }));
+vi.mock('./_supabase.js', () => ({ getSupabase: () => supabaseClient }));
 
 const {
   encodeSessionCookieValue,
@@ -11,7 +11,7 @@ const {
   clearSessionCookieHeader,
   readCookie,
   getSessionUser,
-} = await import('./session.js');
+} = await import('./_session.js');
 
 afterEach(() => {
   vi.unstubAllEnvs();

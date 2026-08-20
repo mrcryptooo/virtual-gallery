@@ -4,7 +4,7 @@ import {
   readCookie,
   revokeSession,
   SESSION_COOKIE,
-} from '../_lib/session.js';
+} from '../_lib/_session.js';
 
 /**
  * GET /api/auth/logout -- a real server-side session revocation (marks

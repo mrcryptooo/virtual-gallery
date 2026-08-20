@@ -1,6 +1,6 @@
 import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto';
-import { getSupabase } from './supabase.js';
-import type { SessionRow, UserRow } from './db.types.js';
+import { getSupabase } from './_supabase.js';
+import type { SessionRow, UserRow } from './_db.types.js';
 
 /**
  * Real, revocable server-side sessions -- not a stateless JWT. The cookie

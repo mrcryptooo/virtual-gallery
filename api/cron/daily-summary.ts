@@ -1,5 +1,5 @@
 import { list, put } from '@vercel/blob';
-import { sendTelegramMessage } from '../_lib/telegram.js';
+import { sendTelegramMessage } from '../_lib/_telegram.js';
 import type {
   ScreenshotRecord,
   SubmissionRecord,
