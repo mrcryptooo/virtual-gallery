@@ -77,4 +77,8 @@ export interface ScreenshotRecord {
       engine's configurable overlay system) -- null while overlay.enabled
       is false (no owner branding asset supplied yet). */
   template: string | null;
+  /** Viewport size at capture time (coarse device context for admin
+      review; not a fingerprinting signal). Older/degraded clients may
+      omit it. */
+  viewport: { width: number; height: number } | null;
 }

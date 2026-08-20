@@ -33,11 +33,16 @@ export async function GET(request: Request): Promise<Response> {
     }
   }
 
-  const { blobs } = await list({ prefix: PREFIX, limit: 200 });
-  const records = await Promise.all(
-    blobs.map((blob) => fetch(blob.url).then((r) => r.json() as Promise<ScreenshotRecord>)),
-  );
-  records.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  try {
+    const { blobs } = await list({ prefix: PREFIX, limit: 200 });
+    const records = await Promise.all(
+      blobs.map((blob) => fetch(blob.url).then((r) => r.json() as Promise<ScreenshotRecord>)),
+    );
+    records.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
-  return Response.json({ records, count: records.length });
+    return Response.json({ records, count: records.length });
+  } catch (error) {
+    console.error('GET /api/admin/screenshots: list failed', error);
+    return Response.json({ error: 'Could not list screenshots right now.' }, { status: 500 });
+  }
 }

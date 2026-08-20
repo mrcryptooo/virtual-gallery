@@ -12,13 +12,14 @@
  * case to AdminEvent + formatMessage() when a genuinely new class of
  * event needs to notify, not per call site.
  *
- * Real-time events implemented here: new submission, new screenshot.
- * NOT implemented in this milestone (see the Phase 2 report): the daily
- * summary digest (unique visitors/sessions/registered users/most-visited
- * panoramas) -- that needs either a Vercel Cron job or an external
- * scheduler hitting a new endpoint, plus a way to count "visitors" that
- * doesn't exist yet (no analytics/session tracking in this project). This
- * module's shape does not block adding that later.
+ * Real-time events: new submission, new screenshot. Daily digest: see
+ * api/cron/daily-summary.ts, which calls sendTelegramMessage directly
+ * (it needs to know success/failure to log and to decide whether to
+ * write its dedupe marker) rather than the fire-and-forget notifyAdmin.
+ * The digest deliberately only reports submissions/screenshots -- real,
+ * already-persisted activity -- not "unique visitors" or "sessions",
+ * which would need a visitor-analytics service this project does not
+ * have (see docs/reports/premium-experience-infrastructure-boundary.md).
  */
 
 export type AdminEvent =
@@ -48,24 +49,38 @@ function formatMessage(event: AdminEvent): string {
 }
 
 /**
- * Fire-and-forget: never throws, never blocks the caller. If
- * TELEGRAM_BOT_TOKEN or TELEGRAM_ADMIN_CHAT_ID isn't set (the default --
- * the owner provides these separately, per the milestone spec), this is a
- * silent no-op rather than a broken feature or an exposed error.
+ * Low-level send. Throws on failure (network error or a non-2xx from
+ * Telegram) so callers that need to know the outcome (the cron digest)
+ * can catch it; notifyAdmin below wraps this for its own fire-and-forget
+ * callers instead. Returns false without throwing if the two required
+ * env vars aren't configured -- "not configured" is not a failure to log
+ * as one.
  */
-export function notifyAdmin(event: AdminEvent): void {
+export async function sendTelegramMessage(text: string): Promise<boolean> {
   const token = process.env['TELEGRAM_BOT_TOKEN'];
   const chatId = process.env['TELEGRAM_ADMIN_CHAT_ID'];
   if (!token || !chatId) {
-    return;
+    return false;
   }
 
-  const text = formatMessage(event);
-  fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+  const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ chat_id: chatId, text }),
-  }).catch((error: unknown) => {
+  });
+  if (!response.ok) {
+    throw new Error(`Telegram API responded ${String(response.status)}`);
+  }
+  return true;
+}
+
+/**
+ * Fire-and-forget: never throws, never blocks the caller. Silent no-op
+ * (not an error) if Telegram isn't configured -- the app never breaks or
+ * exposes an error just because these aren't set up yet.
+ */
+export function notifyAdmin(event: AdminEvent): void {
+  sendTelegramMessage(formatMessage(event)).catch((error: unknown) => {
     // Never let a notification failure affect the actual request this was
     // triggered from -- log server-side only.
     console.error('notifyAdmin: Telegram send failed', error);

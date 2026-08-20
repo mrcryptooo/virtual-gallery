@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { notifyAdmin } from './telegram.js';
+import { notifyAdmin, sendTelegramMessage } from './telegram.js';
 
 const originalFetch = global.fetch;
 
@@ -63,5 +63,35 @@ describe('notifyAdmin', () => {
     expect(() => {
       notifyAdmin({ type: 'system-error', context: 'test', message: 'boom' });
     }).not.toThrow();
+  });
+});
+
+describe('sendTelegramMessage', () => {
+  it('returns false without calling fetch when not configured', async () => {
+    vi.stubEnv('TELEGRAM_BOT_TOKEN', '');
+    vi.stubEnv('TELEGRAM_ADMIN_CHAT_ID', '');
+    const fetchSpy = vi.fn();
+    global.fetch = fetchSpy as unknown as typeof fetch;
+
+    await expect(sendTelegramMessage('hello')).resolves.toBe(false);
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('returns true on a successful send', async () => {
+    vi.stubEnv('TELEGRAM_BOT_TOKEN', 'test-token');
+    vi.stubEnv('TELEGRAM_ADMIN_CHAT_ID', '12345');
+    global.fetch = vi.fn(() => Promise.resolve({ ok: true })) as unknown as typeof fetch;
+
+    await expect(sendTelegramMessage('hello')).resolves.toBe(true);
+  });
+
+  it('throws when Telegram responds with a non-2xx status', async () => {
+    vi.stubEnv('TELEGRAM_BOT_TOKEN', 'test-token');
+    vi.stubEnv('TELEGRAM_ADMIN_CHAT_ID', '12345');
+    global.fetch = vi.fn(() =>
+      Promise.resolve({ ok: false, status: 401 }),
+    ) as unknown as typeof fetch;
+
+    await expect(sendTelegramMessage('hello')).rejects.toThrow('401');
   });
 });

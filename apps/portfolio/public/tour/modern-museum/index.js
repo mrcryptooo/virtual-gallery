@@ -678,7 +678,8 @@
                 },
                 width: width,
                 height: height,
-                template: SCREENSHOT_OVERLAY.enabled ? 'owner-overlay' : null
+                template: SCREENSHOT_OVERLAY.enabled ? 'owner-overlay' : null,
+                viewport: { width: window.innerWidth, height: window.innerHeight }
               })
             });
           })
