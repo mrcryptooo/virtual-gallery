@@ -17,6 +17,16 @@ const SubmitArtPage = lazy(() =>
   import('./SubmitArtPage').then((module) => ({ default: module.SubmitArtPage })),
 );
 
+// Lazy for the same reason: /profile and /admin are visited by a small
+// minority of visitors (signed-in users, and admins respectively) and
+// have no reason to be in the landing page's own bundle.
+const ProfilePage = lazy(() =>
+  import('./ProfilePage').then((module) => ({ default: module.ProfilePage })),
+);
+const AdminPage = lazy(() =>
+  import('./AdminPage').then((module) => ({ default: module.AdminPage })),
+);
+
 /**
  * Routes served by the Marzipano static export rather than this SPA. The
  * server rewrites them before React ever loads (vercel.json in production,
@@ -32,6 +42,8 @@ const STATIC_TOUR_ROUTES = new Set(['modern-museum']);
  *   /p/<project-slug>   → walkthrough (engine-rendered projects)
  *   /competition        → Competitions (coming soon)
  *   /submit             → Submit Your Art
+ *   /profile            → signed-in visitor's own profile + gallery
+ *   /admin              → admin panel (server-side RBAC; see api/_lib/adminAuth.ts)
  *   /dev/tokens         → design-system showcase (dev builds only)
  *   /dev/hero           → isolated Seismic Stone dev harness (dev builds only)
  */
@@ -77,6 +89,22 @@ export function App() {
     return (
       <Suspense fallback={null}>
         <SubmitArtPage />
+      </Suspense>
+    );
+  }
+
+  if (path === '/profile') {
+    return (
+      <Suspense fallback={null}>
+        <ProfilePage />
+      </Suspense>
+    );
+  }
+
+  if (path === '/admin') {
+    return (
+      <Suspense fallback={null}>
+        <AdminPage />
       </Suspense>
     );
   }

@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react';
+import { useCurrentUser } from '@/lib/auth/useCurrentUser';
 import styles from './SiteHeader.module.css';
 
 const NAV_LINKS = [
@@ -24,6 +25,38 @@ export interface SiteHeaderProps {
 export function SiteHeader({ trailing, revealed = true }: SiteHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const path = typeof window !== 'undefined' ? window.location.pathname : '';
+  const currentUser = useCurrentUser();
+
+  const profileEntry =
+    currentUser.status === 'signed-in' ? (
+      <a
+        href="/profile"
+        className={styles['profileLink']}
+        aria-current={path === '/profile' ? 'page' : undefined}
+      >
+        {currentUser.user.avatarUrl ? (
+          <img
+            className={styles['profileAvatar']}
+            src={currentUser.user.avatarUrl}
+            alt=""
+            width={24}
+            height={24}
+          />
+        ) : (
+          <span className={styles['profileAvatarFallback']} aria-hidden="true">
+            {currentUser.user.displayName.slice(0, 1).toUpperCase()}
+          </span>
+        )}
+        <span className={styles['profileName']}>{currentUser.user.displayName}</span>
+      </a>
+    ) : currentUser.status === 'signed-out' ? (
+      <a
+        href={`/api/auth/login?redirectTo=${encodeURIComponent(path || '/')}`}
+        className={styles['signInLink']}
+      >
+        Sign in with X
+      </a>
+    ) : null;
 
   return (
     <header className={`${styles['header'] ?? ''} ${revealed ? (styles['revealed'] ?? '') : ''}`}>
@@ -42,6 +75,7 @@ export function SiteHeader({ trailing, revealed = true }: SiteHeaderProps) {
             {link.label}
           </a>
         ))}
+        {profileEntry}
         {trailing}
       </nav>
 
@@ -74,6 +108,18 @@ export function SiteHeader({ trailing, revealed = true }: SiteHeaderProps) {
               {link.label}
             </a>
           ))}
+          {currentUser.status === 'signed-in' ? (
+            <a href="/profile" className={styles['mobileNavLink']}>
+              {currentUser.user.displayName}
+            </a>
+          ) : currentUser.status === 'signed-out' ? (
+            <a
+              href={`/api/auth/login?redirectTo=${encodeURIComponent(path || '/')}`}
+              className={styles['mobileNavLink']}
+            >
+              Sign in with X
+            </a>
+          ) : null}
         </nav>
       )}
     </header>

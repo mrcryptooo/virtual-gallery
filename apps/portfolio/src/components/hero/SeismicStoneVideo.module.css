@@ -138,6 +138,35 @@
   }
 }
 
+/* Short viewports (a phone in landscape, mainly): the stone's own
+   footprint at the standard -6vh bias still reaches ~77% down the
+   viewport, leaving too little clearance below it for the landing
+   page's identity block + CTA (see LandingPage.module.css's matching
+   max-height: 480px block) once there's this little vertical room to
+   work with. Shifts all three layers that share this transform further
+   up in lockstep -- scale is deliberately left untouched, since that's
+   the value the mask-percentage math and the "no visible video
+   rectangle" guarantee are built around. */
+@media (max-height: 480px) {
+  .backgroundVideoBlurRing {
+    transform: translateY(-14vh) scale(0.66);
+  }
+
+  .backgroundVideo {
+    transform: translateY(calc(-14vh + var(--stone-parallax-y, 0px))) scale(0.58);
+  }
+
+  .hitArea {
+    transform: translate(-50%, -50%) translateY(-14vh) scale(0.58);
+  }
+}
+
+@media (max-height: 480px) and (prefers-reduced-motion: reduce) {
+  .backgroundVideo {
+    transform: translateY(-14vh) scale(0.58);
+  }
+}
+
 /* Invisible interaction region only -- carries no visible content of its
    own. Sized identically to .backgroundVideo (same "cover" box, same 0.58
    scale) so getBoundingClientRect() -- which reports the post-transform,

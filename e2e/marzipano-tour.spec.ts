@@ -97,6 +97,56 @@ test('the scene list reaches the last authored scene', async ({ page }) => {
   await expect(page.locator('.sceneName')).toHaveText(expected, { timeout: 30_000 });
 });
 
+test('the bottom navigator has 33 correctly-mapped thumbnails and navigates on click', async ({
+  page,
+}) => {
+  await page.goto('/p/modern-museum');
+  await waitForViewer(page);
+  await page.waitForFunction(() => document.querySelectorAll('.sceneThumb').length === 33);
+
+  const mapping = await page.evaluate(() => {
+    const thumbs = Array.from(document.querySelectorAll('.sceneThumb'));
+    return thumbs.map((t) => {
+      const img = t.querySelector<HTMLElement>('.sceneThumb-image');
+      const bg = img ? getComputedStyle(img).backgroundImage : '';
+      return {
+        dataId: t.getAttribute('data-id'),
+        ariaLabel: t.getAttribute('aria-label'),
+        bgUrl: bg.replace(/^url\("?/, '').replace(/"?\)$/, ''),
+      };
+    });
+  });
+
+  // All 33 scenes present, each with its own distinct thumbnail image, and
+  // every thumbnail's image genuinely comes from that same scene's own
+  // tile directory -- not a placeholder or a repeated/duplicated image.
+  expect(mapping).toHaveLength(33);
+  expect(new Set(mapping.map((m) => m.dataId)).size).toBe(33);
+  expect(new Set(mapping.map((m) => m.bgUrl)).size).toBe(33);
+  for (const m of mapping) {
+    expect(m.bgUrl).toContain(`/${m.dataId ?? ''}/`);
+    expect(m.ariaLabel?.trim()).not.toBe('');
+  }
+
+  // Clicking a thumbnail navigates to exactly that scene (engine
+  // navigation, not a page reload) and updates the active state.
+  const targetIndex = 14;
+  const targetId = mapping[targetIndex]?.dataId;
+  expect(targetId).toBeTruthy();
+  await page.locator('.sceneThumb').nth(targetIndex).click();
+  await page.waitForFunction(
+    (id: string) =>
+      document.querySelector(`.sceneThumb[data-id="${id}"]`)?.getAttribute('aria-current') ===
+      'true',
+    targetId as string,
+    { timeout: 10_000 },
+  );
+  const activeCount = await page.evaluate(
+    () => document.querySelectorAll('.sceneThumb[aria-current="true"]').length,
+  );
+  expect(activeCount).toBe(1);
+});
+
 for (const vp of VIEWPORTS) {
   test(`tour is usable at ${vp.name}`, async ({ page }) => {
     await page.setViewportSize({ width: vp.width, height: vp.height });

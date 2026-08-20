@@ -105,19 +105,10 @@ export function LandingPage() {
       <main className={styles['stage']}>
         <div className={styles['identity']}>
           <PressureTitle revealed={entranceReady} />
-          <p className={styles['subtitle']}>
-            <span
-              className={`${styles['subtitleLead'] ?? ''} ${entranceReady ? (styles['subtitleRevealed'] ?? '') : ''}`}
-            >
-              Private Patronage. Public Art.
-            </span>
-            <span
-              className={`${styles['subtitleBody'] ?? ''} ${entranceReady ? (styles['subtitleRevealed'] ?? '') : ''}`}
-            >
-              Experience a new era of confidential art patronage, powered by Seismic&rsquo;s native
-              on-chain privacy supporting artists and collecting art without exposing your financial
-              activity.
-            </span>
+          <p
+            className={`${styles['tagline'] ?? ''} ${entranceReady ? (styles['taglineRevealed'] ?? '') : ''}`}
+          >
+            Private Patronage. Public Art.
           </p>
         </div>
 

@@ -61,6 +61,86 @@
   border-radius: var(--radius-s);
 }
 
+.signInLink {
+  font-family: var(--font-sans);
+  font-size: var(--type-label-size);
+  font-weight: 600;
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-paper-ink);
+  text-shadow: 0 1px var(--text-shadow-blur) var(--color-swatch-inset);
+  opacity: 0.8;
+  padding: var(--space-2) 0;
+  transition: opacity var(--motion-quick) var(--ease-standard);
+}
+
+.signInLink:hover {
+  opacity: 1;
+}
+
+.signInLink:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-s);
+}
+
+.profileLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-decoration: none;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+  border: var(--hairline) solid transparent;
+  transition:
+    border-color var(--motion-quick) var(--ease-standard),
+    background-color var(--motion-quick) var(--ease-standard);
+}
+
+.profileLink:hover,
+.profileLink[aria-current='page'] {
+  border-color: var(--color-cta-border);
+}
+
+.profileLink:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.profileAvatar {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}
+
+.profileAvatarFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background: var(--color-cta-border);
+  color: var(--color-paper-ink);
+  font-family: var(--font-sans);
+  font-size: var(--type-caption-size);
+  font-weight: 600;
+}
+
+.profileName {
+  font-family: var(--font-sans);
+  font-size: var(--type-label-size);
+  font-weight: 600;
+  color: var(--color-paper-ink);
+  text-shadow: 0 1px var(--text-shadow-blur) var(--color-swatch-inset);
+  max-width: 8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .mobileControls {
   display: none;
   align-items: center;
