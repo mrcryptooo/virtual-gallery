@@ -1,5 +1,5 @@
-import { getSessionUser } from './_lib/session.js';
-import { getSupabase } from './_lib/supabase.js';
+import { getSessionUser } from './_lib/_session.js';
+import { getSupabase } from './_lib/_supabase.js';
 
 /**
  * PATCH /api/profile -- update the signed-in user's own editable fields

@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const getSessionUserMock = vi.fn();
-vi.mock('./_lib/session.js', () => ({ getSessionUser: getSessionUserMock }));
+vi.mock('./_lib/_session.js', () => ({ getSessionUser: getSessionUserMock }));
 
 const fromMock = vi.fn();
-vi.mock('./_lib/supabase.js', () => ({ getSupabase: () => ({ from: fromMock }) }));
+vi.mock('./_lib/_supabase.js', () => ({ getSupabase: () => ({ from: fromMock }) }));
 
 const { PATCH: handler } = await import('./profile.js');
 

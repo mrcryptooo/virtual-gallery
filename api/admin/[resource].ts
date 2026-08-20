@@ -1,6 +1,6 @@
-import { handleScreenshots } from './screenshots.js';
-import { handleSubmissions } from './submissions.js';
-import { handleUsers } from './users.js';
+import { handleScreenshots } from './_screenshots.js';
+import { handleSubmissions } from './_submissions.js';
+import { handleUsers } from './_users.js';
 
 /**
  * Single dynamic route standing in for three separate files

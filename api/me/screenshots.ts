@@ -1,5 +1,5 @@
 import { list } from '@vercel/blob';
-import { getSessionUser } from '../_lib/session.js';
+import { getSessionUser } from '../_lib/_session.js';
 import type { ScreenshotRecord } from '../../apps/portfolio/src/lib/community/types.js';
 
 const PREFIX = 'screenshots/records/';

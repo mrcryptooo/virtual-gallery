@@ -4,10 +4,10 @@ import {
   decodeOAuthCookie,
   exchangeCodeForXProfile,
   readOAuthCookie,
-} from '../_lib/oauth.js';
-import { getSupabase } from '../_lib/supabase.js';
-import { createSession, sessionCookieHeader } from '../_lib/session.js';
-import type { UserRow } from '../_lib/db.types.js';
+} from '../_lib/_oauth.js';
+import { getSupabase } from '../_lib/_supabase.js';
+import { createSession, sessionCookieHeader } from '../_lib/_session.js';
+import type { UserRow } from '../_lib/_db.types.js';
 
 const SESSION_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
 

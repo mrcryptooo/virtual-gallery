@@ -1,6 +1,6 @@
 import { put } from '@vercel/blob';
-import { notifyAdmin } from './_lib/telegram.js';
-import { getSessionUser } from './_lib/session.js';
+import { notifyAdmin } from './_lib/_telegram.js';
+import { getSessionUser } from './_lib/_session.js';
 import type {
   ScreenshotRecord,
   SubmissionMedia,

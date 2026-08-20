@@ -1,6 +1,6 @@
-import { requireAdmin } from '../_lib/adminAuth.js';
-import { getSupabase } from '../_lib/supabase.js';
-import type { UserRow } from '../_lib/db.types.js';
+import { requireAdmin } from '../_lib/_adminAuth.js';
+import { getSupabase } from '../_lib/_supabase.js';
+import type { UserRow } from '../_lib/_db.types.js';
 
 /**
  * Real-RBAC read access to the users table for the Admin Panel.

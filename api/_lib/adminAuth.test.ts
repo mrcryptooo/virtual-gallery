@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const getSessionUserMock = vi.fn();
-vi.mock('./session.js', () => ({ getSessionUser: getSessionUserMock }));
+vi.mock('./_session.js', () => ({ getSessionUser: getSessionUserMock }));
 
-const { requireAdmin } = await import('./adminAuth.js');
+const { requireAdmin } = await import('./_adminAuth.js');
 
 afterEach(() => {
   getSessionUserMock.mockReset();
