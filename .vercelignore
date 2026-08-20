@@ -12,3 +12,14 @@ apps/portfolio/dist/
 docs/
 e2e/
 packages/engine/test/fixtures/
+
+# Neither of these should ever be part of a source upload: Vercel's own
+# `installCommand` (pnpm install --frozen-lockfile) reinstalls dependencies
+# server-side, and .git carries the repo's full history -- including
+# objects for files deleted long ago (e.g. the old engine-rendered
+# modern-museum package removed in 5e46e9f) that still take up real space
+# in .git even though they're gone from the working tree. Neither was
+# excluded before; `vercel deploy --archive=tgz` was sweeping both into
+# the upload, which is what actually caused the failed ~482MB deploy.
+.git/
+node_modules/
