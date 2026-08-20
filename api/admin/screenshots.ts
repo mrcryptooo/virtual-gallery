@@ -7,11 +7,14 @@ import type { ScreenshotRecord } from '../../apps/portfolio/src/lib/community/ty
  * api/admin/submissions.ts exactly (same auth gate, same list/get-by-id
  * shape). ScreenshotRecord.userId is now a real users.id when captured
  * by a signed-in visitor, null for anonymous captures.
+ *
+ * Dispatched from api/admin/[resource].ts, not exported as GET directly
+ * -- see that file's header comment (Vercel's Hobby-plan Function limit).
  */
 
 const PREFIX = 'screenshots/records/';
 
-export async function GET(request: Request): Promise<Response> {
+export async function handleScreenshots(request: Request): Promise<Response> {
   const auth = await requireAdmin(request);
   if (!auth.ok) {
     return auth.response;

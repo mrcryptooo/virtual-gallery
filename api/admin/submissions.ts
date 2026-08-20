@@ -8,11 +8,14 @@ import type { SubmissionRecord } from '../../apps/portfolio/src/lib/community/ty
  * this route only needs to prove list/get/media-preview access is
  * properly secured. Auth is requireAdmin() -- a real session resolved to
  * an admin-role user in Postgres, not a shared bearer token.
+ *
+ * Dispatched from api/admin/[resource].ts, not exported as GET directly
+ * -- see that file's header comment (Vercel's Hobby-plan Function limit).
  */
 
 const PREFIX = 'submissions/records/';
 
-export async function GET(request: Request): Promise<Response> {
+export async function handleSubmissions(request: Request): Promise<Response> {
   const auth = await requireAdmin(request);
   if (!auth.ok) {
     return auth.response;

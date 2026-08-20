@@ -18,7 +18,7 @@ vi.mock('../_lib/session.js', () => ({
   sessionCookieHeader: (v: string) => `seismic_session=${v}`,
 }));
 
-const { GET: handler } = await import('./callback.js');
+const { handleCallback: handler } = await import('./callback.js');
 
 function requestWithOAuthCookie(
   params: Record<string, string>,

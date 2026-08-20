@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-const { GET: handler } = await import('./login.js');
+const { handleLogin: handler } = await import('./login.js');
 
 afterEach(() => {
   vi.unstubAllEnvs();

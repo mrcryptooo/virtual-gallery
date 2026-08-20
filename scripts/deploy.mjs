@@ -21,7 +21,7 @@
  *  • The deploy is verified before the script reports success.
  */
 import { execFileSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const DIST = join('apps', 'portfolio', 'dist');
@@ -38,6 +38,58 @@ if (!existsSync(join(DIST, 'index.html')) || !existsSync(projectsDir)) {
   process.exit(1);
 }
 
+// ── 1b. Carry the serverless functions into the artifact ───────────────────
+// The uploaded directory (DIST) *is* the deployment source, so Vercel's
+// zero-config Functions detection only finds an `api/` folder if one exists
+// inside it. Mirror the repo-root `api/` tree here, applying the same
+// exclusions as .vercelignore (test files and vitest.config.ts are not
+// route handlers and previously pushed the function count over the Hobby
+// plan's 12-function limit).
+console.log('[deploy] copying api/ into the artifact…');
+const apiSrc = 'api';
+const apiDest = join(DIST, 'api');
+function copyApiDir(src, dest) {
+  mkdirSync(dest, { recursive: true });
+  for (const entry of readdirSync(src, { withFileTypes: true })) {
+    if (entry.name === 'tsconfig.json' || entry.name === 'vitest.config.ts') continue;
+    if (entry.name.endsWith('.test.ts')) continue;
+    const srcPath = join(src, entry.name);
+    const destPath = join(dest, entry.name);
+    if (entry.isDirectory()) {
+      copyApiDir(srcPath, destPath);
+    } else {
+      cpSync(srcPath, destPath);
+    }
+  }
+}
+copyApiDir(apiSrc, apiDest);
+
+// The uploaded directory has no package.json of its own, so without one
+// Vercel's function bundler can't tell these are ESM modules (api/ imports
+// use "type": "module" + explicit .js extensions on relative specifiers),
+// and `npm install` below would have nothing telling it which runtime
+// packages api/'s non-relative imports need installed. Carry only what the
+// functions actually import at runtime (checked via grep, not copied
+// wholesale): @supabase/supabase-js and @vercel/blob. This is not the
+// whole repo-root manifest, which describes a pnpm workspace this artifact
+// directory isn't part of.
+const rootPkg = JSON.parse(readFileSync('package.json', 'utf8'));
+writeFileSync(
+  join(DIST, 'package.json'),
+  `${JSON.stringify(
+    {
+      type: rootPkg.type,
+      engines: rootPkg.engines,
+      dependencies: {
+        '@supabase/supabase-js': rootPkg.dependencies['@supabase/supabase-js'],
+        '@vercel/blob': rootPkg.dependencies['@vercel/blob'],
+      },
+    },
+    null,
+    2,
+  )}\n`,
+);
+
 // ── 2. Routing + headers for the prebuilt upload ────────────────────────────
 const config = JSON.parse(readFileSync('vercel.json', 'utf8'));
 // This upload is already built. The linked Vercel project carries build
@@ -45,7 +97,13 @@ const config = JSON.parse(readFileSync('vercel.json', 'utf8'));
 // otherwise Vercel tries to rebuild the artifact folder and fails looking for
 // an output directory inside it.
 config.framework = null;
-config.installCommand = '';
+// Not blanked like buildCommand: the api/ functions just copied in need
+// their two runtime dependencies (@supabase/supabase-js, @vercel/blob)
+// actually installed before Vercel's function bundler runs. There's no
+// lockfile in this artifact directory, so plain npm install resolves them
+// fresh rather than trying (and failing) to honor the workspace's pnpm
+// lockfile, which doesn't apply to this synthetic package.json.
+config.installCommand = 'npm install';
 config.buildCommand = '';
 config.outputDirectory = '.';
 writeFileSync(join(DIST, 'vercel.json'), `${JSON.stringify(config, null, 2)}\n`);

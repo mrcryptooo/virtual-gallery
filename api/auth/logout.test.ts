@@ -9,7 +9,7 @@ vi.mock('../_lib/session.js', async () => {
   return { ...actual, revokeSession: revokeSessionMock };
 });
 
-const { GET: handler } = await import('./logout.js');
+const { handleLogout: handler } = await import('./logout.js');
 
 afterEach(() => {
   vi.unstubAllEnvs();

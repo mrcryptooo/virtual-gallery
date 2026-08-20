@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 const getSessionUserMock = vi.fn();
 vi.mock('../_lib/session.js', () => ({ getSessionUser: getSessionUserMock }));
 
-const { GET: handler } = await import('./me.js');
+const { handleMe: handler } = await import('./me.js');
 
 afterEach(() => {
   getSessionUserMock.mockReset();

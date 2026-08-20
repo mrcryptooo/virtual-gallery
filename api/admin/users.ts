@@ -2,9 +2,13 @@ import { requireAdmin } from '../_lib/adminAuth.js';
 import { getSupabase } from '../_lib/supabase.js';
 import type { UserRow } from '../_lib/db.types.js';
 
-/** Real-RBAC read access to the users table for the Admin Panel. */
-
-export async function GET(request: Request): Promise<Response> {
+/**
+ * Real-RBAC read access to the users table for the Admin Panel.
+ *
+ * Dispatched from api/admin/[resource].ts, not exported as GET directly
+ * -- see that file's header comment (Vercel's Hobby-plan Function limit).
+ */
+export async function handleUsers(request: Request): Promise<Response> {
   const auth = await requireAdmin(request);
   if (!auth.ok) {
     return auth.response;
