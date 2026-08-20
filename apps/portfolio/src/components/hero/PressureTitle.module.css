@@ -1,0 +1,58 @@
+/**
+ * "Seismic Museum" landing title. Roboto Flex Variable supplies the real
+ * wght/wdth axes the mouse-proximity effect animates (see PressureTitle.tsx);
+ * the "italic" feel is CSS synthetic oblique (font-style: oblique <angle>),
+ * not a second italic font file -- kept out of the font budget for a
+ * dimension the effect only needs a subtle lean from, not a true italic
+ * face. Falls back to a static, non-interactive weight for
+ * prefers-reduced-motion (component skips its RAF loop entirely there).
+ */
+.title {
+  margin: 0;
+  padding: 0.1em 0;
+  font-family: var(--font-display-variable);
+  font-weight: 500;
+  font-size: var(--type-hero-title-size);
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+  color: var(--color-paper-ink);
+  text-align: center;
+  text-shadow: 0 1px var(--text-shadow-blur) var(--color-swatch-inset);
+  opacity: 0;
+  transform: translateY(1rem);
+  transition:
+    opacity calc(var(--motion-standard) * 2) var(--ease-standard),
+    transform calc(var(--motion-standard) * 2) var(--ease-standard);
+  transition-delay: calc(var(--motion-standard) * 1.5);
+}
+
+.title.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.char {
+  /* No CSS transition here on purpose: PressureTitle.tsx already drives
+     these values through a damped RAF loop every frame -- that IS the
+     "smooth cursor interpolation" -- so a CSS transition on top would
+     double-smooth (fight the JS-driven per-frame values) rather than help. */
+  display: inline-block;
+  font-variation-settings:
+    'wght' 500,
+    'wdth' 100;
+}
+
+.char:first-child {
+  margin-left: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title {
+    transition: none;
+  }
+
+  .title.revealed {
+    opacity: 1;
+    transform: none;
+  }
+}

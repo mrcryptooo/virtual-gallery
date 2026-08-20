@@ -24,9 +24,7 @@
   // Grab elements from DOM.
   var panoElement = document.querySelector('#pano');
   var sceneNameElement = document.querySelector('#titleBar .sceneName');
-  var sceneListElement = document.querySelector('#sceneList');
-  var sceneElements = document.querySelectorAll('#sceneList .scene');
-  var sceneListToggleElement = document.querySelector('#sceneListToggle');
+  var sceneNavigatorTrackElement = document.querySelector('#sceneNavigatorTrack');
   var autorotateToggleElement = document.querySelector('#autorotateToggle');
   var fullscreenToggleElement = document.querySelector('#fullscreenToggle');
 
@@ -150,25 +148,10 @@
     document.body.classList.add('fullscreen-disabled');
   }
 
-  // Set handler for scene list toggle.
-  sceneListToggleElement.addEventListener('click', toggleSceneList);
-
-  // Start with the scene list open on desktop.
-  if (!document.body.classList.contains('mobile')) {
-    showSceneList();
-  }
-
-  // Set handler for scene switch.
-  scenes.forEach(function(scene) {
-    var el = document.querySelector('#sceneList .scene[data-id="' + scene.data.id + '"]');
-    el.addEventListener('click', function() {
-      switchScene(scene);
-      // On mobile, hide scene list after selecting a scene.
-      if (document.body.classList.contains('mobile')) {
-        hideSceneList();
-      }
-    });
-  });
+  // Seismic Museum addition: build the bottom scene navigator (all scenes,
+  // horizontally scrollable) and wire each thumbnail to the same
+  // switchScene() used everywhere else -- see buildSceneNavigator() below.
+  buildSceneNavigator();
 
   // DOM elements for view controls.
   var viewUpElement = document.querySelector('#viewUp');
@@ -201,37 +184,97 @@
     scene.scene.switchTo();
     startAutorotate();
     updateSceneName(scene);
-    updateSceneList(scene);
+    updateSceneNavigator(scene);
   }
 
   function updateSceneName(scene) {
     sceneNameElement.innerHTML = sanitize(scene.data.name);
   }
 
-  function updateSceneList(scene) {
-    for (var i = 0; i < sceneElements.length; i++) {
-      var el = sceneElements[i];
-      if (el.getAttribute('data-id') === scene.data.id) {
-        el.classList.add('current');
-      } else {
-        el.classList.remove('current');
+  // Seismic Museum addition: bottom scene navigator (replaces the removed
+  // top-left expandable numbered scene list). Built once from the full
+  // `scenes` array -- all 33 panoramas are always in the DOM; only ~7 are
+  // visible at once, the rest reachable by horizontal scroll. Reuses the
+  // existing preview.jpg each scene already has (a stacked 256x256 cube-face
+  // strip): cropping to its first frame via a fixed-height, overflow-hidden
+  // background-image is a real photographic thumbnail with no extra asset
+  // generation or build step.
+  function buildSceneNavigator() {
+    if (!sceneNavigatorTrackElement) {
+      return;
+    }
+    scenes.forEach(function(scene, index) {
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'sceneThumb';
+      button.setAttribute('data-id', scene.data.id);
+      button.setAttribute('aria-current', 'false');
+      button.setAttribute(
+        'aria-label',
+        'Scene ' + (index + 1) + ' of ' + scenes.length + ': ' + scene.data.name
+      );
+
+      var image = document.createElement('span');
+      image.className = 'sceneThumb-image';
+      image.setAttribute('aria-hidden', 'true');
+      image.style.backgroundImage = 'url(' + previewUrlForScene(scene.data.id) + ')';
+
+      var meta = document.createElement('span');
+      meta.className = 'sceneThumb-meta';
+
+      var title = document.createElement('span');
+      title.className = 'sceneThumb-title';
+      title.textContent = sanitizePlain(scene.data.name);
+
+      var dot = document.createElement('span');
+      dot.className = 'sceneThumb-dot';
+      dot.setAttribute('aria-hidden', 'true');
+
+      meta.appendChild(title);
+      meta.appendChild(dot);
+      button.appendChild(image);
+      button.appendChild(meta);
+
+      button.addEventListener('click', function() {
+        switchScene(scene);
+      });
+
+      sceneNavigatorTrackElement.appendChild(button);
+    });
+  }
+
+  function previewUrlForScene(sceneId) {
+    return 'tiles/' + sceneId + '/preview.jpg';
+  }
+
+  function sanitizePlain(s) {
+    // textContent assignment already escapes markup; this only strips
+    // characters that would otherwise render oddly in the compact label.
+    return String(s).trim();
+  }
+
+  function updateSceneNavigator(scene) {
+    if (!sceneNavigatorTrackElement) {
+      return;
+    }
+    var thumbs = sceneNavigatorTrackElement.querySelectorAll('.sceneThumb');
+    var activeThumb = null;
+    for (var i = 0; i < thumbs.length; i++) {
+      var isCurrent = thumbs[i].getAttribute('data-id') === scene.data.id;
+      thumbs[i].setAttribute('aria-current', isCurrent ? 'true' : 'false');
+      if (isCurrent) {
+        activeThumb = thumbs[i];
       }
     }
-  }
-
-  function showSceneList() {
-    sceneListElement.classList.add('enabled');
-    sceneListToggleElement.classList.add('enabled');
-  }
-
-  function hideSceneList() {
-    sceneListElement.classList.remove('enabled');
-    sceneListToggleElement.classList.remove('enabled');
-  }
-
-  function toggleSceneList() {
-    sceneListElement.classList.toggle('enabled');
-    sceneListToggleElement.classList.toggle('enabled');
+    if (activeThumb && activeThumb.scrollIntoView) {
+      var reduceMotion =
+        window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      activeThumb.scrollIntoView({
+        behavior: reduceMotion ? 'auto' : 'smooth',
+        block: 'nearest',
+        inline: 'center'
+      });
+    }
   }
 
   function startAutorotate() {
@@ -444,7 +487,7 @@
     var busy = false;
 
     function currentSceneId() {
-      var el = document.querySelector('#sceneList .scene.current');
+      var el = document.querySelector('.sceneThumb[aria-current="true"]');
       return el ? el.getAttribute('data-id') : 'scene';
     }
 
@@ -599,6 +642,58 @@
       }, 4000);
     }
 
+    // Seismic Museum addition: persist a copy of every capture to Blob
+    // storage with metadata (project/panorama/dimensions/template), in
+    // addition to the visitor's local download -- see api/screenshots.ts.
+    // `userId` is always null: there's no authentication system in this
+    // project yet, so every capture is anonymous until real auth exists
+    // (see the docs on ScreenshotRecord). Best-effort and silent: a failed
+    // persist never blocks or degrades the download the visitor asked for.
+    function persistScreenshot(blob, sceneId) {
+      if (!window.VercelBlobClient || typeof window.VercelBlobClient.upload !== 'function') {
+        return;
+      }
+      var img = new Image();
+      var objectUrl = URL.createObjectURL(blob);
+      img.onload = function() {
+        var width = img.naturalWidth;
+        var height = img.naturalHeight;
+        URL.revokeObjectURL(objectUrl);
+        window.VercelBlobClient
+          .upload('museum-screenshot.png', blob, {
+            access: 'public',
+            handleUploadUrl: '/api/screenshot-upload'
+          })
+          .then(function(result) {
+            return fetch('/api/screenshots', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                projectId: 'modern-museum',
+                panoramaId: sceneId,
+                media: {
+                  url: result.url,
+                  pathname: result.pathname,
+                  contentType: 'image/png'
+                },
+                width: width,
+                height: height,
+                template: SCREENSHOT_OVERLAY.enabled ? 'owner-overlay' : null
+              })
+            });
+          })
+          .catch(function(err) {
+            if (window.console && window.console.warn) {
+              window.console.warn('Seismic Museum: screenshot persist failed (download still succeeded)', err);
+            }
+          });
+      };
+      img.onerror = function() {
+        URL.revokeObjectURL(objectUrl);
+      };
+      img.src = objectUrl;
+    }
+
     screenshotButton.addEventListener('click', function() {
       if (busy) {
         return;
@@ -625,6 +720,7 @@
         }, 600);
 
         downloadBlob(blob, buildFilename());
+        persistScreenshot(blob, currentSceneId());
         setStatus('Snapshot saved.');
       });
     });

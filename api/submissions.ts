@@ -1,4 +1,5 @@
 import { put } from '@vercel/blob';
+import { notifyAdmin } from './_lib/telegram.js';
 import type {
   SubmissionMedia,
   SubmissionRecord,
@@ -91,6 +92,8 @@ export async function POST(request: Request): Promise<Response> {
     contentType: 'application/json',
     addRandomSuffix: false,
   });
+
+  notifyAdmin({ type: 'new-submission', artistName, artworkTitle, id: record.id });
 
   return Response.json({ ok: true, id: record.id });
 }

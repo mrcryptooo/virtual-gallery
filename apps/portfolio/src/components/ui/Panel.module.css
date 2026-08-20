@@ -10,4 +10,14 @@
   background: var(--color-surface-raised);
   border: none;
   box-shadow: var(--shadow-overlay);
+  /* Raised panels are dialogs/sheets (doc comment above) -- a genuine
+     "major surface opens" moment, so they get the seismic reveal. The
+     base (non-raised) panel is used for plain static cards and does not. */
+  animation: seismicReveal var(--motion-seismic) var(--ease-standard) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .raised {
+    animation: none;
+  }
 }
