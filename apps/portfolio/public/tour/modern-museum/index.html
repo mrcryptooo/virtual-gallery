@@ -17,144 +17,6 @@
 
 <div id="pano"></div>
 
-<div id="sceneList">
-  <ul class="scenes">
-    
-      <a href="javascript:void(0)" class="scene" data-id="0-01">
-        <li class="text">01</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="1-02">
-        <li class="text">02</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="2-03">
-        <li class="text">03</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="3-04">
-        <li class="text">04</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="4-05">
-        <li class="text">05</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="5-06">
-        <li class="text">06</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="6-07">
-        <li class="text">07</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="7-08">
-        <li class="text">08</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="8-85">
-        <li class="text">8.5</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="9-09">
-        <li class="text">09</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="10-95">
-        <li class="text">9.5</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="11-10">
-        <li class="text">10</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="12-11">
-        <li class="text">11</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="13-12">
-        <li class="text">12</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="14-13">
-        <li class="text">13</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="15-14">
-        <li class="text">14</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="16-15">
-        <li class="text">15</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="17-16">
-        <li class="text">16</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="18-17">
-        <li class="text">17</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="19-18">
-        <li class="text">18</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="20-19">
-        <li class="text">19</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="21-20">
-        <li class="text">20</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="22-21">
-        <li class="text">21</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="23-22">
-        <li class="text">22</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="24-23">
-        <li class="text">23</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="25-24">
-        <li class="text">24</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="26-25">
-        <li class="text">25</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="27-26">
-        <li class="text">26</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="28-27">
-        <li class="text">27</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="29-28">
-        <li class="text">28</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="30-29">
-        <li class="text">29</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="31-30">
-        <li class="text">30</li>
-      </a>
-    
-      <a href="javascript:void(0)" class="scene" data-id="32-31">
-        <li class="text">31</li>
-      </a>
-    
-  </ul>
-</div>
-
 <div id="titleBar">
   <h1 class="sceneName"></h1>
 </div>
@@ -169,10 +31,16 @@
   <img class="icon on" src="img/windowed.png">
 </a>
 
-<a href="javascript:void(0)" id="sceneListToggle">
-  <img class="icon off" src="img/expand.png">
-  <img class="icon on" src="img/collapse.png">
-</a>
+<!-- Seismic Museum addition: replaces the Marzipano export's default
+     top-left expandable numbered scene list (removed) with a minimal,
+     always-visible, horizontally scrollable bottom scene navigator.
+     Populated at runtime from window.APP_DATA.scenes in index.js so it
+     never drifts out of sync with the authored scene set; navigation
+     goes through the same switchScene() used everywhere else in this
+     file. See index.js "Seismic Museum addition: scene navigator". -->
+<nav id="sceneNavigator" class="sceneNavigator" aria-label="Museum scenes">
+  <div id="sceneNavigatorTrack" class="sceneNavigator-track"></div>
+</nav>
 
 <a href="javascript:void(0)" id="viewUp" class="viewControlButton viewControlButton-1">
   <img class="icon" src="img/up.png">
@@ -208,6 +76,15 @@
 <script src="vendor/screenfull.min.js" ></script>
 <script src="vendor/bowser.min.js" ></script>
 <script src="vendor/marzipano.js" ></script>
+<!-- Seismic Museum addition: browser build of @vercel/blob/client's
+     upload() (see api/screenshot-upload.ts), vendored the same way as the
+     Marzipano/screenfull/bowser libraries above -- this export has no
+     bundler at runtime, so real client-direct-to-Blob upload needs a
+     prebuilt copy rather than an npm import. Regenerate with:
+     esbuild --bundle --format=iife --global-name=VercelBlobClient
+       --platform=browser --minify --target=es2020 (entry re-exports
+       `upload` from '@vercel/blob/client'). -->
+<script src="vendor/vercel-blob-client.js"></script>
 
 <script src="data.js"></script>
 <script src="index.js"></script>

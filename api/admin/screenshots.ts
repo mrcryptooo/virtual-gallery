@@ -1,20 +1,16 @@
 import { head, list } from '@vercel/blob';
 import { isAdminAuthorized } from '../_lib/adminAuth.js';
-import type { SubmissionRecord } from '../../apps/portfolio/src/lib/community/types.js';
+import type { ScreenshotRecord } from '../../apps/portfolio/src/lib/community/types.js';
 
 /**
- * Internal, authenticated read access to Submit Your Art records for the
- * future /admin dashboard (not built this phase). Deliberately GET-only:
- * status changes and notes are a later phase per the owner's spec, this
- * route only needs to prove list/get/media-preview access can be secured
- * without a database migration.
- *
- * Never exposes this list publicly: with no token configured the route
- * refuses every request (fails closed), and it is never linked from any
- * public page.
+ * Internal, authenticated read access to museum screenshot records --
+ * mirrors api/admin/submissions.ts exactly (same auth gate, same
+ * list/get-by-id shape). See ScreenshotRecord: userId is always null
+ * right now (no authentication system exists yet), so this cannot yet
+ * answer "which user captured this" -- only "what/where/when".
  */
 
-const PREFIX = 'submissions/records/';
+const PREFIX = 'screenshots/records/';
 
 export async function GET(request: Request): Promise<Response> {
   if (!isAdminAuthorized(request)) {
@@ -30,7 +26,7 @@ export async function GET(request: Request): Promise<Response> {
     }
     try {
       const blob = await head(`${PREFIX}${id}.json`);
-      const record = (await fetch(blob.url).then((r) => r.json())) as SubmissionRecord;
+      const record = (await fetch(blob.url).then((r) => r.json())) as ScreenshotRecord;
       return Response.json({ record });
     } catch {
       return Response.json({ error: 'Not found' }, { status: 404 });
@@ -40,13 +36,13 @@ export async function GET(request: Request): Promise<Response> {
   try {
     const { blobs } = await list({ prefix: PREFIX, limit: 200 });
     const records = await Promise.all(
-      blobs.map((blob) => fetch(blob.url).then((r) => r.json() as Promise<SubmissionRecord>)),
+      blobs.map((blob) => fetch(blob.url).then((r) => r.json() as Promise<ScreenshotRecord>)),
     );
     records.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
     return Response.json({ records, count: records.length });
   } catch (error) {
-    console.error('GET /api/admin/submissions: list failed', error);
-    return Response.json({ error: 'Could not list submissions right now.' }, { status: 500 });
+    console.error('GET /api/admin/screenshots: list failed', error);
+    return Response.json({ error: 'Could not list screenshots right now.' }, { status: 500 });
   }
 }

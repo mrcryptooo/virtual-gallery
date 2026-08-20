@@ -46,35 +46,65 @@
   pointer-events: auto;
 }
 
-.tagline {
-  margin: 0;
-  overflow: hidden;
-  padding: 0.15em 0;
+/* ── Identity block: title + subtitle, replaces the old single-line
+   tagline. Kept minimal -- two short lines under the title, not a
+   marketing section. ─────────────────────────────────────────────────── */
+.identity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 38.75rem;
 }
 
-.taglineInner {
-  display: block;
-  font-family: var(--font-serif);
-  font-weight: 500;
-  font-size: clamp(1.85rem, 3vw, 3.1rem);
-  line-height: 1.2;
-  letter-spacing: 0.008em;
-  color: var(--color-paper-ink);
+.subtitle {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
   text-align: center;
+}
+
+.subtitleLead,
+.subtitleBody {
+  display: block;
+  font-family: var(--font-sans);
+  color: var(--color-paper-ink);
   text-shadow: 0 1px var(--text-shadow-blur) var(--color-swatch-inset);
   opacity: 0;
-  transform: translateY(1rem);
+  transform: translateY(0.75rem);
   transition:
     opacity calc(var(--motion-standard) * 2) var(--ease-standard),
-    transform calc(var(--motion-standard) * 2) var(--ease-standard),
-    letter-spacing calc(var(--motion-standard) * 2) var(--ease-standard);
-  transition-delay: calc(var(--motion-standard) * 1.5);
+    transform calc(var(--motion-standard) * 2) var(--ease-standard);
 }
 
-.entranceReady .taglineInner {
+.subtitleLead {
+  font-size: var(--type-hero-subtitle-lead-size);
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  line-height: 1.3;
+  transition-delay: calc(var(--motion-standard) * 1.85);
+}
+
+.subtitleBody {
+  max-width: 46ch;
+  font-size: var(--type-hero-subtitle-body-size);
+  font-weight: 400;
+  line-height: 1.55;
+  transition-delay: calc(var(--motion-standard) * 2.05);
+}
+
+.subtitleLead.subtitleRevealed {
   opacity: 1;
   transform: translateY(0);
-  letter-spacing: 0.01em;
+}
+
+.subtitleBody.subtitleRevealed {
+  /* Dimmer than the lead line -- softens the body copy without a second
+     ink token; final resting state, not mid-transition. */
+  opacity: 0.72;
+  transform: translateY(0);
 }
 
 /* ── CTA ────────────────────────────────────────────────────────────────── */
@@ -141,10 +171,16 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .taglineInner,
+  .subtitleLead,
   .cta {
     transition: none;
     opacity: 1;
+    transform: none;
+  }
+
+  .subtitleBody {
+    transition: none;
+    opacity: 0.72;
     transform: none;
   }
 

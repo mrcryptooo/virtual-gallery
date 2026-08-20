@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { PressureTitle } from '@/components/hero/PressureTitle';
 import { SeismicStoneVideo } from '@/components/hero/SeismicStoneVideo';
 import { SoundToggle } from '@/components/hero/SoundToggle';
 import { SiteHeader } from '@/components/nav/SiteHeader';
@@ -102,9 +103,23 @@ export function LandingPage() {
       />
 
       <main className={styles['stage']}>
-        <p className={styles['tagline']}>
-          <span className={styles['taglineInner']}>The Community Is the Legacy</span>
-        </p>
+        <div className={styles['identity']}>
+          <PressureTitle revealed={entranceReady} />
+          <p className={styles['subtitle']}>
+            <span
+              className={`${styles['subtitleLead'] ?? ''} ${entranceReady ? (styles['subtitleRevealed'] ?? '') : ''}`}
+            >
+              Private Patronage. Public Art.
+            </span>
+            <span
+              className={`${styles['subtitleBody'] ?? ''} ${entranceReady ? (styles['subtitleRevealed'] ?? '') : ''}`}
+            >
+              Experience a new era of confidential art patronage, powered by Seismic&rsquo;s native
+              on-chain privacy supporting artists and collecting art without exposing your financial
+              activity.
+            </span>
+          </p>
+        </div>
 
         <a className={styles['cta']} href={MUSEUM_HREF}>
           Enter the Museum

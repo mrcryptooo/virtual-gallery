@@ -106,6 +106,14 @@
   background: var(--color-paper);
   border-radius: var(--radius-m);
   box-shadow: var(--shadow-overlay);
+  transform-origin: 50% 0%;
+  animation: seismicReveal var(--motion-seismic) var(--ease-standard) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobileNav {
+    animation: none;
+  }
 }
 
 .mobileNavLink {

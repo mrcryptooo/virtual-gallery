@@ -24,6 +24,7 @@
   /* ── Typography (doc 11 §1) ────────────────────────────────────────── */
   --font-serif: 'Playfair Display', georgia, serif;
   --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display-variable: 'Roboto Flex Variable', var(--font-sans);
 
   --type-display-size: clamp(2.75rem, 7vw, 5.5rem);
   --type-display-line: 1.02;
@@ -116,6 +117,20 @@
   --text-shadow-blur: 20px;
   /* Inline validation-error text (Submit Your Art form). */
   --color-error: #a13b3b;
+  /* Hero title ("Seismic Museum", PressureTitle) -- slightly larger than
+     the tagline it replaces (was clamp(1.85rem, 3vw, 3.1rem)) so it reads
+     as the page's primary identity without dominating the composition. */
+  --type-hero-title-size: clamp(2.15rem, 3.6vw, 3.6rem);
+  /* Subtitle block underneath the title (doc-11-unformalized, same
+     precedent as the rest of this section). First line larger than the
+     second, both smaller than the title. */
+  --type-hero-subtitle-lead-size: clamp(1.05rem, 1.6vw, 1.375rem);
+  --type-hero-subtitle-body-size: clamp(0.875rem, 1.15vw, 1rem);
+  /* Seismic reveal (see global.css's `seismicReveal` keyframe/utility) --
+     short, one-shot panel-opening duration, distinct from the doc-10
+     motion scale's own named durations since this is a purpose-built
+     effect, not a generic transition speed. */
+  --motion-seismic: 420ms;
 
   /* Breakpoint — the landing hero is the first responsive @media use in
      this app; custom properties can't be read inside a media condition, so

@@ -27,6 +27,28 @@
     U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/* Landing hero title only (TextPressure-style mouse-interactive wordmark,
+   see components/hero/PressureTitle). Self-hosted latin subset extracted
+   from @fontsource-variable/roboto-flex's `wdth` build (weight + width
+   axes only -- the two continuous axes the effect actually animates; the
+   third "italic" axis is produced with CSS synthetic oblique instead of a
+   second italic font file, see PressureTitle.module.css), then glyph-
+   subsetted (harfbuzz, via the `subset-font` package -- used once to
+   produce this file, not a runtime/build dependency) down to just the
+   ~10 glyphs "Seismic Museum" needs while preserving the full wght/wdth
+   variation range. ~7 KB, comfortably inside the doc 08 §3 font budget. */
+@font-face {
+  font-family: 'Roboto Flex Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 1000;
+  font-stretch: 25% 151%;
+  src: url('./fonts/roboto-flex-latin-wdth.woff2') format('woff2-variations');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 /* ── Reset ─────────────────────────────────────────────────────────────── */
 *,
 *::before,
@@ -121,4 +143,53 @@ p {
   line-height: var(--type-label-line);
   letter-spacing: var(--type-label-tracking);
   text-transform: uppercase;
+}
+
+/* ── Seismic reveal (doc-11-unformalized, landing-hero precedent) ─────────
+   Shared opening transition for major panels/menus (mobile nav, museum
+   info panels, ...): a short, controlled seismic-inspired sequence --
+   tiny vibration, a subtle directional displacement, a crack-like
+   clip-path reveal, then settle -- rather than a plain fade. A single
+   global @keyframes (not scoped by CSS Modules, unlike classes) so any
+   component's module CSS can reference it by name via `animation-name`.
+   One-shot, short (~420ms), GPU-cheap (transform/opacity/clip-path only),
+   never a looping/idle animation. `.seismicReveal` is a ready-to-use
+   utility class for components with no other panel-entrance styling of
+   their own; components with existing entrance CSS instead reference
+   `seismicReveal` directly in their own `animation-name`. */
+@keyframes seismicReveal {
+  0% {
+    opacity: 0;
+    clip-path: polygon(0 0, 48% 0, 52% 9%, 100% 0, 100% 100%, 52% 100%, 48% 91%, 0 100%);
+    transform: translate3d(0, 0.3125rem, 0) scale(0.985);
+  }
+  14% {
+    transform: translate3d(-0.1875rem, 0.1875rem, 0) scale(0.99);
+  }
+  27% {
+    transform: translate3d(0.125rem, 0.125rem, 0) scale(0.992);
+  }
+  42% {
+    opacity: 1;
+    clip-path: polygon(0 0, 48% 0, 50% 3%, 100% 0, 100% 100%, 52% 100%, 50% 97%, 0 100%);
+    transform: translate3d(-0.0625rem, 0.0625rem, 0) scale(0.998);
+  }
+  100% {
+    opacity: 1;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.seismicReveal {
+  animation: seismicReveal var(--motion-seismic) var(--ease-standard) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seismicReveal {
+    animation: none;
+    opacity: 1;
+    clip-path: none;
+    transform: none;
+  }
 }

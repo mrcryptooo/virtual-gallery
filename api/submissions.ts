@@ -1,4 +1,5 @@
 import { put } from '@vercel/blob';
+import { notifyAdmin } from './_lib/telegram.js';
 import type {
   SubmissionMedia,
   SubmissionRecord,
@@ -41,6 +42,12 @@ function isSubmissionMedia(value: unknown): value is SubmissionMedia {
     typeof media['url'] === 'string' &&
     media['url'].startsWith('https://') &&
     typeof media['pathname'] === 'string' &&
+    // Ties the record to a file that actually went through
+    // blob-upload.ts's token (which only ever writes under this prefix),
+    // not an arbitrary attacker-supplied HTTPS URL -- otherwise a client
+    // could create a "submission" pointing at any external image without
+    // ever uploading anything through this app.
+    media['pathname'].startsWith('submissions/media/') &&
     typeof media['contentType'] === 'string'
   );
 }
@@ -86,11 +93,21 @@ export async function POST(request: Request): Promise<Response> {
     status: 'pending',
   };
 
-  await put(`submissions/records/${record.id}.json`, JSON.stringify(record, null, 2), {
-    access: 'public',
-    contentType: 'application/json',
-    addRandomSuffix: false,
-  });
+  try {
+    await put(`submissions/records/${record.id}.json`, JSON.stringify(record, null, 2), {
+      access: 'public',
+      contentType: 'application/json',
+      addRandomSuffix: false,
+    });
+  } catch (error) {
+    console.error('POST /api/submissions: Blob write failed', error);
+    return Response.json(
+      { error: 'Could not save your submission right now. Please try again.' },
+      { status: 500 },
+    );
+  }
+
+  notifyAdmin({ type: 'new-submission', artistName, artworkTitle, id: record.id });
 
   return Response.json({ ok: true, id: record.id });
 }

@@ -3,6 +3,7 @@
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm --filter @virtual-gallery/portfolio build",
   "outputDirectory": "apps/portfolio/dist",
+  "crons": [{ "path": "/api/cron/daily-summary", "schedule": "0 9 * * *" }],
   "rewrites": [
     { "source": "/p/modern-museum", "destination": "/tour/modern-museum/index.html" },
     { "source": "/p/modern-museum/", "destination": "/tour/modern-museum/index.html" },
@@ -11,7 +12,11 @@
   "headers": [
     {
       "source": "/(.*)",
-      "headers": [{ "key": "X-Content-Type-Options", "value": "nosniff" }]
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" }
+      ]
     },
     {
       "source": "/assets/(.*)",
