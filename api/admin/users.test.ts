@@ -6,7 +6,7 @@ vi.mock('../_lib/adminAuth.js', () => ({ requireAdmin: requireAdminMock }));
 const fromMock = vi.fn();
 vi.mock('../_lib/supabase.js', () => ({ getSupabase: () => ({ from: fromMock }) }));
 
-const { GET: handler } = await import('./users.js');
+const { handleUsers: handler } = await import('./users.js');
 
 const UNAUTHORIZED = {
   ok: false,

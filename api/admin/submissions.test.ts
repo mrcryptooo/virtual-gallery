@@ -8,7 +8,7 @@ const requireAdminMock = vi.fn();
 vi.mock('../_lib/adminAuth.js', () => ({ requireAdmin: requireAdminMock }));
 
 const originalFetch = global.fetch;
-const { GET: handler } = await import('./submissions.js');
+const { handleSubmissions: handler } = await import('./submissions.js');
 
 const UNAUTHORIZED = {
   ok: false,

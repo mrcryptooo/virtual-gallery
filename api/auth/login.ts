@@ -12,12 +12,16 @@ import {
  * GET /api/auth/login -- starts the X OAuth 2.0 + PKCE flow. A plain
  * link (`<a href="/api/auth/login">Sign in with X</a>`) is enough; this
  * needs no JS on the client.
+ *
+ * Dispatched from api/auth/[action].ts rather than exported as GET
+ * directly -- see that file's header comment for why (Vercel's
+ * Hobby-plan 12-Function-per-deployment limit).
  */
 // Vercel's Function type accepts a plain (non-Promise) Response too, but
 // every other route here is async; keeping this one's signature
 // consistent (and Promise<Response>-typed) is worth a single disable.
 // eslint-disable-next-line @typescript-eslint/require-await
-export async function GET(request: Request): Promise<Response> {
+export async function handleLogin(request: Request): Promise<Response> {
   if (!process.env['X_CLIENT_ID']) {
     return Response.json({ error: 'X sign-in is not configured yet.' }, { status: 503 });
   }

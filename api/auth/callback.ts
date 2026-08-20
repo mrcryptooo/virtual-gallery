@@ -29,8 +29,11 @@ function redirectWithClearedOAuthCookie(
  * exactly once, upserts `users`, creates a real server-side session, and
  * redirects back into the app. The X access token itself is never
  * stored -- see oauth.ts's header comment for why.
+ *
+ * Dispatched from api/auth/[action].ts, not exported as GET directly --
+ * see that file's header comment (Vercel's Hobby-plan Function limit).
  */
-export async function GET(request: Request): Promise<Response> {
+export async function handleCallback(request: Request): Promise<Response> {
   const url = new URL(request.url);
   const error = url.searchParams.get('error');
   const oauthCookie = decodeOAuthCookie(readOAuthCookie(request));
