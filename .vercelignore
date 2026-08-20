@@ -23,3 +23,14 @@ packages/engine/test/fixtures/
 # the upload, which is what actually caused the failed ~482MB deploy.
 .git/
 node_modules/
+
+# Vercel's zero-config Functions detection (this project has no framework
+# preset) treats every .ts file under api/ as a route candidate,
+# including test files and vitest.config.ts -- none of which export an
+# HTTP handler. That inflated the function count past the Hobby plan's
+# 12-Function-per-deployment limit (a second, distinct failure found
+# right after fixing the .git/node_modules upload-size issue above).
+# Excluding them from the source upload is enough: CI/local dev run them
+# straight from git, unaffected by what a Vercel deploy uploads.
+api/**/*.test.ts
+api/vitest.config.ts
