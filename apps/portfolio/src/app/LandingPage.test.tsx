@@ -19,7 +19,9 @@ describe('LandingPage (production landing route)', () => {
     expect(screen.getByRole('button', { name: 'Enter the Seismic Museum' })).toBeInTheDocument();
 
     expect(screen.getByText('Private Patronage. Public Art.')).toBeInTheDocument();
-    expect(screen.getByText(/confidential art patronage/i)).toBeInTheDocument();
+    // The landing page is deliberately minimal: title + one tagline line,
+    // no further explanatory paragraph underneath it.
+    expect(screen.queryByText(/confidential art patronage/i)).not.toBeInTheDocument();
 
     const cta = screen.getByRole('link', { name: /Enter the Museum/i });
     expect(cta).toHaveAttribute('href', '/p/modern-museum');

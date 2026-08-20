@@ -1,5 +1,6 @@
 import { put } from '@vercel/blob';
 import { notifyAdmin } from './_lib/telegram.js';
+import { getSessionUser } from './_lib/session.js';
 import type {
   SubmissionMedia,
   SubmissionRecord,
@@ -79,9 +80,12 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ error: 'Consent is required to submit.' }, { status: 400 });
   }
 
+  const sessionUser = await getSessionUser(request);
+
   const record: SubmissionRecord = {
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
+    userId: sessionUser?.user.id ?? null,
     artistName,
     email,
     socialLinks: str(input.socialLinks, 500),

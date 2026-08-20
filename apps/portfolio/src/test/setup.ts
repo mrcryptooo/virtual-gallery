@@ -20,3 +20,18 @@ if (typeof window.matchMedia !== 'function') {
     dispatchEvent: vi.fn(),
   }));
 }
+
+// SiteHeader (rendered by nearly every page) calls /api/auth/me on mount
+// via useCurrentUser -- default every test to "signed out" so pages that
+// don't care about auth state don't need their own fetch mock just to
+// avoid an unhandled network call in jsdom. Tests that DO care (auth
+// flows, SiteHeader's own tests) override global.fetch themselves, which
+// takes precedence over this default.
+const originalFetch = global.fetch;
+global.fetch = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+  const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+  if (url.includes('/api/auth/me')) {
+    return Promise.resolve(new Response(JSON.stringify({ user: null }), { status: 200 }));
+  }
+  return originalFetch(input, init);
+});

@@ -1,20 +1,20 @@
 import { head, list } from '@vercel/blob';
-import { isAdminAuthorized } from '../_lib/adminAuth.js';
+import { requireAdmin } from '../_lib/adminAuth.js';
 import type { ScreenshotRecord } from '../../apps/portfolio/src/lib/community/types.js';
 
 /**
- * Internal, authenticated read access to museum screenshot records --
- * mirrors api/admin/submissions.ts exactly (same auth gate, same
- * list/get-by-id shape). See ScreenshotRecord: userId is always null
- * right now (no authentication system exists yet), so this cannot yet
- * answer "which user captured this" -- only "what/where/when".
+ * Real-RBAC read access to museum screenshot records -- mirrors
+ * api/admin/submissions.ts exactly (same auth gate, same list/get-by-id
+ * shape). ScreenshotRecord.userId is now a real users.id when captured
+ * by a signed-in visitor, null for anonymous captures.
  */
 
 const PREFIX = 'screenshots/records/';
 
 export async function GET(request: Request): Promise<Response> {
-  if (!isAdminAuthorized(request)) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await requireAdmin(request);
+  if (!auth.ok) {
+    return auth.response;
   }
 
   const url = new URL(request.url);

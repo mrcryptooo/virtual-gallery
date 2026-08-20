@@ -1,24 +1,21 @@
 import { head, list } from '@vercel/blob';
-import { isAdminAuthorized } from '../_lib/adminAuth.js';
+import { requireAdmin } from '../_lib/adminAuth.js';
 import type { SubmissionRecord } from '../../apps/portfolio/src/lib/community/types.js';
 
 /**
- * Internal, authenticated read access to Submit Your Art records for the
- * future /admin dashboard (not built this phase). Deliberately GET-only:
- * status changes and notes are a later phase per the owner's spec, this
- * route only needs to prove list/get/media-preview access can be secured
- * without a database migration.
- *
- * Never exposes this list publicly: with no token configured the route
- * refuses every request (fails closed), and it is never linked from any
- * public page.
+ * Real-RBAC read access to Submit Your Art records for the Admin Panel.
+ * Deliberately GET-only: status changes and notes are a later phase,
+ * this route only needs to prove list/get/media-preview access is
+ * properly secured. Auth is requireAdmin() -- a real session resolved to
+ * an admin-role user in Postgres, not a shared bearer token.
  */
 
 const PREFIX = 'submissions/records/';
 
 export async function GET(request: Request): Promise<Response> {
-  if (!isAdminAuthorized(request)) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await requireAdmin(request);
+  if (!auth.ok) {
+    return auth.response;
   }
 
   const url = new URL(request.url);

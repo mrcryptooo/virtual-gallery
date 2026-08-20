@@ -14,6 +14,7 @@
     ]
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.3",
     "@vercel/blob": "^0.27.3"
   },
   "scripts": {
@@ -49,6 +50,7 @@
     "@commitlint/config-conventional": "^19.7.0",
     "@playwright/test": "^1.61.1",
     "@types/node": "^22.20.1",
+    "@types/pg": "^8.23.1",
     "@virtual-gallery/engine": "workspace:*",
     "eslint": "^9.20.0",
     "eslint-plugin-boundaries": "^5.0.0",
@@ -56,6 +58,7 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.4.0",
+    "pg": "^8.23.0",
     "prettier": "^3.5.0",
     "sharp": "^0.35.3",
     "typescript": "^5.8.0",

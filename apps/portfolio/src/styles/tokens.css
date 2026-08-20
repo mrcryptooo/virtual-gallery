@@ -120,12 +120,11 @@
   /* Hero title ("Seismic Museum", PressureTitle) -- slightly larger than
      the tagline it replaces (was clamp(1.85rem, 3vw, 3.1rem)) so it reads
      as the page's primary identity without dominating the composition. */
-  --type-hero-title-size: clamp(2.15rem, 3.6vw, 3.6rem);
-  /* Subtitle block underneath the title (doc-11-unformalized, same
-     precedent as the rest of this section). First line larger than the
-     second, both smaller than the title. */
+  --type-hero-title-size: clamp(2rem, 3.2vw, 3.25rem);
+  /* Single tagline line underneath the title (doc-11-unformalized, same
+     precedent as the rest of this section) -- smaller than the title,
+     no further paragraph beneath it. */
   --type-hero-subtitle-lead-size: clamp(1.05rem, 1.6vw, 1.375rem);
-  --type-hero-subtitle-body-size: clamp(0.875rem, 1.15vw, 1rem);
   /* Seismic reveal (see global.css's `seismicReveal` keyframe/utility) --
      short, one-shot panel-opening duration, distinct from the doc-10
      motion scale's own named durations since this is a purpose-built
@@ -137,4 +136,8 @@
      this exists only as the documented source of truth for the literal
      value used in component CSS (not consumed via var()). */
   --breakpoint-compact: 640px;
+  /* Same reasoning as --breakpoint-compact -- documented source of truth
+     for the max-height: 480px media condition used by the landing hero
+     (a phone in landscape, mainly) and its stone-geometry counterpart. */
+  --breakpoint-short-viewport: 480px;
 }

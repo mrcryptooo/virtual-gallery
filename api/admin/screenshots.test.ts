@@ -4,45 +4,41 @@ const listMock = vi.fn();
 const headMock = vi.fn();
 vi.mock('@vercel/blob', () => ({ list: listMock, head: headMock }));
 
+const requireAdminMock = vi.fn();
+vi.mock('../_lib/adminAuth.js', () => ({ requireAdmin: requireAdminMock }));
+
 const originalFetch = global.fetch;
 const { GET: handler } = await import('./screenshots.js');
 
+const UNAUTHORIZED = {
+  ok: false,
+  response: Response.json({ error: 'Unauthorized' }, { status: 401 }),
+};
+const FORBIDDEN = { ok: false, response: Response.json({ error: 'Forbidden' }, { status: 403 }) };
+const AUTHORIZED = { ok: true, user: { user: { id: 'admin-1', role: 'admin' } } };
+
 afterEach(() => {
-  vi.unstubAllEnvs();
   global.fetch = originalFetch;
   listMock.mockReset();
   headMock.mockReset();
+  requireAdminMock.mockReset();
 });
 
 describe('GET /api/admin/screenshots', () => {
-  it('fails closed with no token configured', async () => {
-    vi.stubEnv('ADMIN_API_TOKEN', '');
-    const res = await handler(
-      new Request('http://localhost/api/admin/screenshots', {
-        headers: { authorization: 'Bearer anything' },
-      }),
-    );
-    expect(res.status).toBe(401);
-  });
-
-  it('rejects requests with no Authorization header', async () => {
-    vi.stubEnv('ADMIN_API_TOKEN', 'secret');
+  it('rejects unauthenticated requests with 401', async () => {
+    requireAdminMock.mockResolvedValue(UNAUTHORIZED);
     const res = await handler(new Request('http://localhost/api/admin/screenshots'));
     expect(res.status).toBe(401);
   });
 
-  it('rejects requests with the wrong token', async () => {
-    vi.stubEnv('ADMIN_API_TOKEN', 'secret');
-    const res = await handler(
-      new Request('http://localhost/api/admin/screenshots', {
-        headers: { authorization: 'Bearer wrong' },
-      }),
-    );
-    expect(res.status).toBe(401);
+  it('rejects an authenticated non-admin with 403', async () => {
+    requireAdminMock.mockResolvedValue(FORBIDDEN);
+    const res = await handler(new Request('http://localhost/api/admin/screenshots'));
+    expect(res.status).toBe(403);
   });
 
-  it('lists records newest-first when authorized, with null userId', async () => {
-    vi.stubEnv('ADMIN_API_TOKEN', 'secret');
+  it('lists records newest-first for an authorized admin, preserving null userId', async () => {
+    requireAdminMock.mockResolvedValue(AUTHORIZED);
     listMock.mockResolvedValue({
       blobs: [{ url: 'https://blob.test/a.json' }, { url: 'https://blob.test/b.json' }],
     });
@@ -60,11 +56,7 @@ describe('GET /api/admin/screenshots', () => {
       }),
     ) as unknown as typeof fetch;
 
-    const res = await handler(
-      new Request('http://localhost/api/admin/screenshots', {
-        headers: { authorization: 'Bearer secret' },
-      }),
-    );
+    const res = await handler(new Request('http://localhost/api/admin/screenshots'));
     const json = (await res.json()) as {
       records: { id: string; userId: unknown }[];
       count: number;
@@ -76,12 +68,8 @@ describe('GET /api/admin/screenshots', () => {
   });
 
   it('rejects a malformed id when fetching a single record', async () => {
-    vi.stubEnv('ADMIN_API_TOKEN', 'secret');
-    const res = await handler(
-      new Request('http://localhost/api/admin/screenshots?id=not-a-uuid', {
-        headers: { authorization: 'Bearer secret' },
-      }),
-    );
+    requireAdminMock.mockResolvedValue(AUTHORIZED);
+    const res = await handler(new Request('http://localhost/api/admin/screenshots?id=not-a-uuid'));
     expect(res.status).toBe(400);
   });
 });
