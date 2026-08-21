@@ -13,6 +13,7 @@ import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
  */
 
 const MAX_SCREENSHOT_BYTES = 15 * 1024 * 1024;
+const REQUIRED_PREFIX = 'screenshots/media/';
 
 export async function POST(request: Request): Promise<Response> {
   const body = (await request.json()) as HandleUploadBody;
@@ -21,14 +22,30 @@ export async function POST(request: Request): Promise<Response> {
     const jsonResponse = await handleUpload({
       body,
       request,
+      // The SDK's onBeforeGenerateToken return type has no `pathname`
+      // field -- an earlier version of this route returned one hoping to
+      // rewrite the path server-side, which the SDK silently ignored, so
+      // every screenshot ever saved actually landed at whatever bare
+      // filename the client passed (e.g. "museum-screenshot.png"), never
+      // under this prefix. api/screenshots.ts requires the stored
+      // pathname to start with screenshots/media/, so every save was
+      // rejected -- caught via a real end-to-end production capture, not
+      // assumed. The client now requests the fully-prefixed path itself
+      // (see index.js); this only verifies that request, rejecting a
+      // token for anything outside the prefix this route is allowed to
+      // grant.
       // eslint-disable-next-line @typescript-eslint/require-await
-      onBeforeGenerateToken: async (pathname) => ({
-        pathname: `screenshots/media/${pathname}`,
-        allowedContentTypes: ['image/png'],
-        maximumSizeInBytes: MAX_SCREENSHOT_BYTES,
-        addRandomSuffix: true,
-        tokenPayload: JSON.stringify({ purpose: 'museum-screenshot' }),
-      }),
+      onBeforeGenerateToken: async (pathname) => {
+        if (!pathname.startsWith(REQUIRED_PREFIX)) {
+          throw new Error(`Screenshot uploads must be written under ${REQUIRED_PREFIX}`);
+        }
+        return {
+          allowedContentTypes: ['image/png'],
+          maximumSizeInBytes: MAX_SCREENSHOT_BYTES,
+          addRandomSuffix: true,
+          tokenPayload: JSON.stringify({ purpose: 'museum-screenshot' }),
+        };
+      },
       onUploadCompleted: async () => {
         // No follow-up needed -- the client posts the resulting URL to
         // /api/screenshots once the upload finishes, which is what
