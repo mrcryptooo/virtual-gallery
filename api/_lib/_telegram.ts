@@ -24,7 +24,17 @@
 
 export type AdminEvent =
   | { type: 'new-submission'; artistName: string; artworkTitle: string; id: string }
-  | { type: 'new-screenshot'; projectId: string; panoramaId: string; id: string }
+  | {
+      type: 'new-screenshot';
+      projectId: string;
+      panoramaId: string;
+      panoramaTitle: string;
+      template: string | null;
+      id: string;
+      createdAt: string;
+      mediaUrl: string;
+      displayName: string | null;
+    }
   | { type: 'system-error'; context: string; message: string };
 
 function formatMessage(event: AdminEvent): string {
@@ -38,10 +48,12 @@ function formatMessage(event: AdminEvent): string {
       );
     case 'new-screenshot':
       return (
-        `📸 New museum screenshot\n` +
+        `📸 New museum artwork captured\n\n` +
+        `User: ${event.displayName ?? 'Anonymous'}\n` +
+        `Panorama: ${event.panoramaTitle}\n` +
         `Project: ${event.projectId}\n` +
-        `Scene: ${event.panoramaId}\n` +
-        `id: ${event.id}`
+        `Template: ${event.template ?? 'none'}\n` +
+        `Time: ${event.createdAt}`
       );
     case 'system-error':
       return `⚠️ System error (${event.context})\n${event.message}`;
@@ -75,12 +87,53 @@ export async function sendTelegramMessage(text: string): Promise<boolean> {
 }
 
 /**
+ * Sends a photo by URL rather than re-uploading bytes -- Telegram's
+ * sendPhoto accepts a `photo` field that's either a file upload or an
+ * HTTPS URL it fetches itself. The screenshot's Blob URL is already
+ * public (screenshots are stored `access: 'public'`, same as every other
+ * record in this project), so this needs no new credentials and exposes
+ * nothing that isn't already reachable by anyone with the URL. Throws on
+ * failure so callers can fall back to a text-only message.
+ */
+async function sendTelegramPhoto(photoUrl: string, caption: string): Promise<boolean> {
+  const token = process.env['TELEGRAM_BOT_TOKEN'];
+  const chatId = process.env['TELEGRAM_ADMIN_CHAT_ID'];
+  if (!token || !chatId) {
+    return false;
+  }
+
+  const response = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: chatId, photo: photoUrl, caption }),
+  });
+  if (!response.ok) {
+    throw new Error(`Telegram sendPhoto responded ${String(response.status)}`);
+  }
+  return true;
+}
+
+/**
  * Fire-and-forget: never throws, never blocks the caller. Silent no-op
  * (not an error) if Telegram isn't configured -- the app never breaks or
  * exposes an error just because these aren't set up yet.
  */
 export function notifyAdmin(event: AdminEvent): void {
-  sendTelegramMessage(formatMessage(event)).catch((error: unknown) => {
+  const text = formatMessage(event);
+  if (event.type === 'new-screenshot') {
+    // Prefer attaching the actual artwork; if Telegram can't fetch the
+    // URL for some reason (transient network issue, an edge case in
+    // Telegram's own URL-fetch validation), fall back to the plain text
+    // message -- which already includes every field the caption would
+    // have, so nothing about the notification is lost.
+    sendTelegramPhoto(event.mediaUrl, text).catch(() => {
+      sendTelegramMessage(text).catch((error: unknown) => {
+        console.error('notifyAdmin: Telegram send failed', error);
+      });
+    });
+    return;
+  }
+  sendTelegramMessage(text).catch((error: unknown) => {
     // Never let a notification failure affect the actual request this was
     // triggered from -- log server-side only.
     console.error('notifyAdmin: Telegram send failed', error);

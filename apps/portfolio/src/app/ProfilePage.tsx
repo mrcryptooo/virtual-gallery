@@ -1,8 +1,19 @@
 import { useCallback, useEffect, useState } from 'react';
 import { SiteHeader } from '@/components/nav/SiteHeader';
+import { IconButton } from '@/components/ui/IconButton';
+import { Panel } from '@/components/ui/Panel';
+import { Scrim } from '@/components/ui/Scrim';
 import { useCurrentUser } from '@/lib/auth/useCurrentUser';
 import type { ScreenshotRecord } from '@/lib/community/types';
 import styles from './ProfilePage.module.css';
+
+function formatCaptureDate(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+}
 
 type GalleryState =
   | { status: 'loading' }
@@ -25,6 +36,18 @@ export function ProfilePage() {
   const [bio, setBio] = useState('');
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [gallery, setGallery] = useState<GalleryState>({ status: 'loading' });
+  const [lightboxShot, setLightboxShot] = useState<ScreenshotRecord | null>(null);
+
+  useEffect(() => {
+    if (!lightboxShot) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setLightboxShot(null);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [lightboxShot]);
 
   useEffect(() => {
     if (currentUser.status === 'signed-in') {
@@ -182,12 +205,25 @@ export function ProfilePage() {
             <ul className={styles['gallery']}>
               {gallery.screenshots.map((shot) => (
                 <li key={shot.id} className={styles['galleryItem']}>
-                  <img
-                    src={shot.media.url}
-                    alt={`Museum capture from scene ${shot.panoramaId}`}
-                    loading="lazy"
-                  />
-                  <span className={styles['galleryMeta']}>{shot.panoramaId}</span>
+                  <button
+                    type="button"
+                    className={styles['galleryItemButton']}
+                    onClick={() => {
+                      setLightboxShot(shot);
+                    }}
+                  >
+                    <img
+                      src={shot.media.url}
+                      alt={`Museum capture: ${shot.panoramaTitle}`}
+                      loading="lazy"
+                    />
+                    <span className={styles['galleryMeta']}>
+                      <span className={styles['galleryMetaTitle']}>{shot.panoramaTitle}</span>
+                      <span className={styles['galleryMetaDate']}>
+                        {formatCaptureDate(shot.createdAt)}
+                      </span>
+                    </span>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -198,6 +234,43 @@ export function ProfilePage() {
           Sign out
         </a>
       </main>
+
+      {lightboxShot && (
+        <div className={styles['lightbox']}>
+          <Scrim
+            onDismiss={() => {
+              setLightboxShot(null);
+            }}
+          />
+          <Panel raised className={styles['lightboxPanel']}>
+            <IconButton
+              label="Close"
+              className={styles['lightboxClose']}
+              onClick={() => {
+                setLightboxShot(null);
+              }}
+            >
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M6 6L18 18M18 6L6 18"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </IconButton>
+            <img
+              className={styles['lightboxImage']}
+              src={lightboxShot.media.url}
+              alt={`Museum capture: ${lightboxShot.panoramaTitle}`}
+            />
+            <div className={styles['lightboxMeta']}>
+              <p className={styles['lightboxTitle']}>{lightboxShot.panoramaTitle}</p>
+              <p className={styles['lightboxDate']}>{formatCaptureDate(lightboxShot.createdAt)}</p>
+            </div>
+          </Panel>
+        </div>
+      )}
     </div>
   );
 }

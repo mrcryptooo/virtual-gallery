@@ -73,6 +73,53 @@
 </button>
 <div id="screenshotStatus" class="screenshotStatus" role="status" aria-live="polite"></div>
 
+<!-- Seismic Museum addition: the post-capture preview panel. Shown once a
+     capture has been composited into its final 1920x1080 artwork (base
+     scene + one of five template overlays); lets the visitor confirm the
+     result before it's saved anywhere, then Save / Download / Share on
+     X / Close. Hidden by default; index.js toggles `is-open`. -->
+<div id="screenshotPreview" class="screenshotPreview" aria-hidden="true">
+  <div class="screenshotPreview-scrim" id="screenshotPreviewScrim"></div>
+  <div
+    class="screenshotPreview-panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="screenshotPreviewTitle"
+  >
+    <button
+      type="button"
+      class="screenshotPreview-close"
+      id="screenshotPreviewClose"
+      aria-label="Close"
+    >
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <div class="screenshotPreview-imageWrap">
+      <img id="screenshotPreviewImage" class="screenshotPreview-image" alt="Your captured museum artwork" />
+    </div>
+    <div class="screenshotPreview-body">
+      <p id="screenshotPreviewTitle" class="screenshotPreview-title">Your artwork is ready</p>
+      <p class="screenshotPreview-caption">
+        This is what will appear in your profile gallery -- 1920&times;1080, template applied.
+      </p>
+      <div class="screenshotPreview-actions">
+        <button type="button" id="screenshotPreviewSave" class="screenshotPreview-btn screenshotPreview-btn-primary">
+          Save to profile
+        </button>
+        <button type="button" id="screenshotPreviewDownload" class="screenshotPreview-btn">
+          Download
+        </button>
+        <button type="button" id="screenshotPreviewShare" class="screenshotPreview-btn">
+          Share on X
+        </button>
+      </div>
+      <p id="screenshotPreviewStatus" class="screenshotPreview-status" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</div>
+
 <script src="vendor/screenfull.min.js" ></script>
 <script src="vendor/bowser.min.js" ></script>
 <script src="vendor/marzipano.js" ></script>

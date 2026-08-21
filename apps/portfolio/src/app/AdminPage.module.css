@@ -123,3 +123,138 @@
   font-size: var(--type-caption-size);
   opacity: 0.6;
 }
+
+/* ── Screenshot stats + grid ─────────────────────────────────────────── */
+.screenshotStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin: 0;
+  padding-bottom: var(--space-3);
+  border-bottom: var(--hairline) solid var(--color-cta-border);
+}
+
+.screenshotStat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.screenshotStat dt {
+  font-family: var(--font-sans);
+  font-size: var(--type-caption-size);
+  opacity: 0.6;
+}
+
+.screenshotStat dd {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--type-body-size);
+  font-weight: 600;
+}
+
+.screenshotGrid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: var(--space-4);
+}
+
+.screenshotGridItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.screenshotGridButton {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  border: var(--hairline) solid var(--color-cta-border);
+  border-radius: var(--radius-s);
+  overflow: hidden;
+  background: none;
+  cursor: pointer;
+  transition: border-color var(--motion-quick) ease;
+}
+
+.screenshotGridButton:hover,
+.screenshotGridButton:focus-visible {
+  border-color: var(--color-paper-ink);
+}
+
+.screenshotGridButton:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.screenshotGridButton img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.screenshotGridMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ── Screenshot lightbox ─────────────────────────────────────────────── */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+}
+
+.lightboxPanel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: min(50rem, 100%);
+  max-height: calc(100vh - 2 * var(--space-5));
+  overflow-y: auto;
+}
+
+.lightboxClose {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 2;
+}
+
+.lightboxImage {
+  width: 100%;
+  border-radius: var(--radius-s);
+  display: block;
+}
+
+.lightboxMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lightboxTitle {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+}
+
+.lightboxDate {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--type-caption-size);
+  color: var(--color-paper-ink);
+  opacity: 0.6;
+}

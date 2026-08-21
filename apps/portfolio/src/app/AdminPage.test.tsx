@@ -1,5 +1,6 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { axe } from 'vitest-axe';
 import { AdminPage } from './AdminPage';
 
 const originalFetch = global.fetch;
@@ -88,6 +89,64 @@ describe('AdminPage', () => {
       expect(screen.getByText('Ada')).toBeInTheDocument();
     });
     expect(screen.getByText(/@ada/)).toBeInTheDocument();
+  });
+
+  it('shows screenshot stats, a thumbnail grid, and a lightbox on click', async () => {
+    mockFetch({
+      '/api/auth/me': {
+        user: {
+          id: 'admin-1',
+          xUsername: 'root',
+          displayName: 'Root Admin',
+          avatarUrl: null,
+          bio: null,
+          role: 'admin',
+          createdAt: '2026-01-01T00:00:00.000Z',
+        },
+      },
+      '/api/admin/screenshots': {
+        records: [
+          {
+            id: 's1',
+            createdAt: '2026-08-21T09:00:00.000Z',
+            userId: 'u1',
+            projectId: 'modern-museum',
+            panoramaId: '5-06',
+            panoramaTitle: '5.06',
+            media: {
+              url: 'https://blob.test/shot.png',
+              pathname: 'screenshots/media/shot.png',
+              contentType: 'image/png',
+            },
+            width: 1920,
+            height: 1080,
+            template: 'template-4',
+            viewport: null,
+          },
+        ],
+        count: 1,
+      },
+    });
+    const { container } = render(<AdminPage />);
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Users' })).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Screenshots' }));
+
+    await waitFor(() => {
+      expect(screen.getByAltText(/captured artwork: 5\.06/i)).toBeInTheDocument();
+    });
+    expect(screen.getByText('Total captured')).toBeInTheDocument();
+    expect(screen.getAllByText('1')).toHaveLength(2); // total + the one per-day count
+    expect(screen.getByText(/template-4/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByAltText(/captured artwork: 5\.06/i).closest('button')!);
+
+    await waitFor(() => {
+      expect(screen.getAllByAltText(/captured artwork: 5\.06/i).length).toBeGreaterThan(1);
+    });
+    expect(screen.getByRole('button', { name: /close/i })).toBeInTheDocument();
+    expect(await axe(container)).toHaveNoViolations();
   });
 
   it('surfaces a 401/403 from the admin API as "not authorized" rather than crashing', async () => {

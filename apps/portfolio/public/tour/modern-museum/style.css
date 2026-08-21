@@ -776,12 +776,12 @@ body.view-control-buttons .viewControlButton {
 
 @keyframes screenshotShutterPulse {
   0% {
-    opacity: 0.9;
-    transform: scale(0.8);
+    opacity: 0.85;
+    transform: scale(0.85);
   }
   100% {
     opacity: 0;
-    transform: scale(1.35);
+    transform: scale(1.22);
   }
 }
 
@@ -844,15 +844,15 @@ body.view-control-buttons .viewControlButton {
    ========================================================================== */
 
 :root {
-  --scene-nav-h: 112px;
+  --scene-nav-h: 102px;
   --scene-thumb-w: 108px;
-  --scene-thumb-img-h: 68px;
+  --scene-thumb-img-h: 81px; /* 4:3 against --scene-thumb-w */
 }
 
 .mobile {
-  --scene-nav-h: 100px;
+  --scene-nav-h: 90px;
   --scene-thumb-w: 92px;
-  --scene-thumb-img-h: 58px;
+  --scene-thumb-img-h: 69px; /* 4:3 against --scene-thumb-w */
 }
 
 .sceneNavigator {
@@ -903,7 +903,7 @@ body.view-control-buttons .viewControlButton {
   position: relative;
   flex: 0 0 auto;
   width: var(--scene-thumb-w);
-  padding: 5px 5px 6px;
+  padding: 5px;
   border: none;
   border-radius: 10px;
   background: transparent;
@@ -914,46 +914,41 @@ body.view-control-buttons .viewControlButton {
   transform-origin: 50% 100%;
 }
 
+/* Image-dominant thumbnail: the scene's own front cube-face render
+   (tiles/<id>/1/f/0/0.jpg -- a clean, real, level-1 photographic view
+   already part of the export, not a generated or placeholder asset),
+   cover-cropped into a compact 4:3 card. The scene number is a small
+   corner badge overlaid on the image itself, not a separate text row --
+   keeps every item to one glance, and keeps the whole strip short. */
 .sceneThumb-image {
+  display: block;
+  position: relative;
   width: 100%;
   height: var(--scene-thumb-img-h);
   border-radius: 7px;
   background-color: #050506;
-  background-size: 100% auto;
-  background-position: 0 0;
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
   border: 1px solid rgba(244, 244, 245, 0.14);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
   transition: border-color 0.28s ease, box-shadow 0.28s ease;
 }
 
-.sceneThumb-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 4px;
-  padding: 0 1px;
-  font-size: 11px;
-  line-height: 1.3;
+.sceneThumb-badge {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: rgba(8, 8, 9, 0.72);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
-  color: rgba(244, 244, 245, 0.68);
-}
-
-.sceneThumb-title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.sceneThumb-dot {
-  flex: 0 0 auto;
-  width: 5px;
-  height: 5px;
-  margin-left: 6px;
-  border-radius: 999px;
-  background: rgba(200, 165, 96, 0.85);
-  opacity: 0;
-  transition: opacity 0.2s ease;
+  color: rgba(244, 244, 245, 0.92);
+  line-height: 1.5;
 }
 
 /* Hover (desktop only -- gated so touch devices never get a stuck hover
@@ -987,12 +982,9 @@ body.view-control-buttons .viewControlButton {
   box-shadow: 0 0 0 1px rgba(200, 165, 96, 0.3), 0 6px 18px rgba(0, 0, 0, 0.5);
 }
 
-.sceneThumb[aria-current="true"] .sceneThumb-dot {
-  opacity: 1;
-}
-
-.sceneThumb[aria-current="true"] .sceneThumb-title {
-  color: #f4f4f5;
+.sceneThumb[aria-current="true"] .sceneThumb-badge {
+  background: rgba(200, 165, 96, 0.9);
+  color: #08080a;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1014,4 +1006,233 @@ body.view-control-buttons .viewControlButton {
 
 .screenshotStatus {
   bottom: calc(var(--scene-nav-h) + 74px + env(safe-area-inset-bottom));
+}
+
+/* ==========================================================================
+   Seismic Museum addition -- post-capture preview panel.
+
+   Shown once a capture has been composited into its final 1920x1080
+   artwork. Same dark-glass + warm-gold identity as the camera control and
+   scene navigator. The opening transition is the same seismic-inspired
+   sequence used by the React app's shared `Panel` component
+   (apps/portfolio/src/components/ui/Panel.tsx / global.css's
+   `@keyframes seismicReveal`) -- duplicated here rather than shared
+   because this tour is a standalone static export with its own CSS, not
+   part of the React build. Keep the keyframe/timing values here in sync
+   with global.css's `seismicReveal` if that one ever changes.
+   ========================================================================== */
+
+.screenshotPreview {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.screenshotPreview.is-open {
+  display: flex;
+}
+
+.screenshotPreview-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 8, 9, 0.72);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.screenshotPreview-panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: min(680px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid rgba(200, 165, 96, 0.35);
+  background: rgba(17, 17, 18, 0.94);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+  color: #f4f4f5;
+}
+
+@keyframes screenshotPreviewReveal {
+  0% {
+    opacity: 0;
+    clip-path: polygon(0 0, 48% 0, 52% 9%, 100% 0, 100% 100%, 52% 100%, 48% 91%, 0 100%);
+    transform: translate3d(0, 5px, 0) scale(0.985);
+  }
+  14% {
+    transform: translate3d(-3px, 3px, 0) scale(0.99);
+  }
+  27% {
+    transform: translate3d(2px, 2px, 0) scale(0.992);
+  }
+  42% {
+    opacity: 1;
+    clip-path: polygon(0 0, 48% 0, 50% 3%, 100% 0, 100% 100%, 52% 100%, 50% 97%, 0 100%);
+    transform: translate3d(-1px, 1px, 0) scale(0.998);
+  }
+  100% {
+    opacity: 1;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.screenshotPreview.is-open .screenshotPreview-panel {
+  animation: screenshotPreviewReveal 420ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+.screenshotPreview-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid rgba(244, 244, 245, 0.18);
+  background: rgba(8, 8, 9, 0.55);
+  color: #f4f4f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.screenshotPreview-close:hover {
+  border-color: rgba(200, 165, 96, 0.7);
+  background: rgba(8, 8, 9, 0.8);
+}
+
+.screenshotPreview-close:focus-visible {
+  outline: 2px solid #c8a560;
+  outline-offset: 2px;
+}
+
+.screenshotPreview-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+.screenshotPreview-imageWrap {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #050506;
+  border-bottom: 1px solid rgba(200, 165, 96, 0.22);
+}
+
+.screenshotPreview-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.screenshotPreview-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 20px 20px;
+  overflow-y: auto;
+}
+
+.screenshotPreview-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.screenshotPreview-caption {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(244, 244, 245, 0.68);
+}
+
+.screenshotPreview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.screenshotPreview-btn {
+  flex: 1 1 auto;
+  min-width: 120px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(244, 244, 245, 0.18);
+  background: rgba(244, 244, 245, 0.06);
+  color: #f4f4f5;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background-color 0.18s ease, transform 0.12s ease;
+}
+
+.screenshotPreview-btn:hover {
+  border-color: rgba(200, 165, 96, 0.55);
+  background: rgba(244, 244, 245, 0.1);
+}
+
+.screenshotPreview-btn:active {
+  transform: scale(0.97);
+}
+
+.screenshotPreview-btn:focus-visible {
+  outline: 2px solid #c8a560;
+  outline-offset: 2px;
+}
+
+.screenshotPreview-btn-primary {
+  border-color: rgba(200, 165, 96, 0.9);
+  background: rgba(200, 165, 96, 0.9);
+  color: #08080a;
+  font-weight: 600;
+}
+
+.screenshotPreview-btn-primary:hover {
+  border-color: #c8a560;
+  background: #c8a560;
+}
+
+.screenshotPreview-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}
+
+.screenshotPreview-status {
+  margin: 2px 0 0;
+  min-height: 1.4em;
+  font-size: 12px;
+  color: rgba(200, 165, 96, 0.9);
+}
+
+.screenshotPreview-status.is-error {
+  color: #e2867a;
+}
+
+@media (max-width: 480px) {
+  .screenshotPreview-btn {
+    min-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screenshotPreview.is-open .screenshotPreview-panel {
+    animation: none;
+  }
+  .screenshotPreview-btn,
+  .screenshotPreview-close {
+    transition: none;
+  }
 }

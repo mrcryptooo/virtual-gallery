@@ -194,16 +194,22 @@
   // Seismic Museum addition: bottom scene navigator (replaces the removed
   // top-left expandable numbered scene list). Built once from the full
   // `scenes` array -- all 33 panoramas are always in the DOM; only ~7 are
-  // visible at once, the rest reachable by horizontal scroll. Reuses the
-  // existing preview.jpg each scene already has (a stacked 256x256 cube-face
-  // strip): cropping to its first frame via a fixed-height, overflow-hidden
-  // background-image is a real photographic thumbnail with no extra asset
-  // generation or build step.
+  // visible at once, the rest reachable by horizontal scroll. Each
+  // thumbnail's image is that scene's own front cube-face tile
+  // (tiles/<id>/1/f/0/0.jpg) -- the lowest-resolution, single-tile "f"
+  // face Marzipano already generates for every scene as a fallback level,
+  // reused as-is. This is a real per-scene photographic view, not a
+  // generated or placeholder asset: earlier this used the stacked
+  // preview.jpg (six 256x256 cube faces concatenated vertically) cropped
+  // to its first ~68px, which showed only a sliver of whichever face
+  // happens to be stacked first (often a blank ceiling/floor) -- the
+  // individual face tile is a complete, correctly-oriented image instead.
   function buildSceneNavigator() {
     if (!sceneNavigatorTrackElement) {
       return;
     }
     scenes.forEach(function(scene, index) {
+      var number = index + 1;
       var button = document.createElement('button');
       button.type = 'button';
       button.className = 'sceneThumb';
@@ -211,7 +217,7 @@
       button.setAttribute('aria-current', 'false');
       button.setAttribute(
         'aria-label',
-        'Scene ' + (index + 1) + ' of ' + scenes.length + ': ' + scene.data.name
+        'Scene ' + number + ' of ' + scenes.length + ': ' + scene.data.name
       );
 
       var image = document.createElement('span');
@@ -219,21 +225,13 @@
       image.setAttribute('aria-hidden', 'true');
       image.style.backgroundImage = 'url(' + previewUrlForScene(scene.data.id) + ')';
 
-      var meta = document.createElement('span');
-      meta.className = 'sceneThumb-meta';
+      var badge = document.createElement('span');
+      badge.className = 'sceneThumb-badge';
+      badge.setAttribute('aria-hidden', 'true');
+      badge.textContent = number < 10 ? '0' + number : String(number);
+      image.appendChild(badge);
 
-      var title = document.createElement('span');
-      title.className = 'sceneThumb-title';
-      title.textContent = sanitizePlain(scene.data.name);
-
-      var dot = document.createElement('span');
-      dot.className = 'sceneThumb-dot';
-      dot.setAttribute('aria-hidden', 'true');
-
-      meta.appendChild(title);
-      meta.appendChild(dot);
       button.appendChild(image);
-      button.appendChild(meta);
 
       button.addEventListener('click', function() {
         switchScene(scene);
@@ -244,13 +242,7 @@
   }
 
   function previewUrlForScene(sceneId) {
-    return 'tiles/' + sceneId + '/preview.jpg';
-  }
-
-  function sanitizePlain(s) {
-    // textContent assignment already escapes markup; this only strips
-    // characters that would otherwise render oddly in the compact label.
-    return String(s).trim();
+    return 'tiles/' + sceneId + '/1/f/0/0.jpg';
   }
 
   function updateSceneNavigator(scene) {
@@ -460,35 +452,45 @@
       return;
     }
 
-    // Configurable overlay branding. The owner has not supplied a final PNG
-    // yet, so this ships disabled (`enabled: false`) and the capture engine
-    // must work completely without it. Once the final asset arrives, drop
-    // it in `img/` and flip `enabled: true` (and adjust the other values as
-    // needed) -- no capture logic needs to change.
-    var SCREENSHOT_OVERLAY = {
-      assetPath: 'img/overlay.png',
-      enabled: false,
-      anchor: 'bottom-right', // 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center'
-      widthRatio: 0.22, // overlay width as a fraction of the captured image's width
-      maxWidthPx: 420, // hard cap so the overlay never dominates a large capture
-      opacity: 1,
-      margin: 28, // px inset from the frame edge for corner anchors
-      offsetX: 0, // px fine-tune nudge, applied after anchor + margin
-      offsetY: 0
-    };
+    var previewRoot = document.querySelector('#screenshotPreview');
+    var previewImage = document.querySelector('#screenshotPreviewImage');
+    var previewClose = document.querySelector('#screenshotPreviewClose');
+    var previewScrim = document.querySelector('#screenshotPreviewScrim');
+    var previewSaveButton = document.querySelector('#screenshotPreviewSave');
+    var previewDownloadButton = document.querySelector('#screenshotPreviewDownload');
+    var previewShareButton = document.querySelector('#screenshotPreviewShare');
+    var previewStatusElement = document.querySelector('#screenshotPreviewStatus');
 
-    // Long-edge cap on the exported PNG. Marzipano already sizes the WebGL
-    // canvas backing buffer by devicePixelRatio (so raw captures are already
-    // retina-sharp); this only guards against absurdly large files on
-    // high-DPR mobile/tablet screens by downscaling the *captured* bitmap,
-    // never the live panorama render itself.
+    // Every capture is composited into this exact size, regardless of the
+    // visitor's viewport -- the museum screenshot is a fixed-format
+    // artwork (16:9, matching the five supplied templates 1:1), not a raw
+    // viewport grab. The source panorama capture is cover-cropped (a
+    // single uniform scale, cropped on one axis -- never a non-uniform
+    // stretch) to fill this frame before a template is drawn on top.
+    var OUTPUT_WIDTH = 1920;
+    var OUTPUT_HEIGHT = 1080;
+    var TEMPLATE_COUNT = 5;
+
+    function templatePath(id) {
+      return '/screenshot-templates/template-' + id + '.png';
+    }
+
+    // Long-edge cap on the raw *source* grab before it's cover-cropped to
+    // the fixed output size -- guards against excessive memory/CPU on
+    // high-DPR screens, never affects the final 1920x1080 output.
     var MAX_CAPTURE_DIMENSION = 2400;
 
     var busy = false;
+    var currentPreview = null; // { blob, objectUrl, sceneId, sceneTitle, templateId, saved }
 
     function currentSceneId() {
       var el = document.querySelector('.sceneThumb[aria-current="true"]');
       return el ? el.getAttribute('data-id') : 'scene';
+    }
+
+    function currentSceneTitle(sceneId) {
+      var sceneData = findSceneDataById(sceneId);
+      return sceneData && sceneData.name ? sceneData.name : sceneId;
     }
 
     function sanitizeForFilename(value) {
@@ -499,8 +501,8 @@
       return safe || 'scene';
     }
 
-    function buildFilename() {
-      var scene = sanitizeForFilename(currentSceneId());
+    function buildFilename(sceneId) {
+      var scene = sanitizeForFilename(sceneId);
       var ts = new Date().toISOString().replace(/[:.]/g, '-');
       return 'seismic-museum-' + scene + '-' + ts + '.png';
     }
@@ -511,6 +513,14 @@
       }
       screenshotStatusElement.textContent = message || '';
       screenshotStatusElement.classList.toggle('is-error', !!isError);
+    }
+
+    function setPreviewStatus(message, isError) {
+      if (!previewStatusElement) {
+        return;
+      }
+      previewStatusElement.textContent = message || '';
+      previewStatusElement.classList.toggle('is-error', !!isError);
     }
 
     function exportCanvas(canvas, callback) {
@@ -538,68 +548,78 @@
       }
     }
 
-    function compositeOverlayAndExport(sourceCanvas, callback) {
-      if (!SCREENSHOT_OVERLAY.enabled) {
-        exportCanvas(sourceCanvas, callback);
+    // A proper random pick (uniform over 1..TEMPLATE_COUNT), not tied to
+    // the current panorama or capture order -- each of the five templates
+    // has an equal ~20% chance on every capture.
+    function pickRandomTemplateId() {
+      return Math.floor(Math.random() * TEMPLATE_COUNT) + 1;
+    }
+
+    var templateImageCache = {};
+    function loadTemplateImage(id, callback) {
+      if (templateImageCache[id]) {
+        callback(null, templateImageCache[id]);
         return;
       }
       var img = new Image();
-      img.crossOrigin = 'anonymous';
       img.onload = function() {
-        try {
-          var out = document.createElement('canvas');
-          out.width = sourceCanvas.width;
-          out.height = sourceCanvas.height;
-          var ctx = out.getContext('2d');
-          ctx.drawImage(sourceCanvas, 0, 0);
-
-          var targetW = Math.min(SCREENSHOT_OVERLAY.maxWidthPx, out.width * SCREENSHOT_OVERLAY.widthRatio);
-          var scale = targetW / img.naturalWidth;
-          var targetH = img.naturalHeight * scale;
-          var margin = SCREENSHOT_OVERLAY.margin;
-          var x, y;
-
-          switch (SCREENSHOT_OVERLAY.anchor) {
-            case 'top-left':
-              x = margin;
-              y = margin;
-              break;
-            case 'top-right':
-              x = out.width - targetW - margin;
-              y = margin;
-              break;
-            case 'bottom-left':
-              x = margin;
-              y = out.height - targetH - margin;
-              break;
-            case 'center':
-              x = (out.width - targetW) / 2;
-              y = (out.height - targetH) / 2;
-              break;
-            case 'bottom-right':
-            default:
-              x = out.width - targetW - margin;
-              y = out.height - targetH - margin;
-              break;
-          }
-
-          x += SCREENSHOT_OVERLAY.offsetX || 0;
-          y += SCREENSHOT_OVERLAY.offsetY || 0;
-
-          ctx.globalAlpha = SCREENSHOT_OVERLAY.opacity;
-          ctx.drawImage(img, x, y, targetW, targetH);
-          ctx.globalAlpha = 1;
-          exportCanvas(out, callback);
-        } catch (err) {
-          callback(err);
-        }
+        templateImageCache[id] = img;
+        callback(null, img);
       };
       img.onerror = function() {
-        // Overlay asset missing/broken: fail open with the plain capture
-        // rather than blocking the whole feature on a branding asset.
-        exportCanvas(sourceCanvas, callback);
+        callback(new Error('Template image failed to load: ' + templatePath(id)));
       };
-      img.src = SCREENSHOT_OVERLAY.assetPath;
+      img.src = templatePath(id);
+    }
+
+    // Cover-crop `sourceCanvas` into a new WxH canvas without distorting
+    // it: a single uniform scale (max of the two axis ratios), with the
+    // excess on whichever axis overflows cropped off-center. Never a
+    // non-uniform (independent x/y) stretch.
+    function coverCropToCanvas(sourceCanvas, width, height) {
+      var out = document.createElement('canvas');
+      out.width = width;
+      out.height = height;
+      var ctx = out.getContext('2d');
+      var sw = sourceCanvas.width;
+      var sh = sourceCanvas.height;
+      var targetRatio = width / height;
+      var sourceRatio = sw / sh;
+      var sx, sy, sWidth, sHeight;
+      if (sourceRatio > targetRatio) {
+        sHeight = sh;
+        sWidth = sh * targetRatio;
+        sx = (sw - sWidth) / 2;
+        sy = 0;
+      } else {
+        sWidth = sw;
+        sHeight = sw / targetRatio;
+        sx = 0;
+        sy = (sh - sHeight) / 2;
+      }
+      ctx.drawImage(sourceCanvas, sx, sy, sWidth, sHeight, 0, 0, width, height);
+      return out;
+    }
+
+    // BASE: the current museum view, cover-cropped to 1920x1080.
+    // OVERLAY: the chosen template, drawn at exactly x=0, y=0,
+    // width=1920, height=1080 -- it is already a full-frame 1920x1080
+    // asset, so this draws it 1:1 with no scaling of its own.
+    function composeArtwork(sourceCanvas, templateId, callback) {
+      loadTemplateImage(templateId, function(err, templateImg) {
+        if (err) {
+          callback(err);
+          return;
+        }
+        try {
+          var out = coverCropToCanvas(sourceCanvas, OUTPUT_WIDTH, OUTPUT_HEIGHT);
+          var ctx = out.getContext('2d');
+          ctx.drawImage(templateImg, 0, 0, OUTPUT_WIDTH, OUTPUT_HEIGHT);
+          exportCanvas(out, callback);
+        } catch (drawErr) {
+          callback(drawErr);
+        }
+      });
     }
 
     function captureCurrentView(callback) {
@@ -612,18 +632,25 @@
 
         var longEdge = Math.max(sourceCanvas.width, sourceCanvas.height);
         var scale = longEdge > MAX_CAPTURE_DIMENSION ? MAX_CAPTURE_DIMENSION / longEdge : 1;
+        var workingCanvas = sourceCanvas;
 
-        if (scale === 1) {
-          compositeOverlayAndExport(sourceCanvas, callback);
-          return;
+        if (scale !== 1) {
+          workingCanvas = document.createElement('canvas');
+          workingCanvas.width = Math.round(sourceCanvas.width * scale);
+          workingCanvas.height = Math.round(sourceCanvas.height * scale);
+          workingCanvas.getContext('2d').drawImage(
+            sourceCanvas, 0, 0, workingCanvas.width, workingCanvas.height
+          );
         }
 
-        var scaledCanvas = document.createElement('canvas');
-        scaledCanvas.width = Math.round(sourceCanvas.width * scale);
-        scaledCanvas.height = Math.round(sourceCanvas.height * scale);
-        var ctx = scaledCanvas.getContext('2d');
-        ctx.drawImage(sourceCanvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
-        compositeOverlayAndExport(scaledCanvas, callback);
+        var templateId = pickRandomTemplateId();
+        composeArtwork(workingCanvas, templateId, function(err, blob) {
+          if (err) {
+            callback(err);
+            return;
+          }
+          callback(null, blob, templateId);
+        });
       } catch (err) {
         callback(err);
       }
@@ -642,57 +669,188 @@
       }, 4000);
     }
 
-    // Seismic Museum addition: persist a copy of every capture to Blob
-    // storage with metadata (project/panorama/dimensions/template), in
-    // addition to the visitor's local download -- see api/screenshots.ts.
-    // `userId` is always null: there's no authentication system in this
-    // project yet, so every capture is anonymous until real auth exists
-    // (see the docs on ScreenshotRecord). Best-effort and silent: a failed
-    // persist never blocks or degrades the download the visitor asked for.
-    function persistScreenshot(blob, sceneId) {
+    // Seismic Museum addition: persist the artwork to Blob storage with
+    // its metadata -- see api/screenshots.ts. This now runs only when the
+    // visitor explicitly clicks "Save to profile" in the preview panel
+    // (previously it ran automatically on every capture); the local
+    // download and the X share option never depend on this succeeding.
+    // `userId` is never sent from the client -- the server always derives
+    // it from the session cookie (api/_lib/_session.ts), so an anonymous
+    // visitor's save silently records userId: null server-side and a
+    // signed-in visitor's records their real account, with no way for the
+    // client to claim someone else's identity.
+    function persistScreenshot(preview, onDone) {
       if (!window.VercelBlobClient || typeof window.VercelBlobClient.upload !== 'function') {
+        onDone(new Error('Upload is not available in this browser'));
         return;
       }
-      var img = new Image();
-      var objectUrl = URL.createObjectURL(blob);
-      img.onload = function() {
-        var width = img.naturalWidth;
-        var height = img.naturalHeight;
-        URL.revokeObjectURL(objectUrl);
-        window.VercelBlobClient
-          .upload('museum-screenshot.png', blob, {
-            access: 'public',
-            handleUploadUrl: '/api/screenshot-upload'
-          })
-          .then(function(result) {
-            return fetch('/api/screenshots', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                projectId: 'modern-museum',
-                panoramaId: sceneId,
-                media: {
-                  url: result.url,
-                  pathname: result.pathname,
-                  contentType: 'image/png'
-                },
-                width: width,
-                height: height,
-                template: SCREENSHOT_OVERLAY.enabled ? 'owner-overlay' : null,
-                viewport: { width: window.innerWidth, height: window.innerHeight }
-              })
-            });
-          })
-          .catch(function(err) {
-            if (window.console && window.console.warn) {
-              window.console.warn('Seismic Museum: screenshot persist failed (download still succeeded)', err);
-            }
+      window.VercelBlobClient
+        .upload('museum-screenshot.png', preview.blob, {
+          access: 'public',
+          handleUploadUrl: '/api/screenshot-upload'
+        })
+        .then(function(result) {
+          return fetch('/api/screenshots', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              projectId: 'modern-museum',
+              panoramaId: preview.sceneId,
+              panoramaTitle: preview.sceneTitle,
+              media: {
+                url: result.url,
+                pathname: result.pathname,
+                contentType: 'image/png'
+              },
+              width: OUTPUT_WIDTH,
+              height: OUTPUT_HEIGHT,
+              template: 'template-' + preview.templateId,
+              viewport: { width: window.innerWidth, height: window.innerHeight }
+            })
           });
+        })
+        .then(function(res) {
+          if (!res.ok) {
+            return res
+              .json()
+              .catch(function() {
+                return {};
+              })
+              .then(function(body) {
+                throw new Error(body.error || 'Save failed with status ' + res.status);
+              });
+          }
+          onDone(null);
+        })
+        .catch(function(err) {
+          onDone(err);
+        });
+    }
+
+    // A small set of natural-language variations rather than one fixed
+    // sentence, per capture -- each keeps the same intent (invite someone
+    // to visit) and always includes the museum URL.
+    function shareCaptionVariants(url) {
+      return [
+        'I visited Seismic Museum and discovered this piece.\n\nCome experience it yourself:\n' + url,
+        'Found this inside Seismic Museum -- worth the visit.\n\n' + url,
+        'A small piece of Seismic Museum, captured.\n\nStep inside yourself:\n' + url,
+        'Wandered through Seismic Museum and this one stayed with me.\n\n' + url,
+        'Seismic Museum, one frame at a time.\n\nExplore it here:\n' + url
+      ];
+    }
+
+    // Text-only share: X's web intent can prefill a post's text, but it
+    // cannot attach an image without an authenticated X API integration
+    // (out of scope here -- no X API/media credentials are configured).
+    // The visitor downloads the artwork (button right above this one) and
+    // attaches it themselves in X's compose window; this never claims to
+    // upload the image on their behalf.
+    function openShareIntent() {
+      var url = window.location.origin + '/p/modern-museum';
+      var variants = shareCaptionVariants(url);
+      var text = variants[Math.floor(Math.random() * variants.length)];
+      var intentUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text);
+      window.open(intentUrl, '_blank', 'noopener,noreferrer');
+    }
+
+    function closePreview() {
+      if (!previewRoot) {
+        return;
+      }
+      previewRoot.classList.remove('is-open');
+      previewRoot.setAttribute('aria-hidden', 'true');
+      if (currentPreview && currentPreview.objectUrl) {
+        URL.revokeObjectURL(currentPreview.objectUrl);
+      }
+      currentPreview = null;
+      if (previewImage) {
+        previewImage.src = '';
+      }
+      setPreviewStatus('');
+    }
+
+    function openPreview(blob, sceneId, sceneTitle, templateId) {
+      if (!previewRoot || !previewImage) {
+        return;
+      }
+      var objectUrl = URL.createObjectURL(blob);
+      currentPreview = {
+        blob: blob,
+        objectUrl: objectUrl,
+        sceneId: sceneId,
+        sceneTitle: sceneTitle,
+        templateId: templateId,
+        saved: false
       };
-      img.onerror = function() {
-        URL.revokeObjectURL(objectUrl);
-      };
-      img.src = objectUrl;
+      previewImage.src = objectUrl;
+      setPreviewStatus('');
+      if (previewSaveButton) {
+        previewSaveButton.disabled = false;
+        previewSaveButton.textContent = 'Save to profile';
+      }
+      previewRoot.classList.add('is-open');
+      previewRoot.setAttribute('aria-hidden', 'false');
+      // Exposed purely for e2e verification that the composited output
+      // actually used the randomly-selected template (see
+      // e2e/marzipano-tour.spec.ts) -- not read by any user-facing code.
+      previewRoot.setAttribute('data-template-id', String(templateId));
+    }
+
+    if (previewClose) {
+      previewClose.addEventListener('click', closePreview);
+    }
+    if (previewScrim) {
+      previewScrim.addEventListener('click', closePreview);
+    }
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && previewRoot && previewRoot.classList.contains('is-open')) {
+        closePreview();
+      }
+    });
+
+    if (previewSaveButton) {
+      previewSaveButton.addEventListener('click', function() {
+        if (!currentPreview || currentPreview.saved) {
+          return;
+        }
+        previewSaveButton.disabled = true;
+        previewSaveButton.textContent = 'Saving...';
+        setPreviewStatus('');
+        persistScreenshot(currentPreview, function(err) {
+          if (err) {
+            if (window.console && window.console.warn) {
+              window.console.warn('Seismic Museum: screenshot save failed', err);
+            }
+            previewSaveButton.disabled = false;
+            previewSaveButton.textContent = 'Save to profile';
+            setPreviewStatus('Could not save this to your profile. Please try again.', true);
+            return;
+          }
+          if (currentPreview) {
+            currentPreview.saved = true;
+          }
+          previewSaveButton.textContent = 'Saved';
+          setPreviewStatus('Saved to your profile gallery.');
+        });
+      });
+    }
+
+    if (previewDownloadButton) {
+      previewDownloadButton.addEventListener('click', function() {
+        if (!currentPreview) {
+          return;
+        }
+        downloadBlob(currentPreview.blob, buildFilename(currentPreview.sceneId));
+        setPreviewStatus('Downloaded.');
+      });
+    }
+
+    if (previewShareButton) {
+      previewShareButton.addEventListener('click', function() {
+        openShareIntent();
+        setPreviewStatus('Opened X in a new tab -- download the image above to attach it to your post.');
+      });
     }
 
     screenshotButton.addEventListener('click', function() {
@@ -703,7 +861,10 @@
       screenshotButton.classList.add('is-capturing');
       setStatus('');
 
-      captureCurrentView(function(err, blob) {
+      var sceneId = currentSceneId();
+      var sceneTitle = currentSceneTitle(sceneId);
+
+      captureCurrentView(function(err, blob, templateId) {
         screenshotButton.classList.remove('is-capturing');
         busy = false;
 
@@ -720,9 +881,8 @@
           screenshotButton.classList.remove('did-capture');
         }, 600);
 
-        downloadBlob(blob, buildFilename());
-        persistScreenshot(blob, currentSceneId());
-        setStatus('Snapshot saved.');
+        setStatus('');
+        openPreview(blob, sceneId, sceneTitle, templateId);
       });
     });
   })();
