@@ -60,6 +60,12 @@ export interface CompetitionRecord {
  * api/screenshots.ts). `userId` is real users.id when captured while
  * signed in, null for an anonymous capture -- derived server-side from
  * the session, never trusted from the client.
+ *
+ * Every capture is composited client-side into a fixed 1920x1080 artwork
+ * (the current museum view, cover-cropped, with one of five templates
+ * drawn full-frame on top) before it's ever uploaded -- width/height are
+ * therefore always exactly 1920x1080, enforced again server-side in
+ * api/screenshots.ts rather than trusted from the client.
  */
 export interface ScreenshotRecord {
   id: string;
@@ -69,12 +75,20 @@ export interface ScreenshotRecord {
   projectId: string;
   /** The Marzipano scene id active at capture time, e.g. "5-06". */
   panoramaId: string;
+  /** The scene's authored display name at capture time, e.g. "5.06" --
+      captured alongside panoramaId since scene names aren't guaranteed
+      stable/lookupable later (an authored tour can rename or remove a
+      scene), and the gallery/admin/Telegram notification all want a
+      human-readable title without re-fetching the tour's data.js. */
+  panoramaTitle: string;
   media: SubmissionMedia;
+  /** Always exactly 1920. */
   width: number;
+  /** Always exactly 1080. */
   height: number;
-  /** Overlay template applied at capture time, if any (see the screenshot
-      engine's configurable overlay system) -- null while overlay.enabled
-      is false (no owner branding asset supplied yet). */
+  /** Which of the five overlay templates was randomly selected for this
+      capture, e.g. "template-3" -- null only for records created before
+      the template system existed. */
   template: string | null;
   /** Viewport size at capture time (coarse device context for admin
       review; not a fingerprinting signal). Older/degraded clients may

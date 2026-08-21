@@ -1,5 +1,6 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { axe } from 'vitest-axe';
 import { ProfilePage } from './ProfilePage';
 
 const originalFetch = global.fetch;
@@ -57,14 +58,15 @@ describe('ProfilePage', () => {
             userId: 'u1',
             projectId: 'modern-museum',
             panoramaId: '0-01',
+            panoramaTitle: '01',
             media: {
               url: 'https://blob.test/a.png',
               pathname: 'screenshots/media/a.png',
               contentType: 'image/png',
             },
-            width: 800,
-            height: 600,
-            template: null,
+            width: 1920,
+            height: 1080,
+            template: 'template-2',
             viewport: null,
           },
         ],
@@ -86,7 +88,61 @@ describe('ProfilePage', () => {
     expect(screen.getByLabelText(/bio/i)).toHaveValue('Mathematician');
 
     await waitFor(() => {
-      expect(screen.getByAltText(/scene 0-01/i)).toBeInTheDocument();
+      expect(screen.getByAltText(/museum capture: 01/i)).toBeInTheDocument();
+    });
+  });
+
+  it('opens a larger lightbox view when a gallery item is clicked, and closes it', async () => {
+    mockFetch({
+      '/api/auth/me': {
+        user: {
+          id: 'u1',
+          xUsername: 'ada',
+          displayName: 'Ada Lovelace',
+          avatarUrl: null,
+          bio: null,
+          role: 'user',
+          createdAt: '2026-01-01T00:00:00.000Z',
+        },
+      },
+      '/api/me/screenshots': {
+        screenshots: [
+          {
+            id: 's1',
+            createdAt: '2026-01-02T00:00:00.000Z',
+            userId: 'u1',
+            projectId: 'modern-museum',
+            panoramaId: '0-01',
+            panoramaTitle: '01',
+            media: {
+              url: 'https://blob.test/a.png',
+              pathname: 'screenshots/media/a.png',
+              contentType: 'image/png',
+            },
+            width: 1920,
+            height: 1080,
+            template: 'template-2',
+            viewport: null,
+          },
+        ],
+      },
+    });
+
+    const { container } = render(<ProfilePage />);
+
+    const galleryImage = await screen.findByAltText(/museum capture: 01/i);
+    fireEvent.click(galleryImage.closest('button')!);
+
+    await waitFor(() => {
+      expect(screen.getAllByAltText(/museum capture: 01/i).length).toBeGreaterThan(1);
+    });
+    expect(screen.getByRole('button', { name: /close/i })).toBeInTheDocument();
+    expect(await axe(container)).toHaveNoViolations();
+
+    fireEvent.click(screen.getByRole('button', { name: /close/i }));
+
+    await waitFor(() => {
+      expect(screen.getAllByAltText(/museum capture: 01/i)).toHaveLength(1);
     });
   });
 });

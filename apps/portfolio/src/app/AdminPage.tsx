@@ -1,5 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { SiteHeader } from '@/components/nav/SiteHeader';
+import { IconButton } from '@/components/ui/IconButton';
+import { Panel } from '@/components/ui/Panel';
+import { Scrim } from '@/components/ui/Scrim';
 import { useCurrentUser } from '@/lib/auth/useCurrentUser';
 import type { ScreenshotRecord, SubmissionRecord } from '@/lib/community/types';
 import styles from './AdminPage.module.css';
@@ -53,6 +56,27 @@ function useAdminList<T>(path: string, active: boolean): FetchState<T> {
   return state;
 }
 
+interface ScreenshotStats {
+  total: number;
+  /** Most-recent-first, capped at 7 days -- a quick-glance trend, not a
+      full analytics chart (this project has no analytics service; see
+      api/cron/daily-summary.ts's own comment on the same boundary). */
+  perDay: { date: string; count: number }[];
+}
+
+function computeScreenshotStats(items: ScreenshotRecord[]): ScreenshotStats {
+  const counts = new Map<string, number>();
+  for (const shot of items) {
+    const date = shot.createdAt.slice(0, 10);
+    counts.set(date, (counts.get(date) ?? 0) + 1);
+  }
+  const perDay = Array.from(counts.entries())
+    .map(([date, count]) => ({ date, count }))
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 7);
+  return { total: items.length, perDay };
+}
+
 /**
  * `/admin` -- real server-side RBAC (Phase 7). This page itself is only a
  * UI convenience: every list here comes from an admin API route
@@ -65,6 +89,18 @@ function useAdminList<T>(path: string, active: boolean): FetchState<T> {
 export function AdminPage() {
   const currentUser = useCurrentUser();
   const [tab, setTab] = useState<Tab>('users');
+  const [lightboxShot, setLightboxShot] = useState<ScreenshotRecord | null>(null);
+
+  useEffect(() => {
+    if (!lightboxShot) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setLightboxShot(null);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [lightboxShot]);
 
   const isAdmin = currentUser.status === 'signed-in' && currentUser.user.role === 'admin';
 
@@ -76,6 +112,10 @@ export function AdminPage() {
   const screenshots = useAdminList<ScreenshotRecord>(
     '/api/admin/screenshots',
     isAdmin && tab === 'screenshots',
+  );
+  const screenshotStats = useMemo(
+    () => computeScreenshotStats(screenshots.status === 'ready' ? screenshots.items : []),
+    [screenshots],
   );
 
   if (currentUser.status === 'loading') {
@@ -196,18 +236,89 @@ export function AdminPage() {
         )}
 
         {active.status === 'ready' && active.items.length > 0 && tab === 'screenshots' && (
-          <ul className={styles['list']}>
-            {(screenshots.status === 'ready' ? screenshots.items : []).map((s) => (
-              <li key={s.id} className={styles['listItem']}>
-                <span className={styles['listItemPrimary']}>{s.panoramaId}</span>
-                <span className={styles['listItemMeta']}>
-                  {s.userId ?? 'anonymous'} &middot; {new Date(s.createdAt).toLocaleDateString()}
-                </span>
-              </li>
-            ))}
-          </ul>
+          <>
+            <dl className={styles['screenshotStats']}>
+              <div className={styles['screenshotStat']}>
+                <dt>Total captured</dt>
+                <dd>{screenshotStats.total}</dd>
+              </div>
+              {screenshotStats.perDay.map((day) => (
+                <div key={day.date} className={styles['screenshotStat']}>
+                  <dt>{day.date}</dt>
+                  <dd>{day.count}</dd>
+                </div>
+              ))}
+            </dl>
+            <ul className={styles['screenshotGrid']}>
+              {(screenshots.status === 'ready' ? screenshots.items : []).map((s) => (
+                <li key={s.id} className={styles['screenshotGridItem']}>
+                  <button
+                    type="button"
+                    className={styles['screenshotGridButton']}
+                    onClick={() => {
+                      setLightboxShot(s);
+                    }}
+                  >
+                    <img
+                      src={s.media.url}
+                      alt={`Captured artwork: ${s.panoramaTitle}`}
+                      loading="lazy"
+                    />
+                  </button>
+                  <div className={styles['screenshotGridMeta']}>
+                    <span className={styles['listItemPrimary']}>{s.panoramaTitle}</span>
+                    <span className={styles['listItemMeta']}>
+                      {s.projectId} &middot; {s.template ?? 'no template'} &middot;{' '}
+                      {s.userId ?? 'anonymous'} &middot; {new Date(s.createdAt).toLocaleString()}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </main>
+
+      {lightboxShot && (
+        <div className={styles['lightbox']}>
+          <Scrim
+            onDismiss={() => {
+              setLightboxShot(null);
+            }}
+          />
+          <Panel raised className={styles['lightboxPanel']}>
+            <IconButton
+              label="Close"
+              className={styles['lightboxClose']}
+              onClick={() => {
+                setLightboxShot(null);
+              }}
+            >
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M6 6L18 18M18 6L6 18"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </IconButton>
+            <img
+              className={styles['lightboxImage']}
+              src={lightboxShot.media.url}
+              alt={`Captured artwork: ${lightboxShot.panoramaTitle}`}
+            />
+            <div className={styles['lightboxMeta']}>
+              <p className={styles['lightboxTitle']}>{lightboxShot.panoramaTitle}</p>
+              <p className={styles['lightboxDate']}>
+                {lightboxShot.projectId} &middot; {lightboxShot.template ?? 'no template'} &middot;{' '}
+                {lightboxShot.userId ?? 'anonymous'} &middot;{' '}
+                {new Date(lightboxShot.createdAt).toLocaleString()}
+              </p>
+            </div>
+          </Panel>
+        </div>
+      )}
     </div>
   );
 }

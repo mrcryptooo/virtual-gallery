@@ -224,7 +224,28 @@
   position: relative;
   border-radius: var(--radius-m);
   overflow: hidden;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 9;
+}
+
+.galleryItemButton {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: transform var(--motion-quick) ease;
+}
+
+.galleryItemButton:hover,
+.galleryItemButton:focus-visible {
+  transform: scale(1.03);
+}
+
+.galleryItemButton:focus-visible {
+  outline: 2px solid var(--color-cta-border);
+  outline-offset: 2px;
 }
 
 .galleryItem img {
@@ -236,8 +257,13 @@
 
 .galleryMeta {
   position: absolute;
+  left: var(--space-2);
   right: var(--space-2);
   bottom: var(--space-2);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-s);
   background: var(--color-paper-ink);
@@ -245,6 +271,73 @@
   font-family: var(--font-sans);
   font-size: var(--type-caption-size);
   letter-spacing: 0.02em;
+}
+
+.galleryMetaTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.galleryMetaDate {
+  flex: 0 0 auto;
+  opacity: 0.7;
+}
+
+/* ── Screenshot lightbox ─────────────────────────────────────────────── */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+}
+
+.lightboxPanel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: min(50rem, 100%);
+  max-height: calc(100vh - 2 * var(--space-5));
+  overflow-y: auto;
+}
+
+.lightboxClose {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 2;
+}
+
+.lightboxImage {
+  width: 100%;
+  border-radius: var(--radius-s);
+  display: block;
+}
+
+.lightboxMeta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.lightboxTitle {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+}
+
+.lightboxDate {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--type-caption-size);
+  color: var(--color-paper-ink);
+  opacity: 0.7;
 }
 
 @media (max-width: 640px) {

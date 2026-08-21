@@ -19,13 +19,22 @@ import type {
  * body. Anonymous visitors (no session cookie, or an expired/invalid
  * one) get userId: null exactly as before; signed-in visitors get their
  * real users.id.
+ *
+ * Every capture is composited client-side (base view + one of five
+ * templates) into a fixed 1920x1080 artwork before it's ever uploaded --
+ * width/height are required to be exactly that, not just "some positive
+ * int", so a malformed or tampered request can never persist a record
+ * claiming a size the client-side compositor doesn't actually produce.
  */
 
-const MAX_DIMENSION = 8000; // sanity bound, not a real camera-sensor size
+const REQUIRED_WIDTH = 1920;
+const REQUIRED_HEIGHT = 1080;
+const TEMPLATE_ID_PATTERN = /^template-[1-5]$/;
 
 interface ScreenshotInput {
   projectId?: unknown;
   panoramaId?: unknown;
+  panoramaTitle?: unknown;
   media?: unknown;
   width?: unknown;
   height?: unknown;
@@ -38,9 +47,7 @@ function str(value: unknown, max: number): string {
 }
 
 function isPositiveInt(value: unknown): value is number {
-  return (
-    typeof value === 'number' && Number.isInteger(value) && value > 0 && value <= MAX_DIMENSION
-  );
+  return typeof value === 'number' && Number.isInteger(value) && value > 0 && value <= 8000;
 }
 
 function isScreenshotMedia(value: unknown): value is SubmissionMedia {
@@ -77,15 +84,26 @@ export async function POST(request: Request): Promise<Response> {
 
   const projectId = str(input.projectId, 100);
   const panoramaId = str(input.panoramaId, 100);
+  const panoramaTitle = str(input.panoramaTitle, 100);
 
-  if (!projectId || !panoramaId) {
-    return Response.json({ error: 'Missing project or panorama id.' }, { status: 400 });
+  if (!projectId || !panoramaId || !panoramaTitle) {
+    return Response.json(
+      { error: 'Missing project id, panorama id, or panorama title.' },
+      { status: 400 },
+    );
   }
   if (!isScreenshotMedia(input.media)) {
     return Response.json({ error: 'Missing or malformed media reference.' }, { status: 400 });
   }
-  if (!isPositiveInt(input.width) || !isPositiveInt(input.height)) {
-    return Response.json({ error: 'Missing or invalid image dimensions.' }, { status: 400 });
+  if (input.width !== REQUIRED_WIDTH || input.height !== REQUIRED_HEIGHT) {
+    return Response.json(
+      { error: `Screenshot must be exactly ${String(REQUIRED_WIDTH)}x${String(REQUIRED_HEIGHT)}.` },
+      { status: 400 },
+    );
+  }
+  const template = typeof input.template === 'string' ? input.template : null;
+  if (template !== null && !TEMPLATE_ID_PATTERN.test(template)) {
+    return Response.json({ error: 'Invalid template id.' }, { status: 400 });
   }
 
   const sessionUser = await getSessionUser(request);
@@ -96,10 +114,11 @@ export async function POST(request: Request): Promise<Response> {
     userId: sessionUser?.user.id ?? null,
     projectId,
     panoramaId,
+    panoramaTitle,
     media: input.media,
-    width: input.width,
-    height: input.height,
-    template: typeof input.template === 'string' ? str(input.template, 100) : null,
+    width: REQUIRED_WIDTH,
+    height: REQUIRED_HEIGHT,
+    template,
     viewport: isViewport(input.viewport) ? input.viewport : null,
   };
 
@@ -117,7 +136,17 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
-  notifyAdmin({ type: 'new-screenshot', projectId, panoramaId, id: record.id });
+  notifyAdmin({
+    type: 'new-screenshot',
+    projectId,
+    panoramaId,
+    panoramaTitle,
+    template,
+    id: record.id,
+    createdAt: record.createdAt,
+    mediaUrl: record.media.url,
+    displayName: sessionUser?.user.display_name ?? null,
+  });
 
   return Response.json({ ok: true, id: record.id });
 }
