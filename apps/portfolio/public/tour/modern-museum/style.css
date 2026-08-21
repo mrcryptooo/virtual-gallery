@@ -693,17 +693,114 @@ body.view-control-buttons .viewControlButton {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(200, 165, 96, 0.2);
 }
 
+/* Seismic Museum addition -- Home control. Same dark-glass + gold-accent
+   circular language as the fullscreen/autorotate cluster above and the
+   camera control below, anchored top-left (mirroring that cluster's
+   top-right placement) so the four corners of the frame read as one
+   deliberate control system. */
+.homeButton {
+  position: absolute;
+  z-index: 20;
+  top: 12px;
+  left: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: rgba(17, 17, 18, 0.62);
+  border: 1px solid rgba(200, 165, 96, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: #f4f4f5;
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.mobile .homeButton {
+  top: 10px;
+  left: 10px;
+  width: 44px;
+  height: 44px;
+}
+
+.no-touch .homeButton:hover {
+  border-color: rgba(200, 165, 96, 0.75);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(200, 165, 96, 0.2);
+  transform: translateY(-1px);
+}
+
+.homeButton:active {
+  transform: translateY(0) scale(0.94);
+}
+
+.homeButton:focus-visible {
+  outline: 2px solid #c8a560;
+  outline-offset: 3px;
+}
+
+.homeButton-icon {
+  width: 19px;
+  height: 19px;
+  pointer-events: none;
+}
+
+/* Accessible tooltip: aria-label + title already carry the name for
+   assistive tech and the browser's own fallback; this CSS tooltip is the
+   visual affordance for sighted pointer/keyboard users, matching the
+   dark-glass aesthetic instead of the OS default title tooltip. */
+.homeButton::after {
+  content: "Back to Home";
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: rgba(17, 17, 18, 0.92);
+  color: #f4f4f5;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.no-touch .homeButton:hover::after,
+.homeButton:focus-visible::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .homeButton,
+  .homeButton::after {
+    transition: none;
+  }
+}
+
 /* Seismic Museum addition -- camera / snapshot control. Deliberately not
    styled like the generic Marzipano grey icon buttons above: a refined
    circular glass control echoing the Seismic Museum identity (warm gold
-   accent on dark glass), anchored bottom-right. */
+   accent on dark glass). Anchored to the right edge, vertically centered
+   on the viewport -- a deliberate, responsive `top: 50%` + translateY
+   center rather than a fixed pixel position, so it stays centered at any
+   viewport height instead of drifting on short/tall screens. Every
+   transform below re-states the `translateY(-50%)` centering alongside
+   its own hover/press offset, since `transform` doesn't compose across
+   rules -- omitting it would make the button jump on hover/press. */
 .screenshotButton {
   position: absolute;
   z-index: 20;
-  right: 20px;
-  bottom: 20px;
-  width: 52px;
-  height: 52px;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 64px;
+  height: 64px;
   border-radius: 999px;
   border: 1px solid rgba(200, 165, 96, 0.55);
   background: rgba(17, 17, 18, 0.62);
@@ -721,19 +818,19 @@ body.view-control-buttons .viewControlButton {
 }
 
 .mobile .screenshotButton {
-  width: 56px;
-  height: 56px;
-  right: 16px;
+  width: 68px;
+  height: 68px;
+  right: 18px;
 }
 
-.screenshotButton:hover {
+.no-touch .screenshotButton:hover {
   border-color: rgba(200, 165, 96, 0.9);
   box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(200, 165, 96, 0.25);
-  transform: translateY(-1px);
+  transform: translateY(-50%) translateY(-1px);
 }
 
 .screenshotButton:active {
-  transform: translateY(0) scale(0.94);
+  transform: translateY(-50%) scale(0.94);
 }
 
 .screenshotButton:focus-visible {
@@ -742,8 +839,8 @@ body.view-control-buttons .viewControlButton {
 }
 
 .screenshotButton-icon {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   position: relative;
   z-index: 1;
 }
@@ -803,12 +900,16 @@ body.view-control-buttons .viewControlButton {
   }
 }
 
+/* Sits just below the now vertically-centered camera button, on the same
+   right edge -- not anchored to the button's own box, since its position
+   is computed relative to the button's center + half its height rather
+   than a shared parent, but the two numbers are kept in sync here. */
 .screenshotStatus {
   position: absolute;
   z-index: 20;
-  right: 20px;
-  bottom: 80px;
-  max-width: 240px;
+  right: 24px;
+  top: calc(50% + 44px);
+  max-width: 200px;
   padding: 8px 12px;
   border-radius: 8px;
   background: rgba(17, 17, 18, 0.85);
@@ -822,7 +923,8 @@ body.view-control-buttons .viewControlButton {
 }
 
 .mobile .screenshotStatus {
-  right: 16px;
+  right: 18px;
+  top: calc(50% + 46px);
 }
 
 .screenshotStatus:not(:empty) {
@@ -998,15 +1100,9 @@ body.view-control-buttons .viewControlButton {
   }
 }
 
-/* The camera control and its status toast now live above the navigator
-   instead of at the very bottom edge. */
-.screenshotButton {
-  bottom: calc(var(--scene-nav-h) + 14px + env(safe-area-inset-bottom));
-}
-
-.screenshotStatus {
-  bottom: calc(var(--scene-nav-h) + 74px + env(safe-area-inset-bottom));
-}
+/* The camera control now sits vertically centered on the right edge (see
+   its own rule above), clear of the navigator at any viewport height --
+   no bottom-relative override needed here any more. */
 
 /* ==========================================================================
    Seismic Museum addition -- post-capture preview panel.

@@ -402,6 +402,67 @@ test('"Share on X" opens a text-prefilled web intent that always includes the mu
   await popup.close();
 });
 
+test('the Home button exists, is positioned upper-left, and navigates to the landing page', async ({
+  page,
+}) => {
+  await page.goto('/p/modern-museum');
+  await waitForViewer(page);
+
+  const home = page.locator('#homeButton');
+  await expect(home).toBeVisible();
+  await expect(home).toHaveAttribute('href', '/');
+  await expect(home).toHaveAccessibleName(/back to home/i);
+
+  const box = await home.boundingBox();
+  const viewport = page.viewportSize();
+  if (box === null || viewport === null) {
+    throw new Error('Home button or viewport bounds unavailable');
+  }
+  // "Upper-left area" -- comfortably inside the top-left quadrant, not
+  // pinned to a specific pixel (responsive positioning, per the task).
+  expect(box.x).toBeLessThan(viewport.width * 0.25);
+  expect(box.y).toBeLessThan(viewport.height * 0.25);
+
+  await home.click();
+  await expect(page.getByRole('button', { name: 'Enter the Seismic Museum' })).toBeVisible();
+  expect(new URL(page.url()).pathname).toBe('/');
+});
+
+test('the camera button is larger and vertically centered on the right edge, clear of every other control', async ({
+  page,
+}) => {
+  await page.goto('/p/modern-museum');
+  await waitForViewer(page);
+
+  const camera = page.locator('#screenshotButton');
+  const cameraBox = await camera.boundingBox();
+  const viewport = page.viewportSize();
+  if (cameraBox === null || viewport === null) {
+    throw new Error('Camera button or viewport bounds unavailable');
+  }
+
+  // Larger than the previous 52px baseline.
+  expect(cameraBox.width).toBeGreaterThanOrEqual(60);
+  // Right-anchored.
+  expect(cameraBox.x + cameraBox.width).toBeGreaterThan(viewport.width * 0.8);
+  // Vertically centered: its own center sits within a generous band around
+  // the viewport's vertical midpoint (responsive centering, not a single
+  // pixel value, so this allows for the button's own half-height).
+  const cameraCenterY = cameraBox.y + cameraBox.height / 2;
+  expect(Math.abs(cameraCenterY - viewport.height / 2)).toBeLessThan(viewport.height * 0.15);
+
+  // Clear of the top-right cluster (fullscreen/autorotate) and the bottom
+  // navigator -- no bounding-box overlap with either.
+  const topRightBox = await page.locator('#fullscreenToggle').boundingBox();
+  const navBox = await page.locator('#sceneNavigator').boundingBox();
+  if (topRightBox) {
+    expect(cameraBox.y).toBeGreaterThan(topRightBox.y + topRightBox.height);
+  }
+  if (navBox) {
+    expect(cameraBox.y + cameraBox.height).toBeLessThan(navBox.y);
+  }
+});
+
 for (const vp of VIEWPORTS) {
   test(`tour is usable at ${vp.name}`, async ({ page }) => {
     await page.setViewportSize({ width: vp.width, height: vp.height });
