@@ -684,8 +684,12 @@
         onDone(new Error('Upload is not available in this browser'));
         return;
       }
+      // The prefix must be requested here, not left to the server to add:
+      // @vercel/blob/client's onBeforeGenerateToken callback has no way
+      // to rewrite the path server-side, only to validate/reject the
+      // path the client asked for (see api/screenshot-upload.ts).
       window.VercelBlobClient
-        .upload('museum-screenshot.png', preview.blob, {
+        .upload('screenshots/media/museum-screenshot.png', preview.blob, {
           access: 'public',
           handleUploadUrl: '/api/screenshot-upload'
         })
