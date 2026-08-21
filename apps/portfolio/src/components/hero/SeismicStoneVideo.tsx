@@ -220,6 +220,79 @@ export function SeismicStoneVideo({
     };
   }, []);
 
+  // Back-forward cache (bfcache) resync. Entering the museum is a real
+  // browser navigation (see handleActivate's window.location.assign, and
+  // the Home button's <a href="/">), not client-side routing -- so
+  // returning to / via Back is exactly the scenario browsers restore from
+  // bfcache: the whole JS heap (this component's refs, its still-running
+  // RAF loop) is frozen and resumed as-is, no remount, no effects re-run.
+  // The actual root cause (found by instrumenting a real Playwright
+  // goBack(), not guessed): handleActivate sets activatingRef.current =
+  // true the moment the visitor clicks to enter the museum, and
+  // target/smoothed/displayProgressRef all to 1 (fully open), meaning to
+  // freeze the video for the exit transition -- on a fresh page load this
+  // never matters (a new mount always starts at these refs' initial
+  // values), but bfcache restore resumes the exact same instance, so
+  // activatingRef.current stays permanently true and the RAF loop's
+  // `!activatingRef.current` gate permanently skips video scrubbing --
+  // exactly "frozen until a manual refresh" (a real refresh is the only
+  // thing that re-initializes these refs). `pageshow` with
+  // `event.persisted === true` is the standard signal for bfcache restore
+  // (see web.dev's bfcache guide); on it, put the component back in the
+  // same resting state a fresh mount would have.
+  useEffect(() => {
+    const resync = () => {
+      activatingRef.current = false;
+      targetProgressRef.current = 0;
+      smoothedProgressRef.current = 0;
+      displayProgressRef.current = 0;
+      lastSampleClientRef.current = null;
+      if (navigateTimeout.current !== undefined) {
+        clearTimeout(navigateTimeout.current);
+        navigateTimeout.current = undefined;
+      }
+      metadataReadyRef.current = false;
+      lastFrameAtRef.current = performance.now();
+      lastSetTimeRef.current = -1; // guarantees the next RAF tick's currentTime write isn't skipped by the epsilon check
+      for (const ref of [videoRef, backdropVideoRef]) {
+        const el = ref.current;
+        if (!el) continue;
+        if (el.readyState < 2) {
+          // Decode pipeline genuinely stalled: force the browser to
+          // re-establish it rather than writing currentTime into a dead
+          // element.
+          el.load();
+        }
+        try {
+          el.currentTime = CLOSED_TIME;
+        } catch {
+          // The loadedmetadata handler (registered above, still attached --
+          // this is a resync, not a remount) will set it once ready.
+        }
+      }
+      metadataReadyRef.current = true;
+    };
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) resync();
+    };
+    // visibilitychange as a second signal: some browsers restore a bfcached
+    // page without firing pageshow with persisted=true in every case (or a
+    // visitor switches back via a route other than Back/Forward, e.g. this
+    // component's own Home button target completing a round trip). A
+    // harmless resync if the video was actually fine.
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && activatingRef.current) {
+        resync();
+      }
+    };
+    window.addEventListener('pageshow', onPageShow);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      window.removeEventListener('pageshow', onPageShow);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, []);
+
   // The blurred backdrop is the exact same source, just scaled up and
   // heavily blurred (see .backdropVideo) -- kept in sync below so it always
   // shows the same moment as the sharp foreground. Because it's literally

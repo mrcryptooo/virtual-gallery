@@ -21,6 +21,19 @@
   <h1 class="sceneName"></h1>
 </div>
 
+<!-- Seismic Museum addition: returns to the landing page. A real
+     navigation (plain href, not an SPA route), matching the pattern
+     every other exit from the museum already uses (the scene navigator
+     and camera control never client-side-route either) -- this
+     guarantees a fresh, non-bfcache-restored load of the landing page,
+     which is what its entrance choreography and hero video need. -->
+<a href="/" id="homeButton" class="homeButton" aria-label="Back to Home" title="Back to Home">
+  <svg class="homeButton-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M4 11.5L12 4.5L20 11.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M6.5 9.8V18.5C6.5 19.05 6.95 19.5 7.5 19.5H10.5V15C10.5 14.45 10.95 14 11.5 14H12.5C13.05 14 13.5 14.45 13.5 15V19.5H16.5C17.05 19.5 17.5 19.05 17.5 18.5V9.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</a>
+
 <a href="javascript:void(0)" id="autorotateToggle">
   <img class="icon off" src="img/play.png">
   <img class="icon on" src="img/pause.png">
