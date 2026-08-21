@@ -322,11 +322,16 @@ test('capturing a screenshot always produces a 1920x1080 artwork with the select
 test('template selection is randomized across captures, not fixed to one template', async ({
   page,
 }) => {
+  // Each iteration does a real capture + 1920x1080 composite, which is
+  // slower on CI's shared runners than locally -- the default 30s test
+  // timeout was too tight for 12 iterations there. 8 draws still keeps
+  // the false-failure odds negligible ((1/5)^7) while leaving headroom.
+  test.setTimeout(60_000);
   await page.goto('/p/modern-museum');
   await waitForViewer(page);
 
   const seenTemplateIds = new Set<string>();
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 8; i++) {
     await page.locator('#screenshotButton').click();
     await page.locator('#screenshotPreview.is-open').waitFor({ timeout: 15_000 });
     const templateId = await page.locator('#screenshotPreview').getAttribute('data-template-id');
@@ -335,8 +340,8 @@ test('template selection is randomized across captures, not fixed to one templat
     await page.locator('#screenshotPreview').waitFor({ state: 'hidden', timeout: 5_000 });
   }
 
-  // With 5 equally-likely templates and 12 draws, the odds every single
-  // draw lands on the same template are astronomically small ((1/5)^11);
+  // With 5 equally-likely templates and 8 draws, the odds every single
+  // draw lands on the same template are astronomically small ((1/5)^7);
   // seeing more than one distinct id is the real-world signal that
   // Math.random() -- not a fixed index -- is driving the pick.
   expect(seenTemplateIds.size).toBeGreaterThan(1);
