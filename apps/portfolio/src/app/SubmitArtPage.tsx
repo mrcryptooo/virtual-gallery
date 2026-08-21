@@ -120,7 +120,11 @@ export function SubmitArtPage() {
       try {
         const media: SubmissionMedia[] = [];
         for (const pending of validFiles) {
-          const result = await upload(pending.file.name, pending.file, {
+          // The prefix must be requested here, not left to the server to
+          // add: @vercel/blob/client's onBeforeGenerateToken callback has
+          // no way to rewrite the path server-side, only to validate/reject
+          // the path the client asked for (see api/blob-upload.ts).
+          const result = await upload(`submissions/media/${pending.file.name}`, pending.file, {
             access: 'public',
             handleUploadUrl: '/api/blob-upload',
             onUploadProgress: ({ percentage }) => {
