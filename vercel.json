@@ -4,6 +4,14 @@
   "buildCommand": "pnpm --filter @virtual-gallery/portfolio build",
   "outputDirectory": "apps/portfolio/dist",
   "crons": [{ "path": "/api/cron/daily-summary", "schedule": "0 9 * * *" }],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.seismicmuseum.xyz" }],
+      "destination": "https://seismicmuseum.xyz/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     { "source": "/p/modern-museum", "destination": "/tour/modern-museum/index.html" },
     { "source": "/p/modern-museum/", "destination": "/tour/modern-museum/index.html" },
