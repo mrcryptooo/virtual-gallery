@@ -6,6 +6,12 @@
   "crons": [{ "path": "/api/cron/daily-summary", "schedule": "0 9 * * *" }],
   "redirects": [
     {
+      "source": "/",
+      "has": [{ "type": "host", "value": "www.seismicmuseum.xyz" }],
+      "destination": "https://seismicmuseum.xyz/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "www.seismicmuseum.xyz" }],
       "destination": "https://seismicmuseum.xyz/:path*",
