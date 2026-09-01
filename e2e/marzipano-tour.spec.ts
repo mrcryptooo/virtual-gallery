@@ -319,6 +319,59 @@ test('capturing a screenshot always produces a 1920x1080 artwork with the select
   expect(result.opaquePixelMatches).toBe(true);
 });
 
+test('every one of the 5 templates individually composites into a valid 1920x1080 artwork', async ({
+  page,
+}) => {
+  // The randomized-selection test below proves Math.random() drives the
+  // pick, but relying on random draws to eventually cover all 5 templates
+  // is not a real guarantee every template file is valid -- a single
+  // corrupt/undecodable template could hide behind the other 4 still
+  // getting picked often enough. This test forces each template id in
+  // turn (by stubbing Math.random so pickRandomTemplateId's
+  // `Math.floor(Math.random() * 5) + 1` lands deterministically) and
+  // verifies each one individually produces a correctly-sized,
+  // correctly-aligned composite.
+  const randomStubForId: Record<number, number> = { 1: 0, 2: 0.21, 3: 0.41, 4: 0.61, 5: 0.81 };
+
+  for (const id of [1, 2, 3, 4, 5]) {
+    await page.addInitScript((stub: number) => {
+      Math.random = () => stub;
+    }, randomStubForId[id]);
+    await page.goto('/p/modern-museum');
+    await waitForViewer(page);
+
+    await page.locator('#screenshotButton').click();
+    await page.locator('#screenshotPreview.is-open').waitFor({ timeout: 15_000 });
+
+    const templateId = await page.locator('#screenshotPreview').getAttribute('data-template-id');
+    expect(
+      templateId,
+      `expected template-${String(id)} to be forced via the Math.random stub`,
+    ).toBe(String(id));
+
+    const previewSrc = await page.locator('#screenshotPreviewImage').getAttribute('src');
+    expect(previewSrc, `template-${String(id)} produced no preview image`).toBeTruthy();
+
+    const result = await compareCompositeToTemplate(
+      page,
+      previewSrc as string,
+      `/screenshot-templates/template-${String(id)}.png`,
+    );
+
+    expect(result.compositedWidth, `template-${String(id)} composite width`).toBe(1920);
+    expect(result.compositedHeight, `template-${String(id)} composite height`).toBe(1080);
+    expect(result.templateWidth, `template-${String(id)} source width`).toBe(1920);
+    expect(result.templateHeight, `template-${String(id)} source height`).toBe(1080);
+    expect(result.foundOpaquePixel, `template-${String(id)} has no opaque pixel to sample`).toBe(
+      true,
+    );
+    expect(
+      result.opaquePixelMatches,
+      `template-${String(id)} overlay is misaligned/stretched/cropped`,
+    ).toBe(true);
+  }
+});
+
 test('template selection is randomized across captures, not fixed to one template', async ({
   page,
 }) => {
